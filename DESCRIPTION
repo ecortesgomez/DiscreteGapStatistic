@@ -1,0 +1,23 @@
+Package: DiscreteGapStatistic
+Type: Package
+Title: Discrete Application of clusGap 
+Version: 0.1.0
+Authors@R: c(
+   person("Jeffrey", "Miecznikowski", email="jcm38@buffalo.edu", role = c("aut")),
+   person("Eduardo", "Cortes", email="ecortesg@buffalo.edu", role = c("aut", "cre")) )
+Maintainer: <ecortesg@buffalo.edu>
+Description: Distance-based approach to apply clusGap using categorical/Likert data.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+Imports:
+   cultevo,
+   dplyr, 
+   lsr,  
+   magrittr,
+   utils
+Suggests:
+    cluster,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
