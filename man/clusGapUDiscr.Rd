@@ -9,8 +9,8 @@ clusGapUDiscr(
   x,
   FUNcluster,
   K.max,
-  B = 100,
-  vals = NULL,
+  B = nrow(x),
+  value.range = "DR",
   verbose = interactive(),
   distName = "hamming",
   ...
@@ -24,14 +24,18 @@ This functions returns a list with a component named `cluster`, a vector of leng
 
 \item{K.max}{Maximum number of clusters `k` to consider}
 
-\item{B}{Number of bootstrap samples.}
+\item{B}{Number of bootstrap samples. By default B = nrow(x).}
 
-\item{vals}{String or numerical vector. A vector with all categories to consider when bootstrapping the null distribution sample (FR: Full Range option).
-By DEFAULT vals=NULL, meaning unique range of categories found in the data will be used when drawing the null (DR: Data Range option).}
+\item{value.range}{String, character vector or a list of character vector with the length matching the number of columns (nQ) of the array.
+A vector with all categories to consider when bootstrapping the null distribution sample (FR: Full Range option).
+By DEFAULT vals=NULL, meaning unique range of categories found in the data will be used when drawing the null (DR: Data Range option).
+If a character is provided, these values would be used for the null distribution drawing across the array.
+If a list is provided, it has to have the same number of columns as the input array. The order of list element corresponds to the array's columns.}
 
 \item{verbose}{integer or logical determining whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.}
 
-\item{distName}{Name of categorical distance to apply}
+\item{distName}{Name of categorical distance to apply.
+Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming', 'hellinger',}
 
 \item{...}{optionally further arguments for `FUNcluster()`}
 
