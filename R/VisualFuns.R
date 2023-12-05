@@ -79,7 +79,7 @@ clusGapDiscrMDS <- function(x,
    AssignedCls <- FUNcluster(distancematrix(x, d = distName),
                              k = nCl)$cluster
 
-   distx <- x %>%
+   distData <- x %>%
       distancematrix(d = distName)
    myMDS <- stats::cmdscale(d = distData, eig=TRUE)
 
