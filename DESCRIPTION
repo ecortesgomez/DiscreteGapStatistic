@@ -16,7 +16,8 @@ Imports:
    dplyr, 
    lsr,  
    magrittr,
-   utils
+   utils,
+   ggplot2
 Suggests:
     cluster,
     testthat (>= 3.0.0)

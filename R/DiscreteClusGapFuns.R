@@ -1,32 +1,33 @@
 #' Discrete application of clusGap
 #' Based on the implementation of the function found in the `cluster` R package
-#' @param x categorical/number matrix
+#' @param x Categorical/number matrix
 #' @param FUNcluster a function that accepts as first argument a matrix like `x`; second argument specifies number of `k` (k=>2) clusters
 #' This function returns a list with a component named `cluster`, a vector of length `n=nrow(x)` of integers from `1:k` indicating observation cluster assignment.
-#' @param K.max Maximum number of clusters `k` to consider
+#' @param K.max Integer. Maximum number of clusters `k` to consider
 #' @param value.range String, character vector or a list of character vector with the length matching the number of columns (nQ) of the array.
 #' A vector with all categories to consider when bootstrapping the null distribution sample (FR: Full Range option).
 #' By DEFAULT vals=NULL, meaning unique range of categories found in the data will be used when drawing the null (DR: Data Range option).
 #' If a character vector of categories is provided, these values would be used for the null distribution drawing across the array.
 #' If a list with category character vectors is provided, it has to have the same number of columns as the input array. The order of list element corresponds to the array's columns.
-#' @param integer or logical, determining if “progress” output should be printed. The default prints one bit per bootstrap sample.
-#' @param distName Name of categorical distance to apply.
-#' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming', 'hellinger',
+#' @param verbose Integer or logical. Determines if “progress” output should be printed. The default prints one bit per bootstrap sample.
+#' @param distName String. Name of categorical distance to apply.
+#' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.
 #' @param B Number of bootstrap samples. By default B = nrow(x).
-#' @param verbose integer or logical determining whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.
+#' @param verbose Integer or logical. Determines whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.
 #' @param ... optionally further arguments for `FUNcluster()`
 #'
 #' @return a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.sim",
 #' where gap = E.logW - logW, and SE.sim correspond to the standard error of `gap`.
 #' @export
 
-clusGapUDiscr <- function (x,
-                           FUNcluster,
-                           K.max,
-                           B = nrow(x),
-                           value.range = "DR",
-                           verbose = interactive(),
-                           distName = "hamming", ...){
+## clusGapUDiscr <- function (x,
+clusGapDiscr <- function (x,
+                          FUNcluster,
+                          K.max,
+                          B = nrow(x),
+                          value.range = "DR",
+                          verbose = interactive(),
+                          distName = "hamming", ...){
 
    stopifnot(is.function(FUNcluster),
              length(dim(x)) == 2,
@@ -35,6 +36,7 @@ clusGapUDiscr <- function (x,
              ncol(x) >= 1)
 
    uniLevs <- unique(as.vector(x))
+   uniLevs <- sort(uniLevs)
 
    if (is.numeric(x)) {
       message(paste0("x array is numerical and has ", length(uniLevs),
@@ -134,11 +136,12 @@ clusGapUDiscr <- function (x,
    E.logW <- colMeans(logWks)
    SE.sim <- sqrt((1 + 1/B) * apply(logWks, 2, stats::var))
    structure(class = "clusGap", list(Tab = cbind(logW, E.logW,
-                                                 gap = E.logW - logW, SE.sim), call = cl., n = n, B = B,
+                                                 gap = E.logW - logW, SE.sim),
+                                     call = cl., n = n, B = B,
                                      FUNcluster = FUNcluster))
 }
 
-#' Criteria to determine k
+#' Criteria to determine number of clusters k
 #' @param cG_obj Output object obtained from `clusGapUDiscr`
 #' @param meth Method to use to determine optimal k number of clusters.
 

@@ -10,8 +10,6 @@ dissbhattacharyya(X, na.rm = TRUE)
 \item{X}{Matrix}
 
 \item{na.rm}{Remove NAs default=TRUE}
-
-\item{adj}{Small quantity added to avoid indefinite log(0) values. DEFAULT=0.001}
 }
 \value{
 Distance R object

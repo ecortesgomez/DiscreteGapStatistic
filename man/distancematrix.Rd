@@ -2,7 +2,7 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{distancematrix}
 \alias{distancematrix}
-\title{Function invoking discrete functions}
+\title{Function invoking discrete distance functions}
 \usage{
 distancematrix(X, d, na.rm = TRUE)
 }
@@ -17,7 +17,7 @@ distancematrix(X, d, na.rm = TRUE)
 R distance object
 }
 \description{
-Function invoking discrete functions
+Function invoking discrete distance functions
 }
 \examples{
 # X = rbind(matrix(paste0("a", rpois(7*5, 1)), nrow=5),

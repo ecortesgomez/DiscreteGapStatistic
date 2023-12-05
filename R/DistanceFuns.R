@@ -1,4 +1,4 @@
-#' Function invoking discrete functions
+#' Function invoking discrete distance functions
 #'
 #' @param X Matrix where rows are the observations and columns are discrete features
 #' @param d Name of distance. Distances available: bhattacharyya, chisquare, cramerV, hamming and hellinger
@@ -63,7 +63,6 @@ BhattacharyyaDist <- function(x){
 
 #' Bhattacharyya's wrapper Function
 #' @param X Matrix
-#' @param adj Small quantity added to avoid indefinite log(0) values. DEFAULT=0.001
 #' @param na.rm Remove NAs default=TRUE
 #'
 #' @return Distance R object
