@@ -7,7 +7,7 @@
 findK(cG_obj, meth = "Tibs2001SEmax")
 }
 \arguments{
-\item{cG_obj}{Output object obtained from `clusGapUDiscr`}
+\item{cG_obj}{Output object obtained from `clusGapDiscr`}
 
 \item{meth}{Method to use to determine optimal k number of clusters.}
 }

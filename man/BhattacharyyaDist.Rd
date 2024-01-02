@@ -4,7 +4,7 @@
 \alias{BhattacharyyaDist}
 \title{Bhattacharyya distance core function}
 \usage{
-BhattacharyyaDist(x)
+BhattacharyyaDist(x, adj = 0.01)
 }
 \arguments{
 \item{x}{Matrix}

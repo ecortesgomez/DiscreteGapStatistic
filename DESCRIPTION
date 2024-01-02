@@ -13,11 +13,16 @@ LazyData: true
 RoxygenNote: 7.2.3
 Imports:
    cultevo,
-   dplyr, 
    lsr,  
    magrittr,
    utils,
-   ggplot2
+   ggplot2, 
+   pheatmap, 
+   likert, 
+   dplyr,
+   Polychrome,
+   RColorBrewer,
+   reshape2
 Suggests:
     cluster,
     testthat (>= 3.0.0)

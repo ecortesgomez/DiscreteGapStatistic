@@ -35,6 +35,9 @@ clusGapDiscr <- function (x,
              (n <- nrow(x)) >= 1,
              ncol(x) >= 1)
 
+   if(!is.matrix(x))
+      x <- as.matrix(x)
+
    uniLevs <- unique(as.vector(x))
    uniLevs <- sort(uniLevs)
 
@@ -45,6 +48,7 @@ clusGapDiscr <- function (x,
       message("Array values would be transformed to categorical levels: ")
       myCats <- paste0(paste0(uniLevs, " -> c", uniLevs), collapse = ", ")
       message(myCats)
+      x <- apply(x, 1, function(y) paste0('c', y)) %>% t ## Transformed matrix
    }
    else {
       message(paste0("Found levels: ", paste0(uniLevs, collapse = ", ")))
@@ -52,9 +56,8 @@ clusGapDiscr <- function (x,
 
    if (B != (B. <- as.integer(B)) || (B <- B.) <= 0)
       stop("'B' has to be a positive integer")
-   cl. <- match.call()
-   if (is.data.frame(x))
-      x <- as.matrix(x)
+   cl. <- match.call
+
    ii <- seq_len(n)
 
    W.k <- function(X, kk) {
@@ -90,18 +93,24 @@ clusGapDiscr <- function (x,
       cat("done\n")
 
    if(is.numeric(value.range)){
+      ## If value.range are numeric, turn them into c0, c1, ...
       message('value.range cannot be numerical and will be transformed to characters.')
-      vals <- as.character(value.range)
-   }else if (is.character(value.range) & !is.list(value.range) & value.range[1] ==
-             "DR" & length(value.range) == 1) {
+      vals <- as.character(paste0('c', value.range))
+   }else if (is.character(value.range) &
+             !is.list(value.range) &
+             value.range[1] == "DR" & length(value.range) == 1) {
+      ## Data-Range null option
       vals <- NULL
       rng.x1 <- lapply(1:ncol(x), function(i) unique(x[, i]))
    }
-   else if (all(is.character(value.range)) & !is.list(value.range) &
+   else if (all(is.character(value.range)) &
+            !is.list(value.range) &
             (length(value.range) > 1)) {
+      ## User-defined single range
       vals <- value.range
    }
    else if (!is.character(value.range) & is.list(value.range)) {
+      ## When user defines the value range for each question
       stopifnot(ncol(x) == length(value.range))
       vals <- value.range
    }
@@ -113,17 +122,26 @@ clusGapDiscr <- function (x,
 
    for (b in 1:B) {
       if (is.null(vals)) {
+         ## Data-Range case. Notice that rng.x1 is a list with individual values ranges.
          z <- lapply(rng.x1, function(M, nn) sample(size = nn,
-                                                    x = M, replace = TRUE), nn = n) %>% do.call(what = cbind)
+                                                    x = M,
+                                                    replace = TRUE),
+                     nn = n) %>%
+            do.call(what = cbind)
       }
       else if (!is.list(vals) & length(vals) > 2) {
+         ## User-specified categories as vector.
          z <- matrix(sample(x = vals, size = nrow(x) * ncol(x),
                             replace = TRUE), nrow = nrow(x))
       }
       else if (is.list(vals)) {
+         ## User-defined categories as list (length nQ)
          z <- sapply(1:length(vals), function(i, nn) sample(size = nn,
-                                                            x = vals[[i]], replace = TRUE), nn = n)
+                                                            x = vals[[i]],
+                                                            replace = TRUE),
+                     nn = n)
       }
+
       for (k in 1:K.max) {
          logWks[b, k] <- log(W.k(z, k))
       }
@@ -142,13 +160,16 @@ clusGapDiscr <- function (x,
 }
 
 #' Criteria to determine number of clusters k
-#' @param cG_obj Output object obtained from `clusGapUDiscr`
+#' @import dplyr
+#' @param cG_obj Output object obtained from `clusGapDiscr`
 #' @param meth Method to use to determine optimal k number of clusters.
+#' @export
 
 findK <- function (cG_obj, meth = "Tibs2001SEmax"){
+   logW <- gap <- SE.sim <- NULL
    if (!meth %in% c("minSE", "minGap", "maxChange")) {
 
-      ## Removing infinite quantity due to log
+      ## Tibs2001 SEmax criterion
       myTab <- data.frame(cG_obj$Tab) %>%
          mutate(nClus = 1:nrow(cG_obj$Tab) ) %>%
          subset(is.finite(logW) & !is.na(gap) & !is.na(SE.sim))

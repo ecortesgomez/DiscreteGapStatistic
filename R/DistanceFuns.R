@@ -33,8 +33,7 @@ distancematrix <- function (X, d, na.rm=TRUE){
 #'
 #' @return Distance R object
 #' @export
-BhattacharyyaDist <- function(x){
-    adj <- 0.01
+BhattacharyyaDist <- function(x, adj = 0.01){
     nRow <- nrow(x)
     myP <- ncol(x)
     compInd <- lapply(sort(unique(as.vector(x))),
