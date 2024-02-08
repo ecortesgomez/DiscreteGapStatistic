@@ -18,11 +18,12 @@ Imports:
    utils,
    ggplot2, 
    pheatmap, 
-   likert, 
    dplyr,
    Polychrome,
    RColorBrewer,
-   reshape2
+   reshape2,
+   likert,
+   ComplexHeatmap
 Suggests:
     cluster,
     testthat (>= 3.0.0)

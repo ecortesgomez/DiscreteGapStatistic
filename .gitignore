@@ -8,3 +8,6 @@ hello.R
 .DS_Store
 .quarto
 DiscreteClusGapFuns0.R
+SideTest_DiscreteGapStatistic.R
+TestVisualFuns.R
+TestVisualFuns_Leg.R

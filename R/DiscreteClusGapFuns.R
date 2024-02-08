@@ -20,7 +20,6 @@
 #' where gap = E.logW - logW, and SE.sim correspond to the standard error of `gap`.
 #' @export
 
-## clusGapUDiscr <- function (x,
 clusGapDiscr <- function (x,
                           FUNcluster,
                           K.max,

@@ -40,28 +40,18 @@ likert.heat.plot2 <- function(x,
    results <- melt(likertOut$results, id.vars = "Item")
    results$variable <- as.character(results$variable)
    results$label <- paste(format(results$value,
-                                digits = 2,
-                                drop0trailing = FALSE),
-                         "%", sep = "")
-   tmp <- data.frame(Item = lsum$Item,
-                    variable = rep("Mean (SD)",
-                                   nrow(lsum)),
-                    value = rep(-100, nrow(lsum)),
-                    label = paste(format(lsum$mean,
-                                         digits = 3, drop0trailing = FALSE),
-                                  " (", format(lsum$sd,
-                                               digits = 2, drop0trailing = FALSE), ")", sep = ""),
-                    stringsAsFactors = FALSE)
-   results <- rbind(tmp, results)
-   results$Item <- factor(x = results$Item, levels = lsum$Item %>% rev)
+                                 digits = 2,
+                                 drop0trailing = FALSE),
+                          "%", sep = "")
+   results$Item <- factor(x = results$Item,
+                          levels = lsum$Item %>% rev)
 
    p <- ggplot(results,
-              aes(x = Item,
-                  y = variable,
-                  fill = value,
-                  label = label)) +
-      scale_y_discrete(limits = c("Mean (SD)",
-                                  names(likertOut$results)[2:ncol(likertOut$results)])) +
+               aes(x = Item,
+                   y = variable,
+                   fill = value,
+                   label = label)) +
+      scale_y_discrete(limits = names(likertOut$results)[2:ncol(likertOut$results)]) +
       geom_tile() +
       geom_text(size = text.size, colour = text.color) +
       coord_flip() +
@@ -116,7 +106,7 @@ distanceHeat <- function(x,
 
 }
 
-#' Clustergram/heatmap assuming a given number of clusters.
+#' Heatmap assuming a given a distance function and a known number of clusters.
 #' Function to display a categorical data matrix given a user defined number of clusters `nCl`, a categorical distance `distName` and a predefined clustering method `FUNcluster`.
 #' The output displays a heatmap separating and color-labelling resulting clusters vertically in the rows and allowing unsupervised clustering on questions in the columns. Each cell is colored according to the categorical values provided or found in the data.
 #' The clustergram is based on the `pheatmap` function from the pheatmap R package. Thus, any parameter found in pheatmap can be specified to `clusGapDiscrHeat`.
@@ -126,76 +116,123 @@ distanceHeat <- function(x,
 #' @import Polychrome
 #' @import RColorBrewer
 #' @param x matrix object or data.frame
-#' @param nCl number of clusters to plot
+#' @param nCl number of clusters to plot; if `nCl` is a vector, its length lN is the number of clusters, with values ranging from 1 to lN in desired order to place the clusters.
 #' @param distName Name of categorical distance to apply.
-#' @param ... other valid arguments in pheatmap function
 #' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.
+#' @param catVals character string vector with (ordered) categorical values
 #' @param FUNcluster a function that accepts as first argument a matrix like `x`; second argument specifies number of `k` (k=>2) clusters
 #' This function returns a list with a component named `cluster`, a vector of length `n=nrow(x)` of integers from `1:k` indicating observation cluster assignment.
-#' @param catVals All categorical values to consider for the plot. In the case `x` is a character matrix, the vector should specify category-number mapping. If `NULL` the function will extract all unique categorical values in `x` and assign numbers to them alphabetically.
-#' @return pheatmap output.
+#' @param out Specifies the desired output between "heatmap" (default; produce a heatmap), "clusters" (return a `data.frame` with clustering assignments) or "clustersReord" (return a `data.frame` with reorganized clusters)
+#' @param clusterNames Either `null` or 'renumber'. When `nCl` the cluster ordering is rearranged. `NULL` leaves cluster names as their original cluster assignment. 'renumber' respects the rearrangements but relabels the cluster numbers from top to bottom in ascending order.
+#' @param prefObs character string vector of length 1 with a prefix for the observations, in case they come unlabelled or the user wants to anomymize sample IDs
+#' @param filename character string with name of file output
+#' @param outDir character string with the directory path to save output file
+#' @param height numeric height of output plot in inches
+#' @param height numeric width of output plot in inches
+#' @return png file or ComplexHeatmap object
 #' @export
-clusGapDiscrHeat <- function(x,
-                       FUNcluster,
+ResHeatmap <- function(x,
                        nCl,
                        distName,
-                       catVals=NULL,
-                       ...){
+                       catVals,
+                       FUNcluster = cluster::pam,
+                       out = 'heatmap',
+                       clusterNames = NULL,
+                       prefObs = NULL,
+                       filename = NULL,
+                       outDir = NULL,
+                       height = 10, width = 6){
+   ## To Do: specify option where the input data is plotted without any cluster rearrangement
 
-   Clust <- rowNames <- NULL
-   x0 <- x
+   if(length(nCl) > 1){
+      clOrd <- nCl
+      nCl <- length(nCl)
+   }else{
+      clOrd <- NULL
+   }
+
    if(!is.matrix(x))
       x <- as.matrix(x)
 
-   myUniq <- as.vector(x) %>% unique %>% sort
-
-   if(is.character(myUniq)){
-      if(is.null(catVals) ){
-         catVals <- stats::setNames(0:(length(myUniq)-1), myUniq)
-      }else{
-        stopifnot(exprs = length(myUniq) == length(catVals))
-      }
-
-      # rownames(x) <- paste0('s', 1:nrow(x))
-      xNum <- catVals[x] %>% matrix(byrow=FALSE, nrow = nrow(x), ncol=ncol(x) )
-      rownames(xNum) <- rownames(x)
-      x <- xNum
-
-      message('Since pheatmap can only generate plots from numerical matrices, ')
-      message('categories in the matrix will be transformed to numerical values:')
-      message(paste0(names(catVals), ' -> ', catVals, collapse = ', '))
+   if(nCl > 0){
+      AssignedCls <- FUNcluster(x = distancematrix(x, d = distName),
+                                k = nCl)$cluster
+   }else{
+      AssignedCls <- rep(0, nrow(x))
    }
 
-   AssignedCls <- FUNcluster(distancematrix(x, d = distName),
-                      k = nCl)$cluster
+   if(!is.null(prefObs))
+      row.names(data) <- paste0(prefObs, 1:nrow(x))
 
-   x <- data.frame(rowNames = row.names(x),
-                   Clust = paste0('Cl', AssignedCls),
-                   x,
-                   check.names = FALSE) %>%
-      dplyr::arrange(Clust, rowNames)
-   x$rowNames <- c()
-   rGaps <- with(x, table(Clust)) %>% as.vector
+   ## Notice that data is reorganized according to clusters!
+   data <- data.frame(rowNames = row.names(x),
+                      Clust = AssignedCls,
+                      x,
+                      check.names=FALSE) %>%
+      arrange(Clust, rowNames)
 
-   if(length(rGaps) > 1 )
-      rGaps <- rGaps[1:(length(rGaps)-1)] %>% cumsum
-   else
-      rGaps <- NULL
+   if(out == 'clusters')
+      return(data[, 1:2])
 
-   clusCols = list(Clust = stats::setNames(nm=paste0('Cl', 1:nCl),
-                                    object = Polychrome::palette36.colors()[1:nCl]))
+   if(!is.null(clOrd)){
+      ## Alter cluster ordering
+      data$Clust <- clOrd[data$Clust]
 
-   myColors = stats::setNames(brewer.pal(n = length(catVals),
-                              name = 'Greens'),
-                              catVals)
-   pheatmap(mat = x[, -1],
-            color = myColors,
-            border.color=NULL,
-            cluster_rows=FALSE,
-            annotation_colors = clusCols,
-            annotation_row = subset(x, select = 'Clust'),
-            gaps_row = rGaps,
-            ...)
+      if(!is.null(clusterNames)){
+         if(clusterNames == 'renumber'){
+            data <- data %>% arrange(Clust, rowNames)
+            ClustRun <- rle(data$Clust)$lengths
+            data$Clust <- rep(1:length(ClustRun), ClustRun)
+         }
+      }
+   }
+
+   if(out == 'clustersReord')
+      return(data[, 1:2])
+
+   ## Tones of green
+   myCols = stats::setNames(object = RColorBrewer::brewer.pal(n = length(catVals),
+                                                              name = 'Greens'),
+                            nm = catVals)
+   myColsCH <- structure(myCols, names = names(myCols))
+
+   rowSplit <- subset(data, select = 'Clust')
+   rowTitle <- paste0('Cluster ', unique(data$Clust))
+
+   if(!is.null(outDir) & !is.null(filename) ){
+      grDevices::png(paste0(outDir, '/', filename,'.png'),
+                     width = width, height = height, units = 'in', res=500)
+
+      hmObj <- ComplexHeatmap::Heatmap(mat = data[, -c(1:2)],
+                                       col = myCols,
+                                       name = ' ',
+                                       show_row_names = FALSE,
+                                       # left_annotation = rowAnn,
+                                       show_heatmap_legend=c(TRUE) ,
+                                       # row_split = data[, 'Clust'],
+                                       row_split = rowSplit,
+                                       row_title = rowTitle)
+      ComplexHeatmap::draw(hmObj,
+                           column_title = paste0("DiscreteClusGap Assignments\n", distName),
+                           column_title_gp = grid::gpar(fontsize = 12, fontface = "bold"),
+                           show_annotation_legend=FALSE)
+      grDevices::dev.off()
+
+   }else{
+      hmObj <-  ComplexHeatmap::Heatmap(mat = data[, -c(1:2)],
+                                        col = myCols,
+                                        name = ' ',
+                                        show_row_names = FALSE,
+                                        ## left_annotation = rowAnn,
+                                        ## row_split = data[, 'Clust'],
+                                        row_split = rowSplit,
+                                        show_heatmap_legend=c(TRUE) ,
+                                        row_title = ' ')
+      ComplexHeatmap::draw(hmObj,
+                           column_title = paste0("DiscreteClusGap Assignments\n", distName),
+                           column_title_gp = grid::gpar(fontsize = 12, fontface = "bold"),
+                           show_annotation_legend=FALSE)
+   }
 }
 
 #' Multidimensional scaling plot for categorical data.

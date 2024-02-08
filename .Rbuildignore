@@ -1,4 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
-DiscreteClusGapFuns0.R
+^DiscreteClusGapFuns0.R$
+^SideTest_DiscreteGapStatistic.R$
+^TestVisualFuns.R$
+^TestVisualFuns_Leg.R$
