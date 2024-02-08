@@ -5,8 +5,8 @@
 #' This function returns a list with a component named `cluster`, a vector of length `n=nrow(x)` of integers from `1:k` indicating observation cluster assignment.
 #' @param K.max Integer. Maximum number of clusters `k` to consider
 #' @param value.range String, character vector or a list of character vector with the length matching the number of columns (nQ) of the array.
-#' A vector with all categories to consider when bootstrapping the null distribution sample (FR: Full Range option).
-#' By DEFAULT vals=NULL, meaning unique range of categories found in the data will be used when drawing the null (DR: Data Range option).
+#' A vector with all categories to consider when bootstrapping the null distribution sample (KS: Known Support option).
+#' By DEFAULT vals=NULL, meaning unique range of categories found in the data will be used when drawing the null (DS: Data Support option).
 #' If a character vector of categories is provided, these values would be used for the null distribution drawing across the array.
 #' If a list with category character vectors is provided, it has to have the same number of columns as the input array. The order of list element corresponds to the array's columns.
 #' @param verbose Integer or logical. Determines if “progress” output should be printed. The default prints one bit per bootstrap sample.
@@ -24,7 +24,7 @@ clusGapDiscr <- function (x,
                           FUNcluster,
                           K.max,
                           B = nrow(x),
-                          value.range = "DR",
+                          value.range = "DS",
                           verbose = interactive(),
                           distName = "hamming", ...){
 
@@ -97,8 +97,8 @@ clusGapDiscr <- function (x,
       vals <- as.character(paste0('c', value.range))
    }else if (is.character(value.range) &
              !is.list(value.range) &
-             value.range[1] == "DR" & length(value.range) == 1) {
-      ## Data-Range null option
+             value.range[1] == "DS" & length(value.range) == 1) {
+      ## Data-Support null option
       vals <- NULL
       rng.x1 <- lapply(1:ncol(x), function(i) unique(x[, i]))
    }
@@ -121,7 +121,7 @@ clusGapDiscr <- function (x,
 
    for (b in 1:B) {
       if (is.null(vals)) {
-         ## Data-Range case. Notice that rng.x1 is a list with individual values ranges.
+         ## Data-Support case. Notice that rng.x1 is a list with individual values ranges.
          z <- lapply(rng.x1, function(M, nn) sample(size = nn,
                                                     x = M,
                                                     replace = TRUE),
@@ -129,7 +129,7 @@ clusGapDiscr <- function (x,
             do.call(what = cbind)
       }
       else if (!is.list(vals) & length(vals) > 2) {
-         ## User-specified categories as vector.
+         ## KS: Known-Support User-specified categories as vector.
          z <- matrix(sample(x = vals, size = nrow(x) * ncol(x),
                             replace = TRUE), nrow = nrow(x))
       }
