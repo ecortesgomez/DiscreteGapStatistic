@@ -38,6 +38,8 @@ This function returns a list with a component named `cluster`, a vector of lengt
 
 \item{out}{Specifies the desired output between "heatmap" (default; produce a heatmap), "clusters" (return a `data.frame` with clustering assignments) or "clustersReord" (return a `data.frame` with reorganized clusters)}
 
+\item{clusterNames}{Either `null` or 'renumber'. When `nCl` the cluster ordering is rearranged. `NULL` leaves cluster names as their original cluster assignment. 'renumber' respects the rearrangements but relabels the cluster numbers from top to bottom in ascending order.}
+
 \item{prefObs}{character string vector of length 1 with a prefix for the observations, in case they come unlabelled or the user wants to anomymize sample IDs}
 
 \item{filename}{character string with name of file output}

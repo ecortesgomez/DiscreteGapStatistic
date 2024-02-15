@@ -7,7 +7,13 @@ Exploratory tool that helps to visualize/cluster blocks of observations across c
 This plot is aimed to guide the `DiscreteClusGap` user to give an idea which type of categorical distance would accommodate better to the inputted data.
 `sample2sampleHeat` is based on the `pheatmap` function from the `pheatmap` R package. Thus, any parameter found in pheatmap can be specified to `sample2sampleHeat`.}
 \usage{
-distanceHeat(x, distName, clustering_method = "complete", ...)
+distanceHeat(
+  x,
+  distName,
+  clustering_method = "complete",
+  border_color = NA,
+  ...
+)
 }
 \arguments{
 \item{x}{matrix object or data.frame}
@@ -15,6 +21,8 @@ distanceHeat(x, distName, clustering_method = "complete", ...)
 \item{distName}{Name of categorical distance to apply.}
 
 \item{clustering_method}{string; clustering method used by pheatmap}
+
+\item{border_color}{string; color cell borders. By default, border_color = NA, where no border colors are shown.}
 
 \item{...}{other valid arguments in pheatmap function
 Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.}

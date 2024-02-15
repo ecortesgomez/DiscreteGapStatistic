@@ -78,11 +78,13 @@ likert.heat.plot2 <- function(x,
 #' @param ... other valid arguments in pheatmap function
 #' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.
 #' @param clustering_method string; clustering method used by pheatmap
+#' @param border_color string; color cell borders. By default, border_color = NA, where no border colors are shown.
 #' @return clustered heatmap
 #' @export
 distanceHeat <- function(x,
                         distName,
                         clustering_method = 'complete',
+                        border_color = NA,
                         ...){
    x0 <- x
    if(!is.matrix(x))
@@ -100,7 +102,7 @@ distanceHeat <- function(x,
                       clustering_distance_rows = myDist,
                       clustering_distance_cols = myDist,
                       clustering_method = clustering_method,
-                      border_color=NA,
+                      border_color = border_color,
                       treeheight_row=0,
                       ...)
 
@@ -116,19 +118,20 @@ distanceHeat <- function(x,
 #' @import Polychrome
 #' @import RColorBrewer
 #' @param x matrix object or data.frame
-#' @param nCl number of clusters to plot; if `nCl` is a vector, its length lN is the number of clusters, with values ranging from 1 to lN in desired order to place the clusters.
+#' @param nCl number of clusters to plot; if `nCl` is a permutation vector of the first lN integers will rearrange clusters according to the original given ordering.
 #' @param distName Name of categorical distance to apply.
 #' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.
 #' @param catVals character string vector with (ordered) categorical values
 #' @param FUNcluster a function that accepts as first argument a matrix like `x`; second argument specifies number of `k` (k=>2) clusters
 #' This function returns a list with a component named `cluster`, a vector of length `n=nrow(x)` of integers from `1:k` indicating observation cluster assignment.
 #' @param out Specifies the desired output between "heatmap" (default; produce a heatmap), "clusters" (return a `data.frame` with clustering assignments) or "clustersReord" (return a `data.frame` with reorganized clusters)
-#' @param clusterNames Either `null` or 'renumber'. When `nCl` the cluster ordering is rearranged. `NULL` leaves cluster names as their original cluster assignment. 'renumber' respects the rearrangements but relabels the cluster numbers from top to bottom in ascending order.
-#' @param prefObs character string vector of length 1 with a prefix for the observations, in case they come unlabelled or the user wants to anomymize sample IDs
+#' @param clusterNames Either `null` or 'renumber'. When `nCl` is a numerical vector, the cluster ordering is rearranged. `NULL` leaves cluster names as their original cluster assignment. 'renumber' respects the rearrangements but relabels the cluster numbers from top to bottom in ascending order.
+#' @param prefObs character string vector of length 1 with a prefix for the observations, in case they come unlabelled or the user wants to anomymize sample IDs.
+#' @param rowNames character vector with names of rows according to `x`. By default, `rownames(x)` will be printed in the plot. `rowNames=NULL` prevents from showing names. `prefObs` option takes precedence if is different to `NULL`.
 #' @param filename character string with name of file output
 #' @param outDir character string with the directory path to save output file
 #' @param height numeric height of output plot in inches
-#' @param height numeric width of output plot in inches
+#' @param width numeric width of output plot in inches
 #' @return png file or ComplexHeatmap object
 #' @export
 ResHeatmap <- function(x,
@@ -139,10 +142,12 @@ ResHeatmap <- function(x,
                        out = 'heatmap',
                        clusterNames = NULL,
                        prefObs = NULL,
+                       rowNames = rownames(x),
                        filename = NULL,
                        outDir = NULL,
                        height = 10, width = 6){
    ## To Do: specify option where the input data is plotted without any cluster rearrangement
+   ## To Do: Specify arbitrary cluster labels.
 
    if(length(nCl) > 1){
       clOrd <- nCl
@@ -161,9 +166,18 @@ ResHeatmap <- function(x,
       AssignedCls <- rep(0, nrow(x))
    }
 
-   if(!is.null(prefObs))
+   if(!is.null(prefObs)){
       row.names(data) <- paste0(prefObs, 1:nrow(x))
-
+      rownames(x) <- paste0(prefObs, 1:nrow(x))
+      showRownames <- TRUE
+   }else{
+      if(is.null(rowNames)){
+         showRownames <- FALSE
+      }else{
+         showRownames <- TRUE
+         rownames(x) <- rowNames
+      }
+   }
    ## Notice that data is reorganized according to clusters!
    data <- data.frame(rowNames = row.names(x),
                       Clust = AssignedCls,
@@ -206,10 +220,9 @@ ResHeatmap <- function(x,
       hmObj <- ComplexHeatmap::Heatmap(mat = data[, -c(1:2)],
                                        col = myCols,
                                        name = ' ',
-                                       show_row_names = FALSE,
-                                       # left_annotation = rowAnn,
+                                       show_row_names = showRownames,
+                                       # row_labels = rowNames,
                                        show_heatmap_legend=c(TRUE) ,
-                                       # row_split = data[, 'Clust'],
                                        row_split = rowSplit,
                                        row_title = rowTitle)
       ComplexHeatmap::draw(hmObj,
@@ -222,12 +235,13 @@ ResHeatmap <- function(x,
       hmObj <-  ComplexHeatmap::Heatmap(mat = data[, -c(1:2)],
                                         col = myCols,
                                         name = ' ',
-                                        show_row_names = FALSE,
-                                        ## left_annotation = rowAnn,
-                                        ## row_split = data[, 'Clust'],
+                                        show_row_names = showRownames,
+                                        # row_labels = rowNames,
                                         row_split = rowSplit,
                                         show_heatmap_legend=c(TRUE) ,
-                                        row_title = ' ')
+                                        row_title = ' ',
+                                        heatmap_width = unit(width, "in"),
+                                        heatmap_height = unit(height, "in"))
       ComplexHeatmap::draw(hmObj,
                            column_title = paste0("DiscreteClusGap Assignments\n", distName),
                            column_title_gp = grid::gpar(fontsize = 12, fontface = "bold"),

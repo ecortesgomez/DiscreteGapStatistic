@@ -10,7 +10,7 @@ clusGapDiscr(
   FUNcluster,
   K.max,
   B = nrow(x),
-  value.range = "DR",
+  value.range = "DS",
   verbose = interactive(),
   distName = "hamming",
   ...
@@ -27,8 +27,8 @@ This function returns a list with a component named `cluster`, a vector of lengt
 \item{B}{Number of bootstrap samples. By default B = nrow(x).}
 
 \item{value.range}{String, character vector or a list of character vector with the length matching the number of columns (nQ) of the array.
-A vector with all categories to consider when bootstrapping the null distribution sample (FR: Full Range option).
-By DEFAULT vals=NULL, meaning unique range of categories found in the data will be used when drawing the null (DR: Data Range option).
+A vector with all categories to consider when bootstrapping the null distribution sample (KS: Known Support option).
+By DEFAULT vals=NULL, meaning unique range of categories found in the data will be used when drawing the null (DS: Data Support option).
 If a character vector of categories is provided, these values would be used for the null distribution drawing across the array.
 If a list with category character vectors is provided, it has to have the same number of columns as the input array. The order of list element corresponds to the array's columns.}
 
