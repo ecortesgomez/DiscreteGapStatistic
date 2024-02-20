@@ -21,7 +21,7 @@ Here we introduce:
 - The main features of the `DiscreteGapStatistic` package via a simple data example.
 - Two plots to summarize and visualize Likert or multivariate categorical data.
 - Explain basic usage of the `clusGapDiscr` function.
-- Perform simulations that (a) reproduce one of the scenarios found in the publication and (b) explore the cluster-selection proportion given a dataset. These can help to extend usage of the present tool.
+- Perform simulations that (a) reproduce one of the scenarios found in the publication and (b) explore the cluster-selection proportion given a dataset. These exercises are intended to help extend this tool's usage.
 
 # Installation
 
@@ -40,7 +40,7 @@ library('dplyr')
 
 # Preliminaries
 
-The MathAnxiety data is loaded from the `likert` package. After doing some light formatting a `data.frame` object is obtained called `massData`. The items are shortened into meaningful words that identify them. Notice that the categories are not transformed to numerical values, but are abbreviated for downstream plotting purposes. Category ordering is preserved using the factor function. 
+The MathAnxiety data is loaded from the `likert` package. After doing some light formatting a `data.frame` object is obtained called `massData`. The possible categories are 'Strongly Disagree', 'Disagree', 'Neutral' , 'Agree', 'Strongly Agree'. Notice that the categories are not transformed to numerical values, but are abbreviated downstream for plotting purposes to DS, D, N, A, SA. Category ordering is preserved using the factor function. 
 
 ```{r LoadLibs, echo=TRUE, eval=FALSE}
 ## Load useful libraries
@@ -86,7 +86,7 @@ rownames(massData) <- c(paste0('F', 1:2), paste0('M', 1),
 ## head(massData)
 ```
 
-# Summarizationation and Data Exploration
+# Summarization and Data Exploration
 
 Visual preliminary functions are introduced to explore the data before running the main function. 
 
@@ -105,18 +105,18 @@ likert.heat.plot2(massData[, -1],
 
 ## Distance matrices
 
-$5$ distance functions are introduced to measure dissimilarities between two categorical vectors (see function `distancematrix`). The following table describes the available distances and the names used within the package.
+In ___ five categorical distance functions are introduced to quantify dissimilarities/discrepancies between two categorical vectors (see function `distancematrix`). The following table describes the available distances and the names used within the package.
 
 ```{r Distances, fig.align = 'center', echo=FALSE}
 data.frame(Distance = c('Hamming', 'chi-square', "Cramer's V", "Hellinger", 'Bhattacharyya'), 
-           name = c('hamming', 'chisquare', 'cramerV', 'hellinger', 'bhattacharyya')) %>%
+           Name = c('hamming', 'chisquare', 'cramerV', 'hellinger', 'bhattacharyya')) %>%
    kbl() %>%
    kable_paper(full_width = FALSE) %>%
    column_spec(column = 1, border_left = TRUE) %>%
    column_spec(column = 2, monospace = TRUE, border_left = TRUE, border_right=TRUE)
 ```
 
-The resulting distance matrix from rectangular datasets can easily be displayed and organized using heatmaps. The following plots visualize the Math Anxiety dataset using the defined distances using the function `distanceHeat`. This function only requires the dataset object and the name of the distance. It can also take advantage of the options and functionalities available in the `pheatmap` function (see the code below). For instance, by default, the columns are clustered using `clustering_method = 'complete'` but this parameter can be specified according to `pheatmap`'s options. Different options are explored in the plots below using the different functions introduced. The clusters obtained here might not necessarily reflect the ones obtained from `clusGapDiscr`. 
+The resulting distance matrix from rectangular datasets can easily be displayed and organized using heatmaps. The following plots visualize the Math Anxiety dataset using the defined distances using the function `distanceHeat`. This function only requires the dataset object and the name of the distance. It can also take advantage of the options and functionalities available in the `pheatmap` function (see the code below). For instance, by default, the columns are clustered using `clustering_method = 'complete'` but this parameter can be specified according to `pheatmap`'s options. Different options are explored in the plots below using the different functions introduced. The clusters obtained here might not necessarily reflect the ones obtained using `clusGapDiscr`. 
 
 ```{r DistanceMats1, out.width=330, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
 distanceHeat(x = massData[, -1], distName = 'hamming',
@@ -124,24 +124,28 @@ distanceHeat(x = massData[, -1], distName = 'hamming',
 
 distanceHeat(x = massData[, -1], distName = 'cramerV',
              main = "Cramer's V Distance\nMath Anxiety Data", fontsize = 6.5, 
-             show_rownames = FALSE)
+             show_rownames = FALSE, cluster_rows = FALSE, cluster_cols=FALSE)
 ```
 
 ```{r DistanceMats2, out.width=330, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
 distanceHeat(x = massData[, -1], distName = 'hellinger',
              main = 'Hellinger Distance\nMath Anxiety Data', fontsize = 6.5, 
-             clustering_method = 'single', show_rownames = FALSE, border_color = 'black')
+             show_rownames = TRUE, border_color = 'black', 
+             , cluster_rows = FALSE, cluster_cols=FALSE)
 
 distanceHeat(x = massData[, -1], distName = 'bhattacharyya',
              main = 'Bhattacharyya Distance\nMath Anxiety Data', fontsize = 6.5, 
-             clustering_method = 'centroid', show_rownames = FALSE, border_color = 'lightgrey')
+              show_rownames = TRUE, border_color = 'lightgrey', 
+             , cluster_rows = FALSE, cluster_cols=FALSE)
 ```
 
+<!--
 ```{r DistanceMats3, out.width=350, dpi=500, echo=TRUE, results='hold', fig.show="hold", fig.align = 'center'}
 distanceHeat(x = massData[, -1], distName = 'chisquare',
              main = 'Chi-square Distance\nMath Anxiety Data', fontsize = 7, 
              cutree_cols = 2)
-```
+``` 
+-->
 
 # `clusGapDiscr`: The Gap Statistic for discrete data
 
@@ -170,6 +174,7 @@ clusGapDiscr(x, FUNcluster, K.max, B = nrow(x),
 - `value.range`: specifies the values of the reference null distribution. Possible values: `'DS'` or a character vector with unique values. `'DS'` option extracts the unique values found in `x`. 
 
 Similar to `clusGap`, `clusGapDiscr` returns a matrix object with `K.max` rows corresponding to the user-specified number of clusters with an estimate of the GS and its corresponding standard error. This information would then determine the number of clusters according to the cluster-selection criterion. The one used in `DiscreteGapStatistic` is the 1-SE criterion implemented by the function `findK`, which accepts `clusGap` objects. The following example applies the dGS on the Math Anxiety data using the Hamming, $\chi^2$, and Cramer's V distances applying the `cluster::pam` algorithm. A plot is then generated displaying the GS against the number of clusters. Each estimate is accompanied by respective standard-error bars and a blue indicating the chosen number of clusters.  
+
 ```{r clusGapDiscrFit, echo=TRUE, eval=FALSE}
 ## Recall Cats:
 # Cats <- setNames(object = c('SD', 'D', 'N', 'A', 'SA'),
@@ -281,38 +286,39 @@ ResHeatmap(massData[, -1],
 include_graphics(paste0('./HM_MathAnxiety_', c('Hamm', 'chisq', 'crV'), '.png'), dpi = 500)
 ```
 
-```{r resHeatMapsPlot, echo=FALSE, eval=TRUE, out.width=215, dpi=500, message=FALSE, warning=FALSE}
+```{r resHeatMapsRun, echo=FALSE, eval=TRUE, out.width=215, dpi=500, message=FALSE, warning=FALSE}
 
-ResHeatmap(massData[, -1],
-           distName = 'hamming',
-           catVals = Cats,
-           nCl = findK(HammRun),
-           out = 'heatmap',
-           filename = 'HM_MathAnxiety_Hamm',
-           outDir = './')
+# ResHeatmap(massData[, -1],
+#            distName = 'hamming',
+#            catVals = Cats,
+#            nCl = findK(HammRun),
+#            out = 'heatmap',
+#            filename = 'HM_MathAnxiety_Hamm',
+#            outDir = './')
+# 
+# ResHeatmap(massData[, -1],
+#            distName = 'chisquare',
+#            catVals = Cats,
+#            nCl = findK(chisqRun),
+#            out = 'heatmap',
+#            filename = 'HM_MathAnxiety_chisq',
+#            outDir = './')
+# 
+# ResHeatmap(massData[, -1],
+#            distName = 'cramerV',
+#            catVals = Cats,
+#            nCl = findK(crVRun),
+#            out = 'heatmap',
+#            filename = 'HM_MathAnxiety_crV',
+#            outDir = './')
 
-ResHeatmap(massData[, -1],
-           distName = 'chisquare',
-           catVals = Cats,
-           nCl = findK(chisqRun),
-           out = 'heatmap',
-           filename = 'HM_MathAnxiety_chisq',
-           outDir = './')
-
-ResHeatmap(massData[, -1],
-           distName = 'cramerV',
-           catVals = Cats,
-           nCl = findK(crVRun),
-           out = 'heatmap',
-           filename = 'HM_MathAnxiety_crV',
-           outDir = './')
-
-include_graphics(paste0('./HM_MathAnxiety_', c('Hamm', 'chisq', 'crV'), '.png'), dpi = 500)
+include_graphics(paste0('./HM_MathAnxiety_', c('Hamm', 'chisq', 'crV'), '.png'), 
+                 dpi = 500)
 ```
 
-Notice that Hamming distance detects subclusters present in Cluster 2 from the $\chi^2$ distance run. To compare the similar clusters side-to-side, the parameter `nCl` can be used to reorder the clusters relative to the given ordering. This case `nCl = 2:1` will alter the order of the two clusters on the $\chi^2$ based cluster. A third heatmap is displayed relabeling the clusters from the $\chi^2$ run using the `clusterNames = 'renumber'` argument.
+Notice that Hamming distance detects subclusters present in Cluster 2 from the $\chi^2$ distance run. To compare the similar clusters side-to-side, the parameter `nCl` can be used to reorder the clusters relative to the given ordering. This case `nCl = 2:1` will alter (invert) the order of the two clusters on the $\chi^2$ based cluster. A third heatmap is displayed relabeling the clusters from the $\chi^2$ run using the `clusterNames = 'renumber'` argument.
 
-```{r resHeatMapsPlot2, echo=FALSE, eval=TRUE, out.width=215, dpi=500, message=FALSE, warning=FALSE}
+```{r resHeatMaps2, echo=TRUE, eval=FALSE, out.width=215, dpi=500, message=FALSE, warning=FALSE, error=FALSE}
 
 ResHeatmap(massData[, -1],
            distName = 'hamming',
@@ -338,10 +344,157 @@ ResHeatmap(massData[, -1],
            out = 'heatmap',
            filename = 'HM_MathAnxiety_chisq_Mod2',
            outDir = './')
+
 include_graphics(paste0('./HM_MathAnxiety_', c('Hamm', 'chisq_Mod1', 'chisq_Mod2'), '.png'), 
                  dpi = 500)
 ```
 
 
-- Replicate a scenario from the paper
-- Running a simulation based on the profiles extracted from the data.
+```{r resHeatMaps2Run, echo=FALSE, eval=TRUE, out.width=215, dpi=500, message=FALSE, warning=FALSE, error=FALSE}
+
+# ResHeatmap(massData[, -1],
+#            distName = 'hamming',
+#            catVals = Cats,
+#            nCl = findK(HammRun),
+#            out = 'heatmap',
+#            filename = 'HM_MathAnxiety_Hamm',
+#            outDir = './')
+# 
+# ResHeatmap(massData[, -1],
+#            distName = 'chisquare',
+#            catVals = Cats,
+#            nCl = 2:1,
+#            out = 'heatmap',
+#            filename = 'HM_MathAnxiety_chisq_Mod1',
+#            outDir = './')
+# 
+# ResHeatmap(massData[, -1],
+#            distName = 'chisquare',
+#            catVals = Cats,
+#            nCl = 2:1,
+#            clusterNames = 'renumber',
+#            out = 'heatmap',
+#            filename = 'HM_MathAnxiety_chisq_Mod2',
+#            outDir = './')
+
+include_graphics(paste0('./HM_MathAnxiety_', c('Hamm', 'chisq_Mod1', 'chisq_Mod2'), '.png'), 
+                 dpi = 500)
+```
+
+# Two simulation exercises
+
+## Evaluating a simple simulation scenario
+
+This example reproduces results from the simulation study found in ___ .
+For this simplified setting, the group responses are determined by different multinomial probability vectors across questions. The simulation scenario is described as two different clusters generated by $\boldsymbol{\pi}_1$ and $\boldsymbol{\pi}_2$, $n_r = 50$, $q = 10$ for the $\chi^2$ and Bhattacharyya distances using the $DS$ null mode. Here both groups have highest densities concentrated in $c0$, but group1's support is limited to $c0$, $c1$ and $c2$, whereas, group2 spreads from categories $c0$ to $c6$. $100$ Monte Carlo repetitions are performed. The following code configures the scenarios.
+
+```{r SettingUpSim1, echo=TRUE, eval=TRUE, dpi=500, message=FALSE, warning=FALSE}
+## Define pi1 and pi2 vectors
+pi1 <- setNames(c(0.8, 0.1, 0.1, 0, 0, 0, 0), paste0('c', 0:6))
+pi2 <- setNames(c(0.4, 0.2, 0.2, 0.05, 0.05, 0.05, 0.05), paste0('c', 0:6))
+
+## Number of Monte-Carlo repetitions
+nMC <- 100
+
+## Build data.frame with both scenarios.
+scenL <- list(Bhatt = list(SimN=1, nGr= 2, nQ=10, nr = 30, dist = 'bhattacharyya',
+                    nullDistr = 'DS', maxK = 9 ), 
+              Chisq = list(SimN=2, nGr= 2, nQ=10, nr = 30, dist = 'chisquare', 
+                    nullDistr = 'DS', maxK = 9 ))
+```
+
+The following code first performs the Monte Carlo simulations, retrieves results and plots them using stacked bars. The simulation piece first generates data using the native `SimData` function requiring `N`  number of observations, `nQ` number of questions and a probability vector. Then `clusGapDiscr` function is called using the parameters above. The result would a be `list` with the chosen number of clusters for each replication. A `data.frame` formats the results to be displayed via `ggplot2`.
+
+```{r Sim1, echo=TRUE, eval=FALSE}
+library(parallel)
+## detectCores()
+## nThr <- 10 ## Select number of threads available
+
+SimBhatt <- mclapply(1:nMC,
+                  function(ii){
+                           SimDat <- rbind(with(scenL$Bhatt,
+                                                SimData(N = nr, nQ = nQ, pi = pi1)), 
+                                           with(scenL$Bhatt,
+                                                SimData(N = nr, nQ = nQ, pi = pi2)))
+                           
+                           cGres <- clusGapDiscr(x = SimDat,
+                                                  FUNcluster = cluster::pam,
+                                                  K.max = scenL$Bhatt['maxK'] %>% as.integer,
+                                                  value.range = scenL$Bhatt['nullDistr'] %>% 
+                                                    as.character,
+                                                  distName = scenL$Bhatt['dist'])
+
+                           try(findK(cG_obj = cGres))
+                       },
+                       mc.cores = nThr)
+
+SimChisq <- mclapply(1:nMC,
+                  function(ii){
+                           SimDat <- rbind(with(scenL$Chisq,
+                                                SimData(N = nr, nQ = nQ, pi = pi1)), 
+                                           with(scenL$Chisq,
+                                                SimData(N = nr, nQ = nQ, pi = pi2)))
+                           
+                           cGres <- clusGapDiscr(x = SimDat,
+                                                  FUNcluster = cluster::pam,
+                                                  K.max = scenL$Chisq['maxK'] %>% as.integer,
+                                                  value.range = scenL$Chisq['nullDistr'] %>% 
+                                                    as.character,
+                                                  distName = scenL$Chisq['dist'])
+
+                           try(findK(cG_obj = cGres))
+                       },
+                       mc.cores = nThr)
+
+resSim <- rbind(SimBhatt %>% unlist %>% table %>% data.frame %>%
+                     mutate(dist = 'Bhattacharyya'), 
+               SimChisq %>% unlist %>% table %>% data.frame %>%
+                     mutate(dist = 'Chisquare')) %>%
+      dplyr::rename(c(nClust = '.')) %>%
+      mutate(nClust = as.integer(nClust)) %>%
+      mutate(nClust = ifelse(nClust > 4 , '>4', nClust) %>%
+                     factor(levels = c(1:4, '>4') %>% rev), 
+             Freq = Freq/100)
+   
+fillCols <- setNames(c('grey80', 'firebrick', 'grey70', 'grey50', 'grey40'), c(1:4, '>4'))
+
+ggplot(resSim, aes(x=dist, y=Freq, fill = nClust)) +
+   geom_bar(stat = 'identity')+
+   scale_fill_manual(values = fillCols) +
+   theme_bw() +
+   labs(title = 'Simulation Results (100 repetitions)\n', 
+        x = 'Categorical Distance', y = 'Probability', 
+        fill = 'nClust') +
+   theme(legend.position = 'bottom')
+```
+
+```{r Sim1Run, echo=FALSE, eval=TRUE, fig.align='center', out.width=400, dpi=500}
+## save(SimBhatt, SimChisq,
+load('./QuickSimRun.RData')
+
+resSim <- rbind(SimBhatt %>% unlist %>% table %>% data.frame %>%
+                     mutate(dist = 'Bhattacharyya'), 
+               SimChisq %>% unlist %>% table %>% data.frame %>%
+                     mutate(dist = 'Chisquare')) %>%
+      dplyr::rename(c(nClust = '.')) %>%
+      mutate(nClust = as.integer(nClust)) %>%
+      mutate(nClust = ifelse(nClust > 4 , '>4', nClust) %>%
+                     factor(levels = c(1:4, '>4') %>% rev), 
+             Freq = Freq/100)
+   
+fillCols <- setNames(c('grey80', 'firebrick', 'grey70', 'grey50', 'grey40'), c(1:4, '>4'))
+
+ggplot(resSim, aes(x=dist, y=Freq, fill = nClust)) +
+   geom_bar(stat = 'identity', width = 0.7)+
+   scale_fill_manual(values = fillCols) +
+   theme_bw() +
+   labs(title = 'Simulation Results', 
+        x = 'Categorical Distance', y = 'Probability', 
+        fill = 'nClust') 
+```
+
+
+The stacked-bar plot summarizes the results of the simulations. The red color highlights correct number of cluster choices, while different tones of grey indicate the wrong choices. Here the two distances perform similarly, except the case where $\chi^2$ distance does not underestimate number of clusters compared to the Bhattacharyya distance, choosing 1-group cluster $7%$ of the time.
+
+
+## Simulating a real dataset
