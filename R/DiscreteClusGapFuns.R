@@ -135,9 +135,10 @@ clusGapDiscr <- function (x,
       }
       else if (is.list(vals)) {
          ## User-defined categories as list (length nQ)
-         z <- sapply(1:length(vals), function(i, nn) sample(size = nn,
-                                                            x = vals[[i]],
-                                                            replace = TRUE),
+         z <- sapply(1:length(vals),
+                     function(i, nn) sample(size = nn,
+                                            x = vals[[i]],
+                                            replace = TRUE),
                      nn = n)
       }
 

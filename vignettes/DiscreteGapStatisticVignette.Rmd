@@ -161,7 +161,7 @@ clusGap(x, FUNcluster, K.max, B = 100,
 - `K.max`: maximum number of clusters to consider.  
 - `B`: integer indicating the number of times to perform the Montecarlo repetitions. 
 
-The discrete GS (dGS) proposed applies and adapts the principle behind the original formulation, but for categorical data using a distance-based approach. The GS assumes that the distance between observations can be correctly described with the Euclidean distance, since assumes the data is continuous. In the case of categorical data, this distance assumption is not appropriate and a different kind of distances need to be defined. `clusGapDiscr` is the main function that performs and implements the dGS. The first four parameters found in `clusGap` are identical and have the same usage to the ones found in `clusGapDiscr`. Additionally, the function requires a categorical distance from the list mentioned above. Another feature of the dGS is the reference null distribution used, which can be a discrete uniform distribution of the categories found in the data; this setting is defined the Data Support (DS). In other settings, the categories to be used must be user-specified via a character vector or list. This setting will be referred as the Known Support (KS). 
+The discrete GS (dGS) proposed applies and adapts the principle behind the original formulation, but for categorical data using a distance-based approach. The GS assumes that the distance between observations can be correctly described with the Euclidean distance, since assumes the data is continuous. In the case of categorical data, this distance assumption is not appropriate and a different kind of distances need to be defined. `clusGapDiscr` is the main function that performs and implements the dGS. The first four parameters found in `clusGap` are identical and have the same usage to the ones found in `clusGapDiscr`. Additionally, the function requires a categorical distance from the list mentioned above. Another feature of the dGS is the reference null distribution used, which can be a discrete uniform distribution of the unique column-wise categories found in the data; this setting is defined as the Data Support (DS). In other settings, the categories to be used must be user-specified via a character vector or list. This setting will be referred as the Known Support (KS). 
 
 ```{r clusGapDiscr, echo=TRUE, eval=FALSE}
 clusGapDiscr(x, FUNcluster, K.max, B = nrow(x),
@@ -493,8 +493,37 @@ ggplot(resSim, aes(x=dist, y=Freq, fill = nClust)) +
         fill = 'nClust') 
 ```
 
-
 The stacked-bar plot summarizes the results of the simulations. The red color highlights correct number of cluster choices, while different tones of grey indicate the wrong choices. Here the two distances perform similarly, except the case where $\chi^2$ distance does not underestimate number of clusters compared to the Bhattacharyya distance, choosing 1-group cluster $7%$ of the time.
 
 
 ## Simulating a real dataset
+
+Notice that the likert heatmap from the Math Anxiety data displayed above contains fairly different question-wise probability profiles. For instance, for Q3 only three categories have non-zero probabilities. Consolidating these question profiles can help to model and simulate datasets with similar profiles and examine then number of clusters chosen running a Monte Carlo simulation. For this particular task the `likert` function from the `likert` package helps to summarize the question probability profiles.   
+
+```{r Sim2Run, echo=FALSE, eval=FALSE, fig.align='center', out.width=400, dpi=500}
+massDataLikert <- massData[, -1] %>%
+      apply(2, as.character) %>%
+      data.frame(check.names=FALSE) %>%
+      mutate_if(is.character, function(x) factor(x, levels = Cats))
+
+## str(auxLikert)
+auxLikert <- likert::likert(massDataLikert)
+piList <- apply(auxLikert$results[, -1], 1, function(x) x/100, simplify=FALSE) 
+names(piList) <- auxLikert$results[, 'Item']
+
+# massDataSim <- SimData(20, nQ = length(piList), pi = piList)
+# head(massDataSim)
+
+Sim2Chisq <- mclapply(1:nMC,
+                  function(ii){
+                           massDataSim <- SimData(20, nQ = length(piList), pi = piList)                  
+                           cGres <- clusGapDiscr(x = massDataSim,
+                                                  FUNcluster = cluster::pam,
+                                                  K.max = 9,
+                                                  value.range = 'DS',
+                                                  distName = 'chisquare')
+                           try(findK(cG_obj = cGres))
+                       },
+                       mc.cores = nThr)
+
+```
