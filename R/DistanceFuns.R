@@ -135,12 +135,16 @@ disschisquare  <-  function (X, na.rm = TRUE) {
 #'
 #' @return numerical value
 #' @export
+
 cramersVmod <- function(x, y){
-    if(length(unique(x)) == 1 | length(unique(y)) == 1)
-        0
-    else
-        lsr::cramersV(x, y)
+   if(length(unique(x)) == 1 | length(unique(y)) == 1 )
+      return(0)
+   else if(all(is.na(x)) | all(is.na(y)))
+      return(NA)
+   else
+      lsr::cramersV(x, y)
 }
+
 
 #' Cramer's V core function
 #' @param X matrix

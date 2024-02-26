@@ -3,6 +3,7 @@ title: "DiscreteGapStatistic"
 author: "Eduardo Cortes, Jeffrey Miecznikowski"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
+bibliography: mybib.bib
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -21,7 +22,7 @@ Here we introduce:
 - The main features of the `DiscreteGapStatistic` package via a simple data example.
 - Two plots to summarize and visualize Likert or multivariate categorical data.
 - Explain basic usage of the `clusGapDiscr` function.
-- Perform simulations that (a) reproduce one of the scenarios found in the publication and (b) explore the cluster-selection proportion given a dataset. These exercises are intended to help extend this tool's usage.
+- Perform simulation experiment that reproducing one of the scenarios found in [@cortes2024Discrete]. These exercise is intended to help extend this tool's usage.
 
 # Installation
 
@@ -40,7 +41,7 @@ library('dplyr')
 
 # Preliminaries
 
-The MathAnxiety data is loaded from the `likert` package. After doing some light formatting a `data.frame` object is obtained called `massData`. The possible categories are 'Strongly Disagree', 'Disagree', 'Neutral' , 'Agree', 'Strongly Agree'. Notice that the categories are not transformed to numerical values, but are abbreviated downstream for plotting purposes to DS, D, N, A, SA. Category ordering is preserved using the factor function. 
+The MathAnxiety dataset can be found in the `likert` package [@speerschneider2013likert]. After loading the dataset, some light formatting is done to produce a `data.frame` called `massData`. The possible categories are 'Strongly Disagree', 'Disagree', 'Neutral' , 'Agree', 'Strongly Agree'. Notice that the categories are not transformed to numerical values, but are abbreviated for plotting purposes to DS, D, N, A, SA. Category ordering is preserved using the `factor` function. 
 
 ```{r LoadLibs, echo=TRUE, eval=FALSE}
 ## Load useful libraries
@@ -90,9 +91,9 @@ rownames(massData) <- c(paste0('F', 1:2), paste0('M', 1),
 
 Visual preliminary functions are introduced to explore the data before running the main function. 
 
-## Likert Heatmap
+## Likert Heatmap {#LikertHeat}
 
-The first function is an adaptation of the `likert.heatmap` found in the `likert` R package. `likert.heat.plot2` has the same arguments as the original function, but has an additional parameter, `allLevels`, where category order is specified in a vector. Another difference in this function is the output. Since the original function numerically codifies categories, mean and variance statistics are produced at the left-hand side of the plot. These statistics are not present in plots produced by `likert.heat.plot2`.
+The first function used is an adaptation of the `likert.heatmap` found in the `likert` R package. `likert.heat.plot2` has the same arguments as the original function, but has an additional parameter, `allLevels`, where category order is specified as a character vector. Another difference in this function is the output. Since the original function numerically codifies categories, mean and variance statistics are produced at the left-hand side of the plot. These statistics will not be present in plots produced by `likert.heat.plot2`.
 
 ```{r LikertHeat,  out.width=600, dpi=500, fig.retina=NULL, echo=TRUE, fig.align = 'center'}
 likert.heat.plot2(massData[, -1],
@@ -105,7 +106,7 @@ likert.heat.plot2(massData[, -1],
 
 ## Distance matrices
 
-In ___ five categorical distance functions are introduced to quantify dissimilarities/discrepancies between two categorical vectors (see function `distancematrix`). The following table describes the available distances and the names used within the package.
+In [@cortes2024Discrete] five categorical distance functions are introduced to quantify dissimilarities/discrepancies between two categorical vectors (see function `distancematrix`). The following table describes the available distances and the names used within the package.
 
 ```{r Distances, fig.align = 'center', echo=FALSE}
 data.frame(Distance = c('Hamming', 'chi-square', "Cramer's V", "Hellinger", 'Bhattacharyya'), 
@@ -116,7 +117,7 @@ data.frame(Distance = c('Hamming', 'chi-square', "Cramer's V", "Hellinger", 'Bha
    column_spec(column = 2, monospace = TRUE, border_left = TRUE, border_right=TRUE)
 ```
 
-The resulting distance matrix from rectangular datasets can easily be displayed and organized using heatmaps. The following plots visualize the Math Anxiety dataset using the defined distances using the function `distanceHeat`. This function only requires the dataset object and the name of the distance. It can also take advantage of the options and functionalities available in the `pheatmap` function (see the code below). For instance, by default, the columns are clustered using `clustering_method = 'complete'` but this parameter can be specified according to `pheatmap`'s options. Different options are explored in the plots below using the different functions introduced. The clusters obtained here might not necessarily reflect the ones obtained using `clusGapDiscr`. 
+The resulting distance matrix from a rectangular dataset can easily be displayed and organized using heatmaps. The following plots visualize the `massData` using the defined distances with the function `distanceHeat`. This function only requires the dataset object and the name of the distance. It can also take advantage of the options and functionalities available in the `pheatmap` function (see the code below) from the `pheatmap` R package [@kolde2019]. For instance, by default, the columns are clustered using `clustering_method = 'complete'` but this parameter can be specified according to `pheatmap`'s options. Different aesthetic options are exemplified in the plots below using the introduced distances. 
 
 ```{r DistanceMats1, out.width=330, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
 distanceHeat(x = massData[, -1], distName = 'hamming',
@@ -147,9 +148,9 @@ distanceHeat(x = massData[, -1], distName = 'chisquare',
 ``` 
 -->
 
-# `clusGapDiscr`: The Gap Statistic for discrete data
+# `clusGapDiscr`: The Gap Statistic for discrete data {#chiclust}
 
-The Gap Statistic (GS) in its original formulation aims to determine an optimal number of clusters given a rectangular dataset with continuous columns and a pre-specified clustering method given $k$ number of clusters (i.e. $k$-means clustering, partitioning around medoids (pam)). This is done by comparing the within-cluster dispersion of the data to a randomly generated reference null distribution of the data obtaining estimations via bootstrapping. The idea is to quantify whether the clustering structure observed in the data is considerably different compared to what would be expected by random chance. `clusGap` is a widely used implementation of the GS from the `cluster` package with the following basic arguments:
+The Gap Statistic (GS) in its original formulation by [@tibshirani2001estimating] aims to determine an optimal number of clusters given a rectangular dataset with continuous columns and a pre-specified clustering method given $k$ number of clusters (i.e. $k$-means clustering or partitioning around medoids (pam)). This is done by comparing the within-cluster dispersion of the data to a randomly generated reference null distribution of the data obtaining estimations via bootstrapping. The idea is to quantify whether the clustering structure observed in the data is considerably different compared to what would be expected by random chance. `clusGap` is a widely used implementation of the GS from the `cluster` package [@maechler2023cluster] with the following basic arguments:
 
 ```{r clusGap, echo=TRUE, eval=FALSE}
 clusGap(x, FUNcluster, K.max, B = 100, 
@@ -161,7 +162,7 @@ clusGap(x, FUNcluster, K.max, B = 100,
 - `K.max`: maximum number of clusters to consider.  
 - `B`: integer indicating the number of times to perform the Montecarlo repetitions. 
 
-The discrete GS (dGS) proposed applies and adapts the principle behind the original formulation, but for categorical data using a distance-based approach. The GS assumes that the distance between observations can be correctly described with the Euclidean distance, since assumes the data is continuous. In the case of categorical data, this distance assumption is not appropriate and a different kind of distances need to be defined. `clusGapDiscr` is the main function that performs and implements the dGS. The first four parameters found in `clusGap` are identical and have the same usage to the ones found in `clusGapDiscr`. Additionally, the function requires a categorical distance from the list mentioned above. Another feature of the dGS is the reference null distribution used, which can be a discrete uniform distribution of the unique column-wise categories found in the data; this setting is defined as the Data Support (DS). In other settings, the categories to be used must be user-specified via a character vector or list. This setting will be referred as the Known Support (KS). 
+The discrete GS (dGS) proposed applies and adapts the principle behind the original formulation, but for categorical data using a distance-based approach. The GS assumes that the distance between observations can be correctly described with the Euclidean distance, since it assumes the data is continuous. In the case of categorical data, this distance assumption is not appropriate and different class of distances needs to be defined. `clusGapDiscr` is the main function that performs and implements the dGS. The first four parameters found in `clusGap` are identical and have the same usage to the ones found in `clusGapDiscr`. Additionally, the function requires a categorical distance from the list mentioned above. Another feature of the dGS is the reference null distribution used, which can be a discrete uniform distribution of the unique column-wise categories found in the data; this setting is defined as the Data Support (DS). In other settings, the categories to be used must be user-specified via a character vector or list. This setting will be referred as the Known Support (KS). 
 
 ```{r clusGapDiscr, echo=TRUE, eval=FALSE}
 clusGapDiscr(x, FUNcluster, K.max, B = nrow(x),
@@ -173,7 +174,7 @@ clusGapDiscr(x, FUNcluster, K.max, B = nrow(x),
 
 - `value.range`: specifies the values of the reference null distribution. Possible values: `'DS'` or a character vector with unique values. `'DS'` option extracts the unique values found in `x`. 
 
-Similar to `clusGap`, `clusGapDiscr` returns a matrix object with `K.max` rows corresponding to the user-specified number of clusters with an estimate of the GS and its corresponding standard error. This information would then determine the number of clusters according to the cluster-selection criterion. The one used in `DiscreteGapStatistic` is the 1-SE criterion implemented by the function `findK`, which accepts `clusGap` objects. The following example applies the dGS on the Math Anxiety data using the Hamming, $\chi^2$, and Cramer's V distances applying the `cluster::pam` algorithm. A plot is then generated displaying the GS against the number of clusters. Each estimate is accompanied by respective standard-error bars and a blue indicating the chosen number of clusters.  
+Similar to `clusGap`, `clusGapDiscr` returns a matrix object with `K.max` rows corresponding to the user-specified number of clusters with an estimate of the GS and its corresponding standard error. This information would then determine the number of clusters according to the cluster-selection criterion. The one used in `DiscreteGapStatistic` is the 1-SE criterion implemented by the function `findK`, which accepts `clusGap` objects. The following example applies the dGS on the Math Anxiety data using the Hamming, $\chi^2$, and Cramer's V distances applying the `cluster::pam` algorithm. A plot is then generated displaying the GS against the number of clusters. Each estimate is accompanied by a respective standard-error bars and a blue dashed line indicating the chosen number of clusters.  
 
 ```{r clusGapDiscrFit, echo=TRUE, eval=FALSE}
 ## Recall Cats:
@@ -381,12 +382,10 @@ include_graphics(paste0('./HM_MathAnxiety_', c('Hamm', 'chisq_Mod1', 'chisq_Mod2
                  dpi = 500)
 ```
 
-# Two simulation exercises
+# Evaluating a simple simulation scenario
 
-## Evaluating a simple simulation scenario
-
-This example reproduces results from the simulation study found in ___ .
-For this simplified setting, the group responses are determined by different multinomial probability vectors across questions. The simulation scenario is described as two different clusters generated by $\boldsymbol{\pi}_1$ and $\boldsymbol{\pi}_2$, $n_r = 50$, $q = 10$ for the $\chi^2$ and Bhattacharyya distances using the $DS$ null mode. Here both groups have highest densities concentrated in $c0$, but group1's support is limited to $c0$, $c1$ and $c2$, whereas, group2 spreads from categories $c0$ to $c6$. $100$ Monte Carlo repetitions are performed. The following code configures the scenarios.
+This example reproduces results from the simulation study found in [@cortes2024Discrete] .
+For this simplified setting, the group responses are determined by different multinomial probability vectors across questions. The simulation scenario is described as two different clusters generated by $\boldsymbol{\pi}_1$ and $\boldsymbol{\pi}_2$, $n_r = 50$, $q = 10$ for the $\chi^2$ and Bhattacharyya distances using the $DS$ null mode. Here both groups have highest densities concentrated in $c0$, but group1's support is limited to $c0$, $c1$ and $c2$, whereas, group2 spreads from categories $c0$ to $c6$. $100$ Monte Carlo repetitions are performed here. The following code configures the scenarios.
 
 ```{r SettingUpSim1, echo=TRUE, eval=TRUE, dpi=500, message=FALSE, warning=FALSE}
 ## Define pi1 and pi2 vectors
@@ -403,7 +402,7 @@ scenL <- list(Bhatt = list(SimN=1, nGr= 2, nQ=10, nr = 30, dist = 'bhattacharyya
                     nullDistr = 'DS', maxK = 9 ))
 ```
 
-The following code first performs the Monte Carlo simulations, retrieves results and plots them using stacked bars. The simulation piece first generates data using the native `SimData` function requiring `N`  number of observations, `nQ` number of questions and a probability vector. Then `clusGapDiscr` function is called using the parameters above. The result would a be `list` with the chosen number of clusters for each replication. A `data.frame` formats the results to be displayed via `ggplot2`.
+The following code first performs the Monte Carlo simulations, retrieves results and plots them using stacked bars. The first piece of code generates data using the internal `SimData` function requiring `N` number of observations, `nQ` number of questions and a probability vector. Then `clusGapDiscr` function is called using the parameters defined above. The result would a be a `list` with the chosen number of clusters for each repetition. A `data.frame` formats the results to be displayed via `ggplot2`.
 
 ```{r Sim1, echo=TRUE, eval=FALSE}
 library(parallel)
@@ -459,13 +458,12 @@ resSim <- rbind(SimBhatt %>% unlist %>% table %>% data.frame %>%
 fillCols <- setNames(c('grey80', 'firebrick', 'grey70', 'grey50', 'grey40'), c(1:4, '>4'))
 
 ggplot(resSim, aes(x=dist, y=Freq, fill = nClust)) +
-   geom_bar(stat = 'identity')+
+   geom_bar(stat = 'identity', width = 0.7)+
    scale_fill_manual(values = fillCols) +
    theme_bw() +
-   labs(title = 'Simulation Results (100 repetitions)\n', 
+   labs(title = 'Simulation Results', 
         x = 'Categorical Distance', y = 'Probability', 
-        fill = 'nClust') +
-   theme(legend.position = 'bottom')
+        fill = 'nClust')
 ```
 
 ```{r Sim1Run, echo=FALSE, eval=TRUE, fig.align='center', out.width=400, dpi=500}
@@ -493,37 +491,7 @@ ggplot(resSim, aes(x=dist, y=Freq, fill = nClust)) +
         fill = 'nClust') 
 ```
 
-The stacked-bar plot summarizes the results of the simulations. The red color highlights correct number of cluster choices, while different tones of grey indicate the wrong choices. Here the two distances perform similarly, except the case where $\chi^2$ distance does not underestimate number of clusters compared to the Bhattacharyya distance, choosing 1-group cluster $7%$ of the time.
+The stacked-bar plot summarizes the results of the simulations. The red color highlights correct number of cluster choices, while different tones of grey indicate the wrong choices. Here the two distances perform similarly, except the case where $\chi^2$ distance does not underestimate number of clusters compared to the Bhattacharyya distance, choosing one cluster ($k=1$) $7\%$ of the time.
 
 
-## Simulating a real dataset
-
-Notice that the likert heatmap from the Math Anxiety data displayed above contains fairly different question-wise probability profiles. For instance, for Q3 only three categories have non-zero probabilities. Consolidating these question profiles can help to model and simulate datasets with similar profiles and examine then number of clusters chosen running a Monte Carlo simulation. For this particular task the `likert` function from the `likert` package helps to summarize the question probability profiles.   
-
-```{r Sim2Run, echo=FALSE, eval=FALSE, fig.align='center', out.width=400, dpi=500}
-massDataLikert <- massData[, -1] %>%
-      apply(2, as.character) %>%
-      data.frame(check.names=FALSE) %>%
-      mutate_if(is.character, function(x) factor(x, levels = Cats))
-
-## str(auxLikert)
-auxLikert <- likert::likert(massDataLikert)
-piList <- apply(auxLikert$results[, -1], 1, function(x) x/100, simplify=FALSE) 
-names(piList) <- auxLikert$results[, 'Item']
-
-# massDataSim <- SimData(20, nQ = length(piList), pi = piList)
-# head(massDataSim)
-
-Sim2Chisq <- mclapply(1:nMC,
-                  function(ii){
-                           massDataSim <- SimData(20, nQ = length(piList), pi = piList)                  
-                           cGres <- clusGapDiscr(x = massDataSim,
-                                                  FUNcluster = cluster::pam,
-                                                  K.max = 9,
-                                                  value.range = 'DS',
-                                                  distName = 'chisquare')
-                           try(findK(cG_obj = cGres))
-                       },
-                       mc.cores = nThr)
-
-```
+# References
