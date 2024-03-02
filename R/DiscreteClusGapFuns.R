@@ -14,6 +14,7 @@
 #' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.
 #' @param B Number of bootstrap samples. By default B = nrow(x).
 #' @param verbose Integer or logical. Determines whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.
+#' @param useLog Logical. Use log function after estimating `W.k`. Following the original formulation `useLog=TRUE` by default.
 #' @param ... optionally further arguments for `FUNcluster()`
 #'
 #' @return a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.sim",
@@ -26,7 +27,9 @@ clusGapDiscr <- function (x,
                           B = nrow(x),
                           value.range = "DS",
                           verbose = interactive(),
-                          distName = "hamming", ...){
+                          distName = "hamming",
+                          useLog = TRUE,
+                          ...){
 
    stopifnot(is.function(FUNcluster),
              length(dim(x)) == 2,
@@ -81,7 +84,11 @@ clusGapDiscr <- function (x,
           sep = "")
 
    for (k in 1:K.max){
-      logW[k] <- log(W.k(x, k))
+      if(useLog){
+         logW[k] <- log(W.k(x, k))
+      }else{
+         logW[k] <- W.k(x, k)
+      }
    }
 
    ## If all distances are 0; option 1.
@@ -143,7 +150,11 @@ clusGapDiscr <- function (x,
       }
 
       for (k in 1:K.max) {
-         logWks[b, k] <- log(W.k(z, k))
+         if(useLog){
+            logWks[b, k] <- log(W.k(z, k))
+         }else{
+            logWks[b, k] <- W.k(z, k)
+         }
       }
       if (verbose)
          cat(".", if (b%%50 == 0)
@@ -153,10 +164,12 @@ clusGapDiscr <- function (x,
       cat("", B, "\n")
    E.logW <- colMeans(logWks)
    SE.sim <- sqrt((1 + 1/B) * apply(logWks, 2, stats::var))
-   structure(class = "clusGap", list(Tab = cbind(logW, E.logW,
-                                                 gap = E.logW - logW, SE.sim),
-                                     call = cl., n = n, B = B,
-                                     FUNcluster = FUNcluster))
+   structure(class = "clusGap",
+             list(Tab = cbind(logW, E.logW,
+                              gap = E.logW - logW, SE.sim),
+                  call = cl., n = n, B = B,
+                  FUNcluster = FUNcluster,
+                  useLog = useLog))
 }
 
 #' Criteria to determine number of clusters k
