@@ -23,6 +23,8 @@ distancematrix <- function (X, d, na.rm=TRUE){
         return(disshamming(X, na.rm))
     if (d == "hellinger")
         return(disshellinger(X, na.rm))
+   if (d == "jaccard")
+      return(dissjaccard(X, na.rm))
 
     stop("Distance metric ", d, " not available")
 }
@@ -137,14 +139,23 @@ disschisquare  <-  function (X, na.rm = TRUE) {
 #' @export
 
 cramersVmod <- function(x, y){
-   if(length(unique(x)) == 1 | length(unique(y)) == 1 )
+   if(x == y){
+      return(1)
+   }else if(length(unique(x)) == 1 | length(unique(y)) == 1 ){
       return(0)
-   else if(all(is.na(x)) | all(is.na(y)))
+   }else if(all(is.na(x)) | all(is.na(y))){
       return(NA)
-   else
-      lsr::cramersV(x, y)
+   }else{
+      ## lsr::cramersV(x, y)
+      test <- stats::chisq.test(x=x, y=y, correct=FALSE)
+      chi2 <- test$statistic
+      N <- sum(test$observed)
+      k <- min(dim(test$observed))
+      V <- sqrt(chi2/(N * (k - 1)))
+      names(V) <- NULL
+      return(V)
+   }
 }
-
 
 #' Cramer's V core function
 #' @param X matrix
@@ -178,6 +189,19 @@ disscramerv <-  function (X, na.rm = TRUE) {
     }
 
     1 - CramerV(X)
+}
+
+#' Hamming distance wrapper function
+#' Function based on cultevo's package implementation
+#' @param X matrix
+#' @param na.rm logical
+#'
+#' @return Distance matrix
+#' @export
+disshamming <- function (X, na.rm = TRUE){
+
+   out <- cultevo::hammingdists(X)/ncol(X)
+   return(out)
 }
 
 #' Hellinger distance core function
@@ -226,16 +250,28 @@ disshellinger  <-  function (X, na.rm = TRUE) {
     HellingerDist(X)
 }
 
-#' Hamming distance wrapper function
-#' Function based on cultevo's package implementation
+#' Jaccard distance core function
 #' @param X matrix
-#' @param na.rm logical
 #'
 #' @return Distance matrix
 #' @export
-disshamming <- function (X, na.rm = TRUE){
-    ## Euclidean Distance from the rows of a matrix
+JaccardDist <- function(X){
+   unX <- unique(as.vector(X))
+   SumMat <- sapply(unX, function(myC) apply(X, 1, function(x) any(x %in% myC) ))
+   ## BinaryDist: Proportion of bits where there's at least one on
+   stats::dist(SumMat, method='binary')
+}
 
-    out <- cultevo::hammingdists(X)
-    return(out)
+#' Jaccard distance wrapper Function
+#' @param X Matrix
+#' @param na.rm logical
+#'
+#' @return Distance R object
+#' @export
+dissjaccard  <-  function (X, na.rm = TRUE) {
+   if (!is.matrix(X)) {
+      stop(paste(sQuote("X"), "not a matrix"))
+   }
+
+   JaccardDist(X)
 }
