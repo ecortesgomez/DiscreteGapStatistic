@@ -124,7 +124,6 @@ disschisquare  <-  function (X, na.rm = TRUE) {
     if (!is.matrix(X)) {
         stop(paste(sQuote("X"), "not a matrix"))
     }
-
     ChisqDist(X)
 }
 
@@ -139,7 +138,7 @@ disschisquare  <-  function (X, na.rm = TRUE) {
 #' @export
 
 cramersVmod <- function(x, y){
-   if(x == y){
+   if(identical(x, y)){
       return(1)
    }else if(length(unique(x)) == 1 | length(unique(y)) == 1 ){
       return(0)
