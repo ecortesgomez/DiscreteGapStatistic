@@ -17,6 +17,7 @@ ResHeatmap(
   out = "heatmap",
   clusterNames = NULL,
   prefObs = NULL,
+  rowNames = rownames(x),
   filename = NULL,
   outDir = NULL,
   height = 10,
@@ -26,7 +27,7 @@ ResHeatmap(
 \arguments{
 \item{x}{matrix object or data.frame}
 
-\item{nCl}{number of clusters to plot; if `nCl` is a vector, its length lN is the number of clusters, with values ranging from 1 to lN in desired order to place the clusters.}
+\item{nCl}{number of clusters to plot; if `nCl` is a permutation vector of the first lN integers will rearrange clusters according to the original given ordering.}
 
 \item{distName}{Name of categorical distance to apply.
 Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.}
@@ -38,15 +39,19 @@ This function returns a list with a component named `cluster`, a vector of lengt
 
 \item{out}{Specifies the desired output between "heatmap" (default; produce a heatmap), "clusters" (return a `data.frame` with clustering assignments) or "clustersReord" (return a `data.frame` with reorganized clusters)}
 
-\item{clusterNames}{Either `null` or 'renumber'. When `nCl` the cluster ordering is rearranged. `NULL` leaves cluster names as their original cluster assignment. 'renumber' respects the rearrangements but relabels the cluster numbers from top to bottom in ascending order.}
+\item{clusterNames}{Either `null` or 'renumber'. When `nCl` is a numerical vector, the cluster ordering is rearranged. `NULL` leaves cluster names as their original cluster assignment. 'renumber' respects the rearrangements but relabels the cluster numbers from top to bottom in ascending order.}
 
-\item{prefObs}{character string vector of length 1 with a prefix for the observations, in case they come unlabelled or the user wants to anomymize sample IDs}
+\item{prefObs}{character string vector of length 1 with a prefix for the observations, in case they come unlabelled or the user wants to anomymize sample IDs.}
+
+\item{rowNames}{character vector with names of rows according to `x`. By default, `rownames(x)` will be printed in the plot. `rowNames=NULL` prevents from showing names. `prefObs` option takes precedence if is different to `NULL`.}
 
 \item{filename}{character string with name of file output}
 
 \item{outDir}{character string with the directory path to save output file}
 
-\item{height}{numeric width of output plot in inches}
+\item{height}{numeric height of output plot in inches}
+
+\item{width}{numeric width of output plot in inches}
 }
 \value{
 png file or ComplexHeatmap object

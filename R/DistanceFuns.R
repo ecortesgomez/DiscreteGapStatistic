@@ -212,7 +212,8 @@ HellingerDist <- function(x){
     nRow <- nrow(x)
     myP <- ncol(x)
     compInd <- lapply(sort(unique(as.vector(x))),
-                      function(k) diag((x == k) %*% t(x == k))/myP)
+                      ## function(k) diag((x == k) %*% t(x == k))/myP)
+                      function(k) diag((x == k) %*% t(x == k)))
     names(compInd) <- sort(unique(as.vector(x)))
 
     myCoords <- utils::combn(1:nRow, m = 2)

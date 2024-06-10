@@ -10,7 +10,7 @@ Description: Distance-based approach to apply clusGap using categorical/Likert d
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Imports:
    cultevo,
    magrittr,
@@ -27,6 +27,7 @@ Suggests:
     cluster,
     knitr,
     rmarkdown,
+    kableExtra,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr

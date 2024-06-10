@@ -11,7 +11,8 @@ SimData(N, nQ, pi)
 
 \item{nQ}{Integer. Number of questions.}
 
-\item{pi}{Numeric vector. Vector of probabilities adding up to 1. Names of elements can be characters.}
+\item{pi}{Numeric vector. Vector of probabilities adding up to 1; it is recommended that names of elements are character strings.
+Alternatively, pi can be list of vectors as previously described with length equal to `nQ`. Notice that the list elements need not have same vector names. The order of pi vectors in the list will be reflected in the resulting simulated matrix. This alternative ideally assumes that questions are independently distributed.}
 }
 \value{
 N x nQ matrix with simulated categories distributed according to vector pi
@@ -24,7 +25,11 @@ Pix <- setNames(c(0.1, 0.2, 0.3, 0.4, 0), paste0('a', 1:5))
 X <- SimData(N=10, nQ=5, Pix)
 head(X)
 
-Piy <- setNames(c(0.6, 0.1, 0.1, 0.1, 0.1), letters[1:5])
+Piy <- setNames(c(0.3, 0.2, 0.4, 0, 0.1), paste0('a', 1:5))
 Y <- SimData(N=10, nQ=3, Piy)
 head(Y)
+
+PiZ <- list(x1 = Pix, x2 = Pix, y1 = Piy, y2 = Piy)
+Z <- SimData(N=10, nQ=length(PiZ), PiZ)
+
 }
