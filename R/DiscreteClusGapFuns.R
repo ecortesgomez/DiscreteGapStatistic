@@ -164,12 +164,12 @@ clusGapDiscr <- function (x,
       cat("", B, "\n")
    E.logW <- colMeans(logWks)
    SE.sim <- sqrt((1 + 1/B) * apply(logWks, 2, stats::var))
-   structure(class = "clusGap",
+   return( structure(class = "clusGap",
              list(Tab = cbind(logW, E.logW,
                               gap = E.logW - logW, SE.sim),
                   call = cl., n = n, B = B,
                   FUNcluster = FUNcluster,
-                  useLog = useLog))
+                  useLog = useLog)) )
 }
 
 #' Criteria to determine number of clusters k
@@ -183,10 +183,16 @@ findK <- function (cG_obj, meth = "Tibs2001SEmax"){
    if (!meth %in% c("minSE", "minGap", "maxChange")) {
 
       ## Tibs2001 SEmax criterion
-      myTab <- data.frame(cG_obj$Tab) %>%
-         mutate(nClus = 1:nrow(cG_obj$Tab) ) %>%
-         subset(is.finite(logW) & !is.na(gap) & !is.na(SE.sim))
+      # myTab <- data.frame(cG_obj$Tab) %>%
+      #    mutate(nClus = 1:nrow(cG_obj$Tab) ) %>%
+      #    subset(is.finite(logW) & !is.na(gap) & !is.na(SE.sim))
 
+      outDF <- data.frame(cG_obj['Tab'])
+      outDF[, 'nClus'] <- 1:nrow(outDF)
+      colnames(outDF) <- c('logW', 'E.logW', 'gap', 'SE.sim', 'nClus')
+
+      myTab <- outDF %>%
+         subset(is.finite(logW) & !is.na(gap) & !is.na(SE.sim))
       selK <- with(myTab,
                    cluster::maxSE(f = gap,
                                   SE.f = SE.sim,

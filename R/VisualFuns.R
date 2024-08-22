@@ -179,6 +179,9 @@ ResHeatmap <- function(x,
       }
    }
    ## Notice that data is reorganized according to clusters!
+   if(is.null(rownames(x)))
+      row.names(x) <- 1:nrow(x)
+
    data <- data.frame(rowNames = row.names(x),
                       Clust = AssignedCls,
                       x,
