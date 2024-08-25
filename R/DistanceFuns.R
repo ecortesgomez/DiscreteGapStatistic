@@ -249,29 +249,3 @@ disshellinger  <-  function (X, na.rm = TRUE) {
 
     HellingerDist(X)
 }
-
-#' Jaccard distance core function
-#' @param X matrix
-#'
-#' @return Distance matrix
-#' @export
-JaccardDist <- function(X){
-   unX <- unique(as.vector(X))
-   SumMat <- sapply(unX, function(myC) apply(X, 1, function(x) any(x %in% myC) ))
-   ## BinaryDist: Proportion of bits where there's at least one on
-   stats::dist(SumMat, method='binary')
-}
-
-#' Jaccard distance wrapper Function
-#' @param X Matrix
-#' @param na.rm logical
-#'
-#' @return Distance R object
-#' @export
-dissjaccard  <-  function (X, na.rm = TRUE) {
-   if (!is.matrix(X)) {
-      stop(paste(sQuote("X"), "not a matrix"))
-   }
-
-   JaccardDist(X)
-}

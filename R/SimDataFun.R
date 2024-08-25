@@ -22,13 +22,15 @@
 #'
 SimData <- function(N, nQ, pi){
 
-   if(class(pi) == 'numeric'){
+   ## if(class(pi) == 'numeric'){
+   if(is.numeric(pi)){
       out <- matrix(sample(names(pi), N*nQ, replace=TRUE, prob = pi),
                     nrow = N,
                     dimnames = list(paste0('s', 1:N),
                                     paste0('q', 1:nQ)))
       return(out)
-   }else if(class(pi) == 'list' & length(pi) == nQ){
+   ## }else if(class(pi) == 'list' & length(pi) == nQ){
+   }else if(is.list(pi) & length(pi) == nQ){
       out <-lapply(pi, function(y) sample(x = names(y), size = N, replace=TRUE, prob = y)) %>%
          do.call(what = cbind)
       rownames(out) <- paste0('s', 1:N)
