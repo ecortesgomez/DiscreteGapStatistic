@@ -23,8 +23,6 @@ distancematrix <- function (X, d, na.rm=TRUE){
         return(disshamming(X, na.rm))
     if (d == "hellinger")
         return(disshellinger(X, na.rm))
-   if (d == "jaccard")
-      return(dissjaccard(X, na.rm))
 
     stop("Distance metric ", d, " not available")
 }
