@@ -4,9 +4,12 @@ Title: Discrete Application of clusGap
 Version: 0.1.0
 Authors@R: c(
    person("Jeffrey", "Miecznikowski", email="jcm38@buffalo.edu", role = c("aut")),
-   person("Eduardo", "Cortes", email="ecortesg@buffalo.edu", role = c("aut", "cre")) )
+   person("Eduardo", "Cortes", email="ecortesg@buffalo.edu", 
+   role = c("aut", "cre"), 
+   comment = c(ORCID = '0000-0002-0966-6488')) )
 Maintainer: <ecortesg@buffalo.edu>
-Description: Distance-based approach to apply clusGap using categorical/Likert data.
+Description: Distance-based approach to apply clusGap using ordinal/categorical data.
+URL: https://github.com/ecortesgomez/DiscreteGapStatistic
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
