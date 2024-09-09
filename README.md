@@ -185,7 +185,7 @@ distanceHeat(x = massData[, -1], distName = 'cramerV',
              show_rownames = FALSE, cluster_rows = FALSE, cluster_cols=FALSE)
 ```
 
-<img src="man/figures/README-DistanceMats1-1.png" width="350" /><img src="man/figures/README-DistanceMats1-2.png" width="350" />
+<img src="man/figures/README-DistanceMats1-1.png" width="360" /><img src="man/figures/README-DistanceMats1-2.png" width="360" />
 
 ``` r
 distanceHeat(x = massData[, -1], distName = 'hellinger',
@@ -199,7 +199,7 @@ distanceHeat(x = massData[, -1], distName = 'bhattacharyya',
              , cluster_rows = FALSE, cluster_cols=FALSE)
 ```
 
-<img src="man/figures/README-DistanceMats2-1.png" width="350" /><img src="man/figures/README-DistanceMats2-2.png" width="350" />
+<img src="man/figures/README-DistanceMats2-1.png" width="360" /><img src="man/figures/README-DistanceMats2-2.png" width="360" />
 
 # `clusGapDiscr`: The Gap Statistic for discrete data
 
@@ -335,7 +335,7 @@ plot(crVRun,
 abline(v = findK(crVRun), lty=3, lwd=2, col="Blue")
 ```
 
-<img src="man/figures/README-clusGapDiscrFit-1.png" width="300" height="500" /><img src="man/figures/README-clusGapDiscrFit-2.png" width="300" height="500" /><img src="man/figures/README-clusGapDiscrFit-3.png" width="300" height="500" />
+<img src="man/figures/README-clusGapDiscrFit-1.png" width="280" height="500" /><img src="man/figures/README-clusGapDiscrFit-2.png" width="280" height="500" /><img src="man/figures/README-clusGapDiscrFit-3.png" width="280" height="500" />
 
 Notice that since all possible categorical values are available in the
 data, using the option `value.range = Cats` would yield exact same
@@ -384,7 +384,7 @@ ResHeatmap(massData[, -1],
 #> will be converted into a character matrix.
 ```
 
-<img src="man/figures/README-resHeatMaps-1.png" width="300" height="500" /><img src="man/figures/README-resHeatMaps-2.png" width="300" height="500" /><img src="man/figures/README-resHeatMaps-3.png" width="300" height="500" />
+<img src="man/figures/README-resHeatMaps-1.png" width="230" /><img src="man/figures/README-resHeatMaps-2.png" width="230" /><img src="man/figures/README-resHeatMaps-3.png" width="230" />
 
 Notice that Hamming distance detects subclusters present in Cluster 2
 from the $\chi^2$ distance run. To compare the similar clusters
@@ -416,4 +416,4 @@ ResHeatmap(massData[, -1],
            out = 'heatmap')
 ```
 
-<img src="man/figures/README-resHeatMaps2-1.png" width="300" height="500" /><img src="man/figures/README-resHeatMaps2-2.png" width="300" height="500" /><img src="man/figures/README-resHeatMaps2-3.png" width="300" height="500" />
+<img src="man/figures/README-resHeatMaps2-1.png" width="230" /><img src="man/figures/README-resHeatMaps2-2.png" width="230" /><img src="man/figures/README-resHeatMaps2-3.png" width="230" />
