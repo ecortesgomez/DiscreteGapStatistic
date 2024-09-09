@@ -105,7 +105,7 @@ data.frame(Distance = c('Hamming', 'chi-square', "Cramer's V", "Hellinger", 'Bha
 
 The resulting distance matrix from a rectangular dataset can easily be displayed and organized using heatmaps. The following plots visualize the `massData` using the defined distances with the function `distanceHeat`. This function only requires the dataset object and the name of the distance. It can also take advantage of the options and functionalities available in the `pheatmap` function (see the code below) from the `pheatmap` R package [@kolde2019]. For instance, by default, the columns are clustered using `clustering_method = 'complete'` but this parameter can be specified according to `pheatmap`'s options. Different aesthetic options are exemplified in the plots below using the introduced distances. 
 
-```{r DistanceMats1, out.width=330, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
+```{r DistanceMats1, out.width=350, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
 distanceHeat(x = massData[, -1], distName = 'hamming',
              main = 'Hamming Distance\nMath Anxiety Data', fontsize = 6.5)
 
@@ -114,7 +114,7 @@ distanceHeat(x = massData[, -1], distName = 'cramerV',
              show_rownames = FALSE, cluster_rows = FALSE, cluster_cols=FALSE)
 ```
 
-```{r DistanceMats2, out.width=330, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
+```{r DistanceMats2, out.width=350, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
 distanceHeat(x = massData[, -1], distName = 'hellinger',
              main = 'Hellinger Distance\nMath Anxiety Data', fontsize = 6.5, 
              show_rownames = TRUE, border_color = 'black', 
@@ -156,7 +156,7 @@ clusGapDiscr(x, FUNcluster, K.max, B = nrow(x),
 
 Similar to `clusGap`, `clusGapDiscr` returns a matrix object with `K.max` rows corresponding to the user-specified number of clusters with an estimate of the GS and its corresponding standard error. This information would then determine the number of clusters according to the cluster-selection criterion. The one used in `DiscreteGapStatistic` is the 1-SE criterion implemented by the function `findK`, which accepts `clusGap` objects. The following example applies the dGS on the Math Anxiety data using the Hamming, $\chi^2$, and Cramer's V distances applying the `cluster::pam` algorithm. A plot is then generated displaying the dGS against the number of clusters. Each estimate is accompanied by corresponding standard-error bars and a blue dashed line indicating the chosen number of clusters.  
 
-```{r clusGapDiscrFit, echo=TRUE, eval=TRUE, out.width=215}
+```{r clusGapDiscrFit, echo=TRUE, eval=TRUE, out.height = 500, out.width=300, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
 ## Recall Cats:
 # Cats <- setNames(object = c('SD', 'D', 'N', 'A', 'SA'),
 #                  nm = c('Strongly Disagree', 'Disagree', 
@@ -205,7 +205,7 @@ Notice that since all possible categorical values are available in the data, usi
 
 Heatmaps can be created to visualize the commonalities within each cluster and the differences between them.
 
-```{r resHeatMaps, echo=TRUE, eval=TRUE, out.width=400, dpi=500}
+```{r resHeatMaps, echo=TRUE, eval=TRUE, out.height = 500, out.width=300, dpi=500, results='hold', fig.show="hold"}
 
 ResHeatmap(massData[, -1],
            distName = 'hamming',
@@ -231,7 +231,7 @@ ResHeatmap(massData[, -1],
 
 Notice that Hamming distance detects subclusters present in Cluster 2 from the $\chi^2$ distance run. To compare the similar clusters side-to-side, the parameter `nCl` can be used to reorder the clusters relative to the given ordering. This case `nCl = 2:1` will alter (invert) the order of the two clusters on the $\chi^2$ based cluster. A third heatmap is displayed relabeling the clusters from the $\chi^2$ run using the `clusterNames = 'renumber'` argument.
 
-```{r resHeatMaps2, echo=TRUE, eval=TRUE, out.width=400, dpi=500, message=FALSE, warning=FALSE, error=FALSE}
+```{r resHeatMaps2, echo=TRUE, eval=TRUE, out.height = 500, out.width=300, dpi=500, results='hold', fig.show="hold", message=FALSE, warning=FALSE, error=FALSE}
 
 ResHeatmap(massData[, -1],
            distName = 'hamming',
