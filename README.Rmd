@@ -1,20 +1,28 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # DiscreteGapStatistic
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of DiscreteGapStatistic is to estimate number of clusters from
-(multiple choice) categorical response format data given any clustering
-algorithm extending the well-known gap statistic using a discrete
-distance based approach.
+The goal of DiscreteGapStatistic is to estimate number of clusters from (multiple choice) categorical response format data given any clustering algorithm extending the well-known gap statistic using a discrete distance based approach.
 
 ## Installation
 
-You can install the development version of DiscreteGapStatistic from
-[GitHub](https://github.com/) with:
+You can install the development version of DiscreteGapStatistic from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -23,31 +31,16 @@ devtools::install_github("ecortesgomez/DiscreteGapStatistic")
 
 ## Example: Math Anxiety Data
 
-Basic usage of `DiscreteGapStatistic` is shown using `likert`’s Math
-Anxiety data.
+Basic usage of `DiscreteGapStatistic` is shown using `likert`'s Math Anxiety data.
 
-``` r
+```{r example}
 library(DiscreteGapStatistic)
-#> Warning: replacing previous import 'dplyr::recode' by 'likert::recode' when
-#> loading 'DiscreteGapStatistic'
-```
-
-``` r
 library('dplyr')
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 ```
 
-First upload libraries and lightly modify the data. Questions are
-formatted and the categories are shortened.
+First upload libraries and lightly modify the data. Questions are formatted and the categories are shortened.
 
-``` r
+```{r LoadData, echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
 library(likert)
 data(mass)
 
@@ -78,10 +71,9 @@ rownames(massData) <- c(paste0('F', 1:2), paste0('M', 1),
                         paste0('F', 14), paste0('M', 6))
 ```
 
-First we visualize the data using a heatmap similar to the one produced
-by `likert::likert.heatmap.plot`.
+First we visualize the data using a heatmap similar to the one produced by `likert::likert.heatmap.plot`.
 
-``` r
+```{r LikertHeat,  out.width=600, dpi=500, fig.retina=NULL, echo=TRUE, fig.align = 'center'}
 likert.heat.plot2(massData[, -1],
                   allLevels = Cats,
                   text.size = 1.5)+
@@ -89,5 +81,3 @@ likert.heat.plot2(massData[, -1],
    theme(axis.text = element_text(size = 5), 
          title = element_text(size = 5))
 ```
-
-<img src="man/figures/README-LikertHeat-1.png" width="600" style="display: block; margin: auto;" />

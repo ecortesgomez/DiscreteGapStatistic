@@ -72,7 +72,8 @@ clusGapDiscr <- function (x,
       }
       mySplit <- split(ii, clus)
       mySplit <- mySplit[sapply(mySplit, length) != 1]
-      0.5 * sum(vapply(mySplit, function(I) {
+      # 0.5 * sum(vapply(mySplit, function(I) {
+      sum(vapply(mySplit, function(I) {
          xs <- X[I, , drop = FALSE]
          sum(distancematrix(xs, d = distName)/nrow(xs), na.rm = TRUE)
       }, 0))
