@@ -21,7 +21,9 @@ You can install the development version of DiscreteGapStatistic from
 devtools::install_github("ecortesgomez/DiscreteGapStatistic")
 ```
 
-## Example: Math Anxiety Data
+# Example: Math Anxiety Data
+
+## Summarization and Data Exploration
 
 Basic usage of `DiscreteGapStatistic` is shown using `likert`’s Math
 Anxiety data.
@@ -44,8 +46,8 @@ library('dplyr')
 #>     intersect, setdiff, setequal, union
 ```
 
-First upload libraries and lightly modify the data. Questions are
-formatted and the categories are shortened.
+Libraries are uploaded. Questions are lightly formatted and the
+categories are shortened.
 
 ``` r
 library(likert)
@@ -78,16 +80,123 @@ rownames(massData) <- c(paste0('F', 1:2), paste0('M', 1),
                         paste0('F', 14), paste0('M', 6))
 ```
 
-First we visualize the data using a heatmap similar to the one produced
-by `likert::likert.heatmap.plot`.
+## Likert Heatmap
+
+The dataset is visualized using a heatmap similar to the one produced by
+`likert::likert.heatmap.plot`.
 
 ``` r
 likert.heat.plot2(massData[, -1],
                   allLevels = Cats,
                   text.size = 1.5)+
    labs(title = 'Math Anxiety Data Likert Heatmap Summary')+
-   theme(axis.text = element_text(size = 5), 
-         title = element_text(size = 5))
+   theme(axis.text = element_text(size = 6), 
+         title = element_text(size = 6))
 ```
 
-<img src="man/figures/README-LikertHeat-1.png" width="600" style="display: block; margin: auto;" />
+<img src="man/figures/README-LikertHeat-1.png" width="800" style="display: block; margin: auto;" />
+
+## Distance Matrices
+
+Five categorical distance functions are introduced to quantify
+dissimilarities/discrepancies between two categorical vectors (see
+function `distancematrix`). The following table describes the available
+distances and the names used within the package.
+
+    #> 
+    #> Attaching package: 'kableExtra'
+    #> The following object is masked from 'package:dplyr':
+    #> 
+    #>     group_rows
+
+<table class=" lightable-paper" style="font-family: &quot;Arial Narrow&quot;, arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Distance
+</th>
+<th style="text-align:left;">
+Name
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;border-left:1px solid;">
+Hamming
+</td>
+<td style="text-align:left;font-family: monospace;border-left:1px solid;border-right:1px solid;">
+hamming
+</td>
+</tr>
+<tr>
+<td style="text-align:left;border-left:1px solid;">
+chi-square
+</td>
+<td style="text-align:left;font-family: monospace;border-left:1px solid;border-right:1px solid;">
+chisquare
+</td>
+</tr>
+<tr>
+<td style="text-align:left;border-left:1px solid;">
+Cramer’s V
+</td>
+<td style="text-align:left;font-family: monospace;border-left:1px solid;border-right:1px solid;">
+cramerV
+</td>
+</tr>
+<tr>
+<td style="text-align:left;border-left:1px solid;">
+Hellinger
+</td>
+<td style="text-align:left;font-family: monospace;border-left:1px solid;border-right:1px solid;">
+hellinger
+</td>
+</tr>
+<tr>
+<td style="text-align:left;border-left:1px solid;">
+Bhattacharyya
+</td>
+<td style="text-align:left;font-family: monospace;border-left:1px solid;border-right:1px solid;">
+bhattacharyya
+</td>
+</tr>
+</tbody>
+</table>
+
+The resulting distance matrix from a rectangular dataset can easily be
+displayed and organized using heatmaps. The following plots visualize
+the `massData` using the defined distances with the function
+`distanceHeat`. This function only requires the dataset object and the
+name of the distance. It can also take advantage of the options and
+functionalities available in the `pheatmap` function (see the code
+below) from the `pheatmap` R package \[@kolde2019\]. For instance, by
+default, the columns are clustered using
+`clustering_method = 'complete'` but this parameter can be specified
+according to `pheatmap`’s options. Different aesthetic options are
+exemplified in the plots below using the introduced distances.
+
+``` r
+distanceHeat(x = massData[, -1], distName = 'hamming',
+             main = 'Hamming Distance\nMath Anxiety Data', fontsize = 6.5)
+
+distanceHeat(x = massData[, -1], distName = 'cramerV',
+             main = "Cramer's V Distance\nMath Anxiety Data", fontsize = 6.5, 
+             show_rownames = FALSE, cluster_rows = FALSE, cluster_cols=FALSE)
+```
+
+<img src="man/figures/README-DistanceMats1-1.png" width="330" /><img src="man/figures/README-DistanceMats1-2.png" width="330" />
+
+``` r
+distanceHeat(x = massData[, -1], distName = 'hellinger',
+             main = 'Hellinger Distance\nMath Anxiety Data', fontsize = 6.5, 
+             show_rownames = TRUE, border_color = 'black', 
+             , cluster_rows = FALSE, cluster_cols=FALSE)
+
+distanceHeat(x = massData[, -1], distName = 'bhattacharyya',
+             main = 'Bhattacharyya Distance\nMath Anxiety Data', fontsize = 6.5, 
+              show_rownames = TRUE, border_color = 'lightgrey', 
+             , cluster_rows = FALSE, cluster_cols=FALSE)
+```
+
+<img src="man/figures/README-DistanceMats2-1.png" width="330" /><img src="man/figures/README-DistanceMats2-2.png" width="330" />

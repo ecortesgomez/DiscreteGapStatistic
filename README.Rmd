@@ -1,5 +1,6 @@
 ---
 output: github_document
+always_allow_html: true
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -29,7 +30,9 @@ You can install the development version of DiscreteGapStatistic from [GitHub](ht
 devtools::install_github("ecortesgomez/DiscreteGapStatistic")
 ```
 
-## Example: Math Anxiety Data
+# Example: Math Anxiety Data
+
+## Summarization and Data Exploration
 
 Basic usage of `DiscreteGapStatistic` is shown using `likert`'s Math Anxiety data.
 
@@ -38,7 +41,7 @@ library(DiscreteGapStatistic)
 library('dplyr')
 ```
 
-First upload libraries and lightly modify the data. Questions are formatted and the categories are shortened.
+Libraries are uploaded. Questions are lightly formatted and the categories are shortened.
 
 ```{r LoadData, echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
 library(likert)
@@ -71,13 +74,55 @@ rownames(massData) <- c(paste0('F', 1:2), paste0('M', 1),
                         paste0('F', 14), paste0('M', 6))
 ```
 
-First we visualize the data using a heatmap similar to the one produced by `likert::likert.heatmap.plot`.
+## Likert Heatmap {#LikertHeat}
 
-```{r LikertHeat,  out.width=600, dpi=500, fig.retina=NULL, echo=TRUE, fig.align = 'center'}
+The dataset is visualized using a heatmap similar to the one produced by `likert::likert.heatmap.plot`.
+
+```{r LikertHeat,  out.width=800, dpi=500, fig.retina=NULL, echo=TRUE, fig.align = 'center'}
 likert.heat.plot2(massData[, -1],
                   allLevels = Cats,
                   text.size = 1.5)+
    labs(title = 'Math Anxiety Data Likert Heatmap Summary')+
-   theme(axis.text = element_text(size = 5), 
-         title = element_text(size = 5))
+   theme(axis.text = element_text(size = 6), 
+         title = element_text(size = 6))
 ```
+
+## Distance Matrices 
+
+Five categorical distance functions are introduced to quantify dissimilarities/discrepancies between two categorical vectors (see function `distancematrix`). The following table describes the available distances and the names used within the package.
+
+```{r Distances, fig.align = 'center', echo=FALSE}
+library(knitr)
+library(kableExtra)
+
+data.frame(Distance = c('Hamming', 'chi-square', "Cramer's V", "Hellinger", 'Bhattacharyya'), 
+           Name = c('hamming', 'chisquare', 'cramerV', 'hellinger', 'bhattacharyya')) %>%
+   kbl() %>%
+   kable_paper(full_width = FALSE) %>%
+   column_spec(column = 1, border_left = TRUE) %>%
+   column_spec(column = 2, monospace = TRUE, border_left = TRUE, border_right=TRUE)
+```
+
+The resulting distance matrix from a rectangular dataset can easily be displayed and organized using heatmaps. The following plots visualize the `massData` using the defined distances with the function `distanceHeat`. This function only requires the dataset object and the name of the distance. It can also take advantage of the options and functionalities available in the `pheatmap` function (see the code below) from the `pheatmap` R package [@kolde2019]. For instance, by default, the columns are clustered using `clustering_method = 'complete'` but this parameter can be specified according to `pheatmap`'s options. Different aesthetic options are exemplified in the plots below using the introduced distances. 
+
+```{r DistanceMats1, out.width=330, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
+distanceHeat(x = massData[, -1], distName = 'hamming',
+             main = 'Hamming Distance\nMath Anxiety Data', fontsize = 6.5)
+
+distanceHeat(x = massData[, -1], distName = 'cramerV',
+             main = "Cramer's V Distance\nMath Anxiety Data", fontsize = 6.5, 
+             show_rownames = FALSE, cluster_rows = FALSE, cluster_cols=FALSE)
+```
+
+```{r DistanceMats2, out.width=330, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
+distanceHeat(x = massData[, -1], distName = 'hellinger',
+             main = 'Hellinger Distance\nMath Anxiety Data', fontsize = 6.5, 
+             show_rownames = TRUE, border_color = 'black', 
+             , cluster_rows = FALSE, cluster_cols=FALSE)
+
+distanceHeat(x = massData[, -1], distName = 'bhattacharyya',
+             main = 'Bhattacharyya Distance\nMath Anxiety Data', fontsize = 6.5, 
+              show_rownames = TRUE, border_color = 'lightgrey', 
+             , cluster_rows = FALSE, cluster_cols=FALSE)
+```
+
