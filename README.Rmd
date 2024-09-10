@@ -206,29 +206,28 @@ Notice that since all possible categorical values are available in the data, usi
 Heatmaps can be created to visualize the commonalities within each cluster and the differences between them.
 
 ```{r resHeatMaps, echo=TRUE, eval=TRUE, fig.retina=NULL,  dpi=500, fig.retina=NULL, out.width=230, dpi=500, results='hold', fig.show="hold"}
-par(mar=c(3,3,3,0))
-## ccf(x = df$C, y = df$P,lag.max = 10, main="foo") 
+
 
 ResHeatmap(massData[, -1],
            distName = 'hamming',
            catVals = Cats,
            nCl = findK(HammRun),
            out = 'heatmap',
-           prefObs = NULL, height = 7)
+           prefObs = NULL, height = 5)
 
 ResHeatmap(massData[, -1],
            distName = 'chisquare',
            catVals = Cats,
            nCl = findK(chisqRun),
            out = 'heatmap',
-           prefObs = NULL)
+           prefObs = NULL, height = 5)
 
 ResHeatmap(massData[, -1],
            distName = 'cramerV',
            catVals = Cats,
            nCl = findK(crVRun),
            out = 'heatmap',
-           prefObs = NULL)
+           prefObs = NULL, height = 4)
 ```
 
 Notice that Hamming distance detects subclusters present in Cluster 2 from the $\chi^2$ distance run. To compare the similar clusters side-to-side, the parameter `nCl` can be used to reorder the clusters relative to the given ordering. This case `nCl = 2:1` will alter (invert) the order of the two clusters on the $\chi^2$ based cluster. A third heatmap is displayed relabeling the clusters from the $\chi^2$ run using the `clusterNames = 'renumber'` argument.
@@ -239,20 +238,23 @@ ResHeatmap(massData[, -1],
            distName = 'hamming',
            catVals = Cats,
            nCl = findK(HammRun),
-           out = 'heatmap')
+           out = 'heatmap', 
+           height = 4)
 
 ResHeatmap(massData[, -1],
            distName = 'chisquare',
            catVals = Cats,
            nCl = 2:1,
-           out = 'heatmap')
+           out = 'heatmap', 
+           height = 4)
 
 ResHeatmap(massData[, -1],
            distName = 'chisquare',
            catVals = Cats,
            nCl = 2:1,
            clusterNames = 'renumber',
-           out = 'heatmap')
+           out = 'heatmap',
+           height = 4)
 ```
 
 

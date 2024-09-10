@@ -346,15 +346,14 @@ Heatmaps can be created to visualize the commonalities within each
 cluster and the differences between them.
 
 ``` r
-par(mar=c(3,3,3,0))
-## ccf(x = df$C, y = df$P,lag.max = 10, main="foo") 
+
 
 ResHeatmap(massData[, -1],
            distName = 'hamming',
            catVals = Cats,
            nCl = findK(HammRun),
            out = 'heatmap',
-           prefObs = NULL, height = 7)
+           prefObs = NULL, height = 5)
 #> Warning: The input is a data frame-like object, convert it to a matrix.
 #> Warning: Note: not all columns in the data frame are numeric. The data frame
 #> will be converted into a character matrix.
@@ -367,7 +366,7 @@ ResHeatmap(massData[, -1],
            catVals = Cats,
            nCl = findK(chisqRun),
            out = 'heatmap',
-           prefObs = NULL)
+           prefObs = NULL, height = 5)
 #> Warning: The input is a data frame-like object, convert it to a matrix.
 #> Warning: Note: not all columns in the data frame are numeric. The data frame
 #> will be converted into a character matrix.
@@ -380,7 +379,7 @@ ResHeatmap(massData[, -1],
            catVals = Cats,
            nCl = findK(crVRun),
            out = 'heatmap',
-           prefObs = NULL)
+           prefObs = NULL, height = 4)
 #> Warning: The input is a data frame-like object, convert it to a matrix.
 #> Warning: Note: not all columns in the data frame are numeric. The data frame
 #> will be converted into a character matrix.
@@ -402,20 +401,23 @@ ResHeatmap(massData[, -1],
            distName = 'hamming',
            catVals = Cats,
            nCl = findK(HammRun),
-           out = 'heatmap')
+           out = 'heatmap', 
+           height = 4)
 
 ResHeatmap(massData[, -1],
            distName = 'chisquare',
            catVals = Cats,
            nCl = 2:1,
-           out = 'heatmap')
+           out = 'heatmap', 
+           height = 4)
 
 ResHeatmap(massData[, -1],
            distName = 'chisquare',
            catVals = Cats,
            nCl = 2:1,
            clusterNames = 'renumber',
-           out = 'heatmap')
+           out = 'heatmap',
+           height = 4)
 ```
 
 <img src="man/figures/README-resHeatMaps2-1.png" width="230" /><img src="man/figures/README-resHeatMaps2-2.png" width="230" /><img src="man/figures/README-resHeatMaps2-3.png" width="230" />
