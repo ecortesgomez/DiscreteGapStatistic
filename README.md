@@ -335,7 +335,7 @@ plot(crVRun,
 abline(v = findK(crVRun), lty=3, lwd=2, col="Blue")
 ```
 
-<img src="man/figures/README-clusGapDiscrFit-1.png" width="210" /><img src="man/figures/README-clusGapDiscrFit-2.png" width="210" /><img src="man/figures/README-clusGapDiscrFit-3.png" width="210" />
+<img src="man/figures/README-clusGapDiscrFit-1.png" width="230" /><img src="man/figures/README-clusGapDiscrFit-2.png" width="230" /><img src="man/figures/README-clusGapDiscrFit-3.png" width="230" />
 
 Notice that since all possible categorical values are available in the
 data, using the option `value.range = Cats` would yield exact same
@@ -354,7 +354,7 @@ ResHeatmap(massData[, -1],
            catVals = Cats,
            nCl = findK(HammRun),
            out = 'heatmap',
-           prefObs = NULL)
+           prefObs = NULL, height = 7)
 #> Warning: The input is a data frame-like object, convert it to a matrix.
 #> Warning: Note: not all columns in the data frame are numeric. The data frame
 #> will be converted into a character matrix.

@@ -156,7 +156,7 @@ clusGapDiscr(x, FUNcluster, K.max, B = nrow(x),
 
 Similar to `clusGap`, `clusGapDiscr` returns a matrix object with `K.max` rows corresponding to the user-specified number of clusters with an estimate of the GS and its corresponding standard error. This information would then determine the number of clusters according to the cluster-selection criterion. The one used in `DiscreteGapStatistic` is the 1-SE criterion implemented by the function `findK`, which accepts `clusGap` objects. The following example applies the dGS on the Math Anxiety data using the Hamming, $\chi^2$, and Cramer's V distances applying the `cluster::pam` algorithm. A plot is then generated displaying the dGS against the number of clusters. Each estimate is accompanied by corresponding standard-error bars and a blue dashed line indicating the chosen number of clusters.  
 
-```{r clusGapDiscrFit, echo=TRUE, eval=TRUE, fig.retina=NULL, out.width=210, dpi=500, echo=TRUE, results='hold', fig.show="hold", }
+```{r clusGapDiscrFit, echo=TRUE, eval=TRUE, fig.retina=NULL, out.width=230, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
 ## Recall Cats:
 # Cats <- setNames(object = c('SD', 'D', 'N', 'A', 'SA'),
 #                  nm = c('Strongly Disagree', 'Disagree', 
@@ -205,7 +205,7 @@ Notice that since all possible categorical values are available in the data, usi
 
 Heatmaps can be created to visualize the commonalities within each cluster and the differences between them.
 
-```{r resHeatMaps, echo=TRUE, eval=TRUE, dpi=500, fig.retina=NULL, out.width=230, dpi=500, results='hold', fig.show="hold"}
+```{r resHeatMaps, echo=TRUE, eval=TRUE, fig.retina=NULL,  dpi=500, fig.retina=NULL, out.width=230, dpi=500, results='hold', fig.show="hold"}
 par(mar=c(3,3,3,0))
 ## ccf(x = df$C, y = df$P,lag.max = 10, main="foo") 
 
@@ -214,7 +214,7 @@ ResHeatmap(massData[, -1],
            catVals = Cats,
            nCl = findK(HammRun),
            out = 'heatmap',
-           prefObs = NULL)
+           prefObs = NULL, height = 7)
 
 ResHeatmap(massData[, -1],
            distName = 'chisquare',
