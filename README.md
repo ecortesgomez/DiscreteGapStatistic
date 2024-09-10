@@ -335,12 +335,11 @@ plot(crVRun,
 abline(v = findK(crVRun), lty=3, lwd=2, col="Blue")
 ```
 
-<img src="man/figures/README-clusGapDiscrFit-1.png" width="230" /><img src="man/figures/README-clusGapDiscrFit-2.png" width="230" /><img src="man/figures/README-clusGapDiscrFit-3.png" width="230" />
+<img src="man/figures/README-clusGapDiscrFit-1.png" width="250" /><img src="man/figures/README-clusGapDiscrFit-2.png" width="250" /><img src="man/figures/README-clusGapDiscrFit-3.png" width="250" />
 
 Notice that since all possible categorical values are available in the
 data, using the option `value.range = Cats` would yield exact same
 results.
-<!-- The running time of `clusGapDiscr` depends on the chosen discrete distance. Overall, Hamming runs the fastest. Bhattacharyya, Hellinger and $\chi^2$ run at about the same speed, but slower than Hamming. The slowest is Cramer's V distance. -->
 
 Heatmaps can be created to visualize the commonalities within each
 cluster and the differences between them.
@@ -353,7 +352,7 @@ ResHeatmap(massData[, -1],
            catVals = Cats,
            nCl = findK(HammRun),
            out = 'heatmap',
-           prefObs = NULL, height = 5)
+           prefObs = NULL, height = 6)
 #> Warning: The input is a data frame-like object, convert it to a matrix.
 #> Warning: Note: not all columns in the data frame are numeric. The data frame
 #> will be converted into a character matrix.
@@ -366,7 +365,7 @@ ResHeatmap(massData[, -1],
            catVals = Cats,
            nCl = findK(chisqRun),
            out = 'heatmap',
-           prefObs = NULL, height = 5)
+           prefObs = NULL, height = 6)
 #> Warning: The input is a data frame-like object, convert it to a matrix.
 #> Warning: Note: not all columns in the data frame are numeric. The data frame
 #> will be converted into a character matrix.
@@ -379,7 +378,7 @@ ResHeatmap(massData[, -1],
            catVals = Cats,
            nCl = findK(crVRun),
            out = 'heatmap',
-           prefObs = NULL, height = 4)
+           prefObs = NULL, height = 6)
 #> Warning: The input is a data frame-like object, convert it to a matrix.
 #> Warning: Note: not all columns in the data frame are numeric. The data frame
 #> will be converted into a character matrix.
@@ -402,14 +401,14 @@ ResHeatmap(massData[, -1],
            catVals = Cats,
            nCl = findK(HammRun),
            out = 'heatmap', 
-           height = 4)
+           height = 6)
 
 ResHeatmap(massData[, -1],
            distName = 'chisquare',
            catVals = Cats,
            nCl = 2:1,
            out = 'heatmap', 
-           height = 4)
+           height = 6)
 
 ResHeatmap(massData[, -1],
            distName = 'chisquare',
@@ -417,7 +416,7 @@ ResHeatmap(massData[, -1],
            nCl = 2:1,
            clusterNames = 'renumber',
            out = 'heatmap',
-           height = 4)
+           height = 6)
 ```
 
 <img src="man/figures/README-resHeatMaps2-1.png" width="230" /><img src="man/figures/README-resHeatMaps2-2.png" width="230" /><img src="man/figures/README-resHeatMaps2-3.png" width="230" />

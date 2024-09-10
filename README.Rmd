@@ -156,7 +156,7 @@ clusGapDiscr(x, FUNcluster, K.max, B = nrow(x),
 
 Similar to `clusGap`, `clusGapDiscr` returns a matrix object with `K.max` rows corresponding to the user-specified number of clusters with an estimate of the GS and its corresponding standard error. This information would then determine the number of clusters according to the cluster-selection criterion. The one used in `DiscreteGapStatistic` is the 1-SE criterion implemented by the function `findK`, which accepts `clusGap` objects. The following example applies the dGS on the Math Anxiety data using the Hamming, $\chi^2$, and Cramer's V distances applying the `cluster::pam` algorithm. A plot is then generated displaying the dGS against the number of clusters. Each estimate is accompanied by corresponding standard-error bars and a blue dashed line indicating the chosen number of clusters.  
 
-```{r clusGapDiscrFit, echo=TRUE, eval=TRUE, fig.retina=NULL, out.width=230, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
+```{r clusGapDiscrFit, echo=TRUE, eval=TRUE, fig.retina=NULL, out.width=250, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
 ## Recall Cats:
 # Cats <- setNames(object = c('SD', 'D', 'N', 'A', 'SA'),
 #                  nm = c('Strongly Disagree', 'Disagree', 
@@ -201,7 +201,6 @@ abline(v = findK(crVRun), lty=3, lwd=2, col="Blue")
 ```
 
 Notice that since all possible categorical values are available in the data, using the option `value.range = Cats` would yield exact same results. 
-<!-- The running time of `clusGapDiscr` depends on the chosen discrete distance. Overall, Hamming runs the fastest. Bhattacharyya, Hellinger and $\chi^2$ run at about the same speed, but slower than Hamming. The slowest is Cramer's V distance. -->
 
 Heatmaps can be created to visualize the commonalities within each cluster and the differences between them.
 
@@ -213,21 +212,21 @@ ResHeatmap(massData[, -1],
            catVals = Cats,
            nCl = findK(HammRun),
            out = 'heatmap',
-           prefObs = NULL, height = 5)
+           prefObs = NULL, height = 6)
 
 ResHeatmap(massData[, -1],
            distName = 'chisquare',
            catVals = Cats,
            nCl = findK(chisqRun),
            out = 'heatmap',
-           prefObs = NULL, height = 5)
+           prefObs = NULL, height = 6)
 
 ResHeatmap(massData[, -1],
            distName = 'cramerV',
            catVals = Cats,
            nCl = findK(crVRun),
            out = 'heatmap',
-           prefObs = NULL, height = 4)
+           prefObs = NULL, height = 6)
 ```
 
 Notice that Hamming distance detects subclusters present in Cluster 2 from the $\chi^2$ distance run. To compare the similar clusters side-to-side, the parameter `nCl` can be used to reorder the clusters relative to the given ordering. This case `nCl = 2:1` will alter (invert) the order of the two clusters on the $\chi^2$ based cluster. A third heatmap is displayed relabeling the clusters from the $\chi^2$ run using the `clusterNames = 'renumber'` argument.
@@ -239,14 +238,14 @@ ResHeatmap(massData[, -1],
            catVals = Cats,
            nCl = findK(HammRun),
            out = 'heatmap', 
-           height = 4)
+           height = 6)
 
 ResHeatmap(massData[, -1],
            distName = 'chisquare',
            catVals = Cats,
            nCl = 2:1,
            out = 'heatmap', 
-           height = 4)
+           height = 6)
 
 ResHeatmap(massData[, -1],
            distName = 'chisquare',
@@ -254,7 +253,7 @@ ResHeatmap(massData[, -1],
            nCl = 2:1,
            clusterNames = 'renumber',
            out = 'heatmap',
-           height = 4)
+           height = 6)
 ```
 
 
