@@ -335,7 +335,7 @@ plot(crVRun,
 abline(v = findK(crVRun), lty=3, lwd=2, col="Blue")
 ```
 
-<img src="man/figures/README-clusGapDiscrFit-1.png" width="250" /><img src="man/figures/README-clusGapDiscrFit-2.png" width="250" /><img src="man/figures/README-clusGapDiscrFit-3.png" width="250" />
+<img src="man/figures/README-clusGapDiscrFit-1.png" width="230" /><img src="man/figures/README-clusGapDiscrFit-2.png" width="230" /><img src="man/figures/README-clusGapDiscrFit-3.png" width="230" />
 
 Notice that since all possible categorical values are available in the
 data, using the option `value.range = Cats` would yield exact same
@@ -346,6 +346,8 @@ Heatmaps can be created to visualize the commonalities within each
 cluster and the differences between them.
 
 ``` r
+par(mar=c(3,3,3,0))
+## ccf(x = df$C, y = df$P,lag.max = 10, main="foo") 
 
 ResHeatmap(massData[, -1],
            distName = 'hamming',
