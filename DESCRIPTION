@@ -1,16 +1,13 @@
 Package: DiscreteGapStatistic
 Type: Package
-Title: DiscreteGapStatistic: An Application of Gap Statistic for ordinal/categorical data.
+Title: DiscreteGapStatistic: An Application of Gap Statistic for ordinal/categorical data
 Version: 0.1.0
 Authors@R: c(
    person("Jeffrey", "Miecznikowski", email="jcm38@buffalo.edu", role = c("aut")),
    person("Eduardo", "Cortes", email="ecortesg@buffalo.edu", 
    role = c("aut", "cre"), 
    comment = c(ORCID = '0000-0002-0966-6488')) )
-Description: The gap statistic approach is extended to estimate the number of
-clusters for categorical response format data. This approach and accompanying software
-is designed to be used with the output of any clustering algorithm and with distances
-specifically designed for categorical (i.e. multiple choice) or ordinal survey response data.
+Description: The gap statistic approach is extended to estimate the number of clusters for categorical response format data. This approach and accompanying software is designed to be used with the output of any clustering algorithm and with distances specifically designed for categorical (i.e. multiple choice) or ordinal survey response data.
 URL: https://github.com/ecortesgomez/DiscreteGapStatistic
 License: MIT + file LICENSE
 Encoding: UTF-8
