@@ -149,6 +149,8 @@ ResHeatmap <- function(x,
    ## To Do: specify option where the input data is plotted without any cluster rearrangement
    ## To Do: Specify arbitrary cluster labels.
 
+   Clust <- NULL
+
    if(length(nCl) > 1){
       clOrd <- nCl
       nCl <- length(nCl)
