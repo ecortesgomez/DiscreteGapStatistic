@@ -8,3 +8,5 @@
 ^vignettes/DiscreteGapStatisticVignette0.Rmd$
 ^data-raw$
 ^README\.Rmd$
+^cran-comments\.md$
+^CRAN-SUBMISSION$
