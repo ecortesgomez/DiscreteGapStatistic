@@ -1,6 +1,6 @@
 Package: DiscreteGapStatistic
 Type: Package
-Title: An extension of the Gap Statistic for Ordinal/Categorical Data including helper functions to visualize resulting number of chosen clusters 
+Title: An Extension of the Gap Statistic for Ordinal/Categorical Data
 Version: 0.1.0
 Authors@R: c(
    person("Jeffrey", "Miecznikowski", email="jcm38@buffalo.edu", role = c("aut")),
