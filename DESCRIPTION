@@ -23,14 +23,14 @@ Imports:
    Polychrome,
    RColorBrewer,
    reshape2,
-   likert,
+   tidyr,
    ComplexHeatmap
 Suggests:
     cluster,
     knitr,
     rmarkdown,
     kableExtra,
-    testthat (>= 3.0.0)
+    testthat
 Config/testthat/edition: 3
 Depends: 
-    R (>= 2.10)
+    R (>= 4.2.0)

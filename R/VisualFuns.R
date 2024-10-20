@@ -8,7 +8,7 @@
 #' @importFrom reshape2 melt
 #' @import ggplot2
 #' @import dplyr
-#' @import likert
+#' @import tidyr
 #' @param x matrix object or data.frame with categorical data. Columns are questions and rows are observations.
 #' @param allLevels vector with all categorical (ordered) levels.
 #' @param low.color string; name of color assigned to the first level found in `allLevels`.
@@ -16,54 +16,57 @@
 #' @param text.color string; text color of numbers within cells.
 #' @param text.size string; text size for numbers within cells.
 #' @param textLen string; maximum length of text-length for question labels (column names)
-#' @param ... other valid arguments in pheatmap function
 #' @return ggplot object.
 #' @export
-likert.heat.plot2 <- function(x,
-                              allLevels,
-                              low.color = "white",
-                              high.color = "blue",
-                              text.color = "black",
-                              text.size = 4,
-                              textLen = 50,
-                              ...) {
+likert.heat.plot2 <- function (x,
+                                  allLevels,
+                                  low.color = "white",
+                                  high.color = "blue",
+                                  text.color = "black",
+                                  text.size = 4,
+                                  textLen = 50){
 
-   Item <- variable <- value <- label <- NULL
-   xLikertForm <- x %>%
-      apply(2, as.character) %>%
-      data.frame(check.names=FALSE) %>%
+   myPer <- function(x) round(100*x/sum(x), 2)
+   Item <- variable <- value <- label <- Freq <- Var1 <- NULL
+   levItem <- colnames(x)
+
+   xLik <- x %>% apply(2, as.character) %>% data.frame(check.names = FALSE) %>%
       mutate_if(is.character, function(x) factor(x, levels = allLevels))
+   xLik <- lapply(1:ncol(xLik),
+                  function(i) table(xLik[[i]]) %>%
+                     as.data.frame %>%
+                     dplyr::mutate(Freq = myPer(Freq), Item = colnames(xLik)[i])) %>%
+      do.call(what=rbind) %>%
+      dplyr::mutate(Item = factor(x = Item, levels = levItem)) %>%
+      tidyr::spread(key = Var1, value = Freq, fill = 0)
 
-   likertOut <- likert(xLikertForm)
-   lsum <- summary(object=likertOut, ordered = FALSE)
-
-   results <- melt(likertOut$results, id.vars = "Item")
+   results <- reshape2::melt(xLik, id.vars = "Item")
    results$variable <- as.character(results$variable)
-   results$label <- paste(format(results$value,
-                                 digits = 2,
-                                 drop0trailing = FALSE),
-                          "%", sep = "")
-   results$Item <- factor(x = results$Item,
-                          levels = lsum$Item %>% rev)
+   results$label <- paste(format(results$value, digits = 2,
+                                 drop0trailing = FALSE), "%", sep = "")
+   results$Item <- factor(x = results$Item, levels = levItem %>% rev)
 
    p <- ggplot(results,
-               aes(x = Item,
-                   y = variable,
-                   fill = value,
+               aes(x = Item, y = variable, fill = value,
                    label = label)) +
-      scale_y_discrete(limits = names(likertOut$results)[2:ncol(likertOut$results)]) +
+      scale_y_discrete(limits = names(xLik)[2:ncol(xLik)]) +
       geom_tile() +
       geom_text(size = text.size, colour = text.color) +
       coord_flip() +
-      scale_fill_gradient2("Percent", low = "white", mid = low.color,
-                           high = high.color, limits = c(0, 100)) + xlab("") +
+      scale_fill_gradient2("Percent",
+                           low = "white",
+                           mid = low.color,
+                           high = high.color,
+                           limits = c(0, 100)) +
+      xlab("") +
       ylab("") +
       theme(panel.grid.major = element_blank(),
             panel.grid.minor = element_blank(), axis.ticks = element_blank(),
             panel.background = element_blank()) +
-      scale_x_discrete(breaks = likertOut$results$Item,
-                       labels = base::substring(likertOut$results$Item, first=1, last = textLen))
-   # class(p) <- c("likert.heat.plot", class(p))
+      scale_x_discrete(breaks = xLik$Item,
+                       labels = base::substring(xLik$Item,
+                                                first = 1,
+                                                last = textLen))
    return(p)
 }
 

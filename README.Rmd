@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of DiscreteGapStatistic is to estimate number of clusters from (multiple choice) categorical response format data given any clustering algorithm extending the well-known gap statistic using a discrete distance based approach.
+DiscreteGapStatistic estimates the number of clusters from (multiple choice) categorical response format data given any clustering algorithm extending the well-known gap statistic using a discrete distance based approach.
 
 ## Installation
 
@@ -205,7 +205,6 @@ Notice that since all possible categorical values are available in the data, usi
 Heatmaps can be created to visualize the commonalities within each cluster and the differences between them.
 
 ```{r resHeatMaps, echo=TRUE, eval=TRUE, fig.retina=NULL,  dpi=500, fig.retina=NULL, out.width=230, dpi=500, results='hold', fig.show="hold"}
-
 
 ResHeatmap(massData[, -1],
            distName = 'hamming',

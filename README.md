@@ -6,10 +6,10 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of DiscreteGapStatistic is to estimate number of clusters from
-(multiple choice) categorical response format data given any clustering
-algorithm extending the well-known gap statistic using a discrete
-distance based approach.
+DiscreteGapStatistic estimates the number of clusters from (multiple
+choice) categorical response format data given any clustering algorithm
+extending the well-known gap statistic using a discrete distance based
+approach.
 
 ## Installation
 
@@ -345,7 +345,6 @@ Heatmaps can be created to visualize the commonalities within each
 cluster and the differences between them.
 
 ``` r
-
 
 ResHeatmap(massData[, -1],
            distName = 'hamming',

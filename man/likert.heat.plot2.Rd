@@ -16,8 +16,7 @@ likert.heat.plot2(
   high.color = "blue",
   text.color = "black",
   text.size = 4,
-  textLen = 50,
-  ...
+  textLen = 50
 )
 }
 \arguments{
@@ -34,8 +33,6 @@ likert.heat.plot2(
 \item{text.size}{string; text size for numbers within cells.}
 
 \item{textLen}{string; maximum length of text-length for question labels (column names)}
-
-\item{...}{other valid arguments in pheatmap function}
 }
 \value{
 ggplot object.
