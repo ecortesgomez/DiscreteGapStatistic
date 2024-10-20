@@ -39,13 +39,14 @@ Basic usage of `DiscreteGapStatistic` is shown using `likert`'s Math Anxiety dat
 ```{r example}
 library(DiscreteGapStatistic)
 library('dplyr')
-```
-
-Libraries are uploaded. Questions are lightly formatted and the categories are shortened.
-
-```{r LoadData, echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
 library(likert)
 data(mass)
+```
+
+Libraries are uploaded. Questions are lightly reformatted and the categories are shortened.
+
+```{r LoadData, echo=TRUE, eval=TRUE, warning=FALSE, message=FALSE}
+## mass dataset is loaded automatically with DiscreteGapStatistic
 
 massQ <- colnames(mass)
 massQsh <- c('Gender',

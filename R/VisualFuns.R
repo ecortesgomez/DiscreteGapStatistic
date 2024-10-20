@@ -19,12 +19,12 @@
 #' @return ggplot object.
 #' @export
 likert.heat.plot2 <- function (x,
-                                  allLevels,
-                                  low.color = "white",
-                                  high.color = "blue",
-                                  text.color = "black",
-                                  text.size = 4,
-                                  textLen = 50){
+                              allLevels,
+                              low.color = "white",
+                              high.color = "blue",
+                              text.color = "black",
+                              text.size = 4,
+                              textLen = 50){
 
    myPer <- function(x) round(100*x/sum(x), 2)
    Item <- variable <- value <- label <- Freq <- Var1 <- NULL

@@ -46,12 +46,26 @@ library('dplyr')
 #>     intersect, setdiff, setequal, union
 ```
 
-Libraries are uploaded. Questions are lightly formatted and the
+``` r
+library(likert)
+#> Loading required package: ggplot2
+#> Loading required package: xtable
+#> 
+#> Attaching package: 'likert'
+#> The following object is masked from 'package:dplyr':
+#> 
+#>     recode
+```
+
+``` r
+data(mass)
+```
+
+Libraries are uploaded. Questions are lightly reformatted and the
 categories are shortened.
 
 ``` r
-library(likert)
-data(mass)
+## mass dataset is loaded automatically with DiscreteGapStatistic
 
 massQ <- colnames(mass)
 massQsh <- c('Gender',
