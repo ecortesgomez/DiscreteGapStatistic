@@ -38,9 +38,7 @@ Basic usage of `DiscreteGapStatistic` is shown using `likert`'s Math Anxiety dat
 
 ```{r example}
 library(DiscreteGapStatistic)
-library('dplyr')
-library(likert)
-data(mass)
+library(dplyr)
 ```
 
 Libraries are uploaded. Questions are lightly reformatted and the categories are shortened.
@@ -80,6 +78,7 @@ rownames(massData) <- c(paste0('F', 1:2), paste0('M', 1),
 The dataset is visualized using a heatmap similar to the one produced by `likert::likert.heatmap.plot`.
 
 ```{r LikertHeat,  out.width=800, dpi=500, fig.retina=NULL, echo=TRUE, fig.align = 'center'}
+library(ggplot2)
 likert.heat.plot2(massData[, -1],
                   allLevels = Cats,
                   text.size = 1.5)+

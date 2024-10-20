@@ -30,12 +30,7 @@ Anxiety data.
 
 ``` r
 library(DiscreteGapStatistic)
-#> Warning: replacing previous import 'dplyr::recode' by 'likert::recode' when
-#> loading 'DiscreteGapStatistic'
-```
-
-``` r
-library('dplyr')
+library(dplyr)
 #> 
 #> Attaching package: 'dplyr'
 #> The following objects are masked from 'package:stats':
@@ -44,21 +39,6 @@ library('dplyr')
 #> The following objects are masked from 'package:base':
 #> 
 #>     intersect, setdiff, setequal, union
-```
-
-``` r
-library(likert)
-#> Loading required package: ggplot2
-#> Loading required package: xtable
-#> 
-#> Attaching package: 'likert'
-#> The following object is masked from 'package:dplyr':
-#> 
-#>     recode
-```
-
-``` r
-data(mass)
 ```
 
 Libraries are uploaded. Questions are lightly reformatted and the
@@ -100,6 +80,7 @@ The dataset is visualized using a heatmap similar to the one produced by
 `likert::likert.heatmap.plot`.
 
 ``` r
+library(ggplot2)
 likert.heat.plot2(massData[, -1],
                   allLevels = Cats,
                   text.size = 1.5)+
