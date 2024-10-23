@@ -177,6 +177,7 @@ clusGapDiscr <- function (x,
 #' @import dplyr
 #' @param cG_obj Output object obtained from `clusGapDiscr`
 #' @param meth Method to use to determine optimal k number of clusters.
+#' @return A numerical value from 1 to K.max, contained in the input `cG_obj` object.
 #' @export
 
 findK <- function (cG_obj, meth = "Tibs2001SEmax"){

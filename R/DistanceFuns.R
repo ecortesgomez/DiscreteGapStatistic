@@ -8,9 +8,9 @@
 #' @export
 #'
 #' @examples
-#' # X = rbind(matrix(paste0("a", rpois(7*5, 1)), nrow=5),
-#' #           matrix(paste0("a", rpois(7*5, 3)), nrow=5))
-#' # distancematrix(X = X, d = "hellinger")
+#' X = rbind(matrix(paste0("a", rpois(7*5, 1)), nrow=5),
+#'           matrix(paste0("a", rpois(7*5, 3)), nrow=5))
+#' distancematrix(X = X, d = "hellinger")
 distancematrix <- function (X, d, na.rm=TRUE){
 
     if(d == 'bhattacharyya')
@@ -117,7 +117,6 @@ ChisqDist <- function(x){
 #' @return Distance R object
 #' @export
 disschisquare  <-  function (X, na.rm = TRUE) {
-    ## chisquare2 distance for discrete distributions
 
     if (!is.matrix(X)) {
         stop(paste(sQuote("X"), "not a matrix"))
@@ -143,7 +142,6 @@ cramersVmod <- function(x, y){
    }else if(all(is.na(x)) | all(is.na(y))){
       return(NA)
    }else{
-      ## lsr::cramersV(x, y)
       test <- stats::chisq.test(x=x, y=y, correct=FALSE)
       chi2 <- test$statistic
       N <- sum(test$observed)

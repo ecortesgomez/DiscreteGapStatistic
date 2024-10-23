@@ -20,7 +20,7 @@ R distance object
 Function invoking discrete distance functions
 }
 \examples{
-# X = rbind(matrix(paste0("a", rpois(7*5, 1)), nrow=5),
-#           matrix(paste0("a", rpois(7*5, 3)), nrow=5))
-# distancematrix(X = X, d = "hellinger")
+X = rbind(matrix(paste0("a", rpois(7*5, 1)), nrow=5),
+          matrix(paste0("a", rpois(7*5, 3)), nrow=5))
+distancematrix(X = X, d = "hellinger")
 }

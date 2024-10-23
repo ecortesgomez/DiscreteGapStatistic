@@ -11,6 +11,9 @@ findK(cG_obj, meth = "Tibs2001SEmax")
 
 \item{meth}{Method to use to determine optimal k number of clusters.}
 }
+\value{
+A numerical value from 1 to K.max, contained in the input `cG_obj` object.
+}
 \description{
 Criteria to determine number of clusters k
 }
