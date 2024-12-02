@@ -11,4 +11,7 @@ DiscreteClusGapFuns0.R
 SideTest_DiscreteGapStatistic.R
 TestVisualFuns.R
 TestVisualFuns_Leg.R
+DGStester.R
+DiscreteClusGapFuns0.R
+VisualFuns0.R
 inst/doc

@@ -13,8 +13,9 @@ ResHeatmap(
   nCl,
   distName,
   catVals,
-  FUNcluster = cluster::pam,
+  clusterFUN,
   out = "heatmap",
+  seed = NULL,
   clusterNames = NULL,
   prefObs = NULL,
   rowNames = rownames(x),
@@ -34,10 +35,15 @@ Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hel
 
 \item{catVals}{character string vector with (ordered) categorical values}
 
-\item{FUNcluster}{a function that accepts as first argument a matrix like `x`; second argument specifies number of `k` (k=>2) clusters
-This function returns a list with a component named `cluster`, a vector of length `n=nrow(x)` of integers from `1:k` indicating observation cluster assignment.}
+\item{clusterFUN}{Character string with one of the available clustering implementations.
+Available options are: 'pam' (default) from `cluster::pam`, 'diana' from `cluster::diana`, 'fanny' from `cluster::fanny`.
+'agnes-\{average, single, complete, ward, weighted\}' from `cluster::agnes`,
+'hclust-\{ward.D, ward.D2, single, complete, average, mcquitty, median, centroid\}' from `stats::hclust`,
+'kmodes' from `klar::kmodes` (`weighted = FALSE` and `fast= TRUE`).}
 
 \item{out}{Specifies the desired output between "heatmap" (default; produce a heatmap), "clusters" (return a `data.frame` with clustering assignments) or "clustersReord" (return a `data.frame` with reorganized clusters)}
+
+\item{seed}{Seed number.}
 
 \item{clusterNames}{Either `null` or 'renumber'. When `nCl` is a numerical vector, the cluster ordering is rearranged. `NULL` leaves cluster names as their original cluster assignment. 'renumber' respects the rearrangements but relabels the cluster numbers from top to bottom in ascending order.}
 

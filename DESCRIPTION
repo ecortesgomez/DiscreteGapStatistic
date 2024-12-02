@@ -1,7 +1,7 @@
 Package: DiscreteGapStatistic
 Type: Package
 Title: An Extension of the Gap Statistic for Ordinal/Categorical Data
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: c(
    person("Jeffrey", "Miecznikowski", email="jcm38@buffalo.edu", role = c("aut")),
    person("Eduardo", "Cortes", email="ecortesg@buffalo.edu", 
@@ -24,12 +24,13 @@ Imports:
    RColorBrewer,
    reshape2,
    tidyr,
-   ComplexHeatmap
+   ComplexHeatmap,
+   cluster,
+   stats
 Suggests:
-    cluster,
+    kableExtra,
     knitr,
     rmarkdown,
-    kableExtra,
     testthat
 Config/testthat/edition: 3
 Depends: 

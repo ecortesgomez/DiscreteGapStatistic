@@ -1,10 +1,11 @@
-#' Discrete application of clusGap
-#' Based on the implementation of the function found in the `cluster` R package
-#' @param x Categorical/number matrix
+#' Discrete application of clusGap - core function.
+#' Based on the implementation of the function found in the `cluster` R package.
+#' @param x A matrix object specifying category attributes in the columns and observations in the rows.
 #' @param FUNcluster a function that accepts as first argument a matrix like `x`; second argument specifies number of `k` (k=>2) clusters
-#' This function returns a list with a component named `cluster`, a vector of length `n=nrow(x)` of integers from `1:k` indicating observation cluster assignment.
+#' This function should return a list with a component named `cluster`, a vector of length `n=nrow(x)` of integers from `1:k` indicating observation cluster assignment.
+#' Make sure `FUNcluster` and `Input2Alg` agree.
 #' @param K.max Integer. Maximum number of clusters `k` to consider
-#' @param value.range String, character vector or a list of character vector with the length matching the number of columns (nQ) of the array.
+#' @param value.range String, character vector or a list of character vectors with the length matching the number of columns (nQ) of the array.
 #' A vector with all categories to consider when bootstrapping the null distribution sample (KS: Known Support option).
 #' By DEFAULT vals=NULL, meaning unique range of categories found in the data will be used when drawing the null (DS: Data Support option).
 #' If a character vector of categories is provided, these values would be used for the null distribution drawing across the array.
@@ -12,6 +13,10 @@
 #' @param verbose Integer or logical. Determines if “progress” output should be printed. The default prints one bit per bootstrap sample.
 #' @param distName String. Name of categorical distance to apply.
 #' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.
+#' @param Input2Alg Specifies the kind of input provided to the algorithm function in `FUNcluster`.
+#' For algorithms that only accept a distance matrix use `'distMatr'` option (default).
+#' For algorithms that require the dataset and a prespecified distance function (e.g. `stats::dist`) use the `'distFun'` option.
+#' This case the distance function is defined internally and determined by parameter `distName`.
 #' @param B Number of bootstrap samples. By default B = nrow(x).
 #' @param verbose Integer or logical. Determines whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.
 #' @param useLog Logical. Use log function after estimating `W.k`. Following the original formulation `useLog=TRUE` by default.
@@ -19,9 +24,8 @@
 #'
 #' @return a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.sim",
 #' where gap = E.logW - logW, and SE.sim correspond to the standard error of `gap`.
-#' @export
 
-clusGapDiscr <- function (x,
+clusGapDiscr0 <- function (x,
                           FUNcluster,
                           K.max,
                           B = nrow(x),
@@ -29,6 +33,7 @@ clusGapDiscr <- function (x,
                           verbose = interactive(),
                           distName = "hamming",
                           useLog = TRUE,
+                          Input2Alg = 'distMatr',
                           ...){
 
    stopifnot(is.function(FUNcluster),
@@ -62,21 +67,57 @@ clusGapDiscr <- function (x,
 
    ii <- seq_len(n)
 
-   W.k <- function(X, kk) {
-      clus <- if (kk > 1) {
-         Xdist <- distancematrix(X, d = distName)
-         FUNcluster(Xdist, kk)$cluster
+   if(Input2Alg == 'distMatr'){
+
+      W.k <- function(X, kk) {
+         clus <- if (kk > 1) {
+            Xdist <- distancematrix(X, d = distName)
+            FUNcluster(Xdist, kk)$cluster
+         }
+         else {
+            rep.int(1L, nrow(X))
+         }
+         mySplit <- split(ii, clus)
+         mySplit <- mySplit[sapply(mySplit, length) != 1]
+         # 0.5 * sum(vapply(mySplit, function(I) {
+         sum(vapply(mySplit, function(I) {
+            xs <- X[I, , drop = FALSE]
+            sum(distancematrix(xs, d = distName)/nrow(xs), na.rm = TRUE)
+         }, 0))
       }
-      else {
-         rep.int(1L, nrow(X))
+
+   }else if(Input2Alg == 'distFun'){
+
+      PWdistFun <- function(x, y){
+         x <- unlist(x)
+         y <- unlist(y)
+         distancematrix(rbind(x, y), d = distName)[1]
       }
-      mySplit <- split(ii, clus)
-      mySplit <- mySplit[sapply(mySplit, length) != 1]
-      # 0.5 * sum(vapply(mySplit, function(I) {
-      sum(vapply(mySplit, function(I) {
-         xs <- X[I, , drop = FALSE]
-         sum(distancematrix(xs, d = distName)/nrow(xs), na.rm = TRUE)
-      }, 0))
+
+      myFUNcluster <- function(X, kk){
+         ## Condition: FUNcluster is expecting a distFun parameter
+         FUNcluster(X,
+                    kk,
+                    distFun = function(x, y) PWdistFun(x, y) )
+      }
+
+      W.k <- function(X, kk){
+         clus <- if (kk > 1) {
+            ## Xdist <- distancematrix(X, d = distName)
+            myFUNcluster(X, kk)$cluster
+         }
+         else {
+            rep.int(1L, nrow(X))
+         }
+         mySplit <- split(ii, clus) ## Split into a list with potential clusters
+         mySplit <- mySplit[sapply(mySplit, length) != 1] ## Removes singletons
+         # 0.5 * sum(vapply(mySplit, function(I) {
+         sum(vapply(mySplit, function(I) {
+            xs <- X[I, , drop = FALSE]
+            sum(distancematrix(xs, d = distName)/nrow(xs), na.rm = TRUE)
+         }, 0))
+      }
+
    }
 
    logW <- E.logW <- SE.sim <- numeric(K.max)
@@ -165,12 +206,158 @@ clusGapDiscr <- function (x,
       cat("", B, "\n")
    E.logW <- colMeans(logWks)
    SE.sim <- sqrt((1 + 1/B) * apply(logWks, 2, stats::var))
-   return( structure(class = "clusGap",
-             list(Tab = cbind(logW, E.logW,
-                              gap = E.logW - logW, SE.sim),
-                  call = cl., n = n, B = B,
-                  FUNcluster = FUNcluster,
-                  useLog = useLog)) )
+
+   return(structure(class = "clusGap",
+                     list(Tab = cbind(logW, E.logW,
+                                      gap = E.logW - logW,
+                                      SE.sim),
+                          call = cl.,
+                          n = n,
+                          B = B,
+                          FUNcluster = FUNcluster,
+                          useLog = useLog,
+                          dist = distName)) )
+}
+
+#' Discrete application of clusGap
+#' Based on the implementation of the function found in the `cluster` R package.
+#' @param x A matrix object specifying category attributes in the columns and observations in the rows.
+#' @param clusterFUN Character string with one of the available clustering implementations.
+#' Available options are: 'pam' (default) from `cluster::pam`, 'diana' from `cluster::diana`, 'fanny' from `cluster::fanny`,
+#' 'agnes-\{average, single, complete, ward, weighted\}' from `cluster::fanny`,
+#' 'hclust-\{ward.D, ward.D2, single, complete, average, mcquitty, median, centroid\}' from `stats::hclust`,
+#' 'kmodes' from `klar::kmodes` (`iter.max = 10`, `weighted = FALSE` and `fast= TRUE`).
+#' 'kmodes-N' enables to run the `kmodes` algorithm with a given number N of iterations where `iter.max = N`.
+#' @param K.max Integer. Maximum number of clusters `k` to consider
+#' @param value.range String character vector or a list of character vector with the length matching the number of columns (nQ) of the array.
+#' A vector with all categories to consider when bootstrapping the null distribution sample (KS: Known Support option).
+#' By DEFAULT vals=NULL, meaning unique range of categories found in the data will be used when drawing the null (DS: Data Support option).
+#' If a character vector of categories is provided, these values would be used for the null distribution drawing across the array.
+#' If a list with category character vectors is provided, it has to have the same number of columns as the input array. The order of list element corresponds to the array's columns.
+#' @param verbose Integer or logical. Determines if “progress” output should be printed. The default prints one bit per bootstrap sample.
+#' @param distName String. Name of categorical distance to apply.
+#' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.
+#' @param B Number of bootstrap samples. By default B = nrow(x).
+#' @param verbose Integer or logical. Determines whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.
+#' @param useLog Logical. Use log function after estimating `W.k`. Following the original formulation `useLog=TRUE` by default.
+#' @param ... optionally further arguments for `FUNcluster()`
+#'
+#' @return a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.sim",
+#' where gap = E.logW - logW, and SE.sim correspond to the standard error of `gap`.
+#' @export
+
+clusGapDiscr <- function(x,
+                         clusterFUN,
+                         K.max,
+                         B = nrow(x),
+                         value.range = "DS",
+                         verbose = interactive(),
+                         distName = "hamming",
+                         useLog = TRUE,
+                         ...){
+
+   if(clusterFUN == 'pam'){
+      clusGapDiscr0(x = x,
+                    FUNcluster = cluster::pam,
+                    K.max = K.max,
+                    B = B,
+                    value.range = value.range,
+                    verbose = verbose,
+                    distName = distName,
+                    useLog = useLog,
+                     ...)
+
+   }else if(clusterFUN == 'fanny'){
+      clusGapDiscr0(x = x,
+                    FUNcluster = cluster::fanny,
+                    K.max = K.max,
+                    B = B,
+                    value.range = value.range,
+                    verbose = verbose,
+                    distName = distName,
+                    useLog = useLog,
+                    ...)
+
+   }else if(clusterFUN == 'diana'){
+      dianaK <- function(d, k){
+         out <- cluster::diana(x = d) %>%
+                 stats::cutree(k = k)
+         list(cluster = out)
+      }
+
+      clusGapDiscr0(x = x,
+                    FUNcluster = dianaK,
+                    K.max = K.max,
+                    B = B,
+                    value.range = value.range,
+                    verbose = verbose,
+                    distName = distName,
+                    useLog = useLog,
+                    ...)
+
+   }else if(grepl(pattern = '^agnes-.+', x = clusterFUN)){
+
+      cMeth <- sub('agnes-', '', clusterFUN)
+      agnesK <- function(d = d, k = k){
+         out <- cluster::agnes(x = d,
+                               diss = TRUE,
+                               method = cMeth) %>%
+            stats::cutree(k = k)
+         list(cluster = out)
+      }
+
+      clusGapDiscr0(x = x,
+                    FUNcluster = agnesK,
+                    K.max = K.max,
+                    B = B,
+                    value.range = value.range,
+                    verbose = verbose,
+                    distName = distName,
+                    useLog = useLog,
+                    ...)
+
+   }else if(grepl(pattern = '^hclust-.+', x = clusterFUN)){
+
+      cMeth <- sub('hclust-', '', clusterFUN)
+      hClustK <- function(d = d, k = k){
+            out <- stats::hclust(d = d, method = cMeth) %>%
+               stats::cutree(k = k)
+            list(cluster = out)
+         }
+
+      clusGapDiscr0(x = x,
+                    FUNcluster = hClustK,
+                    K.max = K.max,
+                    B = B,
+                    value.range = value.range,
+                    verbose = verbose,
+                    distName = distName,
+                    useLog = useLog,
+                    ...)
+
+   }else if(grepl(pattern = '^kmodes.*', x = clusterFUN)){
+
+      cIter <- ifelse(grepl(pattern = 'kmodes-.+',  x = clusterFUN),
+                      as.numeric(sub('kmodes-', '', clusterFUN)),
+                      10)
+
+      kmodesD_ <- function(x, k, distFun){
+         kmodesD(data = x, modes = k, distFun = distFun, iter.max = cIter)
+      }
+
+      clusGapDiscr0(x = x,
+                    FUNcluster = kmodesD_,
+                    K.max = K.max,
+                    B = B,
+                    value.range = value.range,
+                    verbose = verbose,
+                    distName = distName,
+                    useLog = useLog,
+                    Input2Alg = 'distFun',
+                    ...)
+   }else
+      message('Clustering algorithm not available.')
+
 }
 
 #' Criteria to determine number of clusters k

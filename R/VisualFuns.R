@@ -125,9 +125,13 @@ distanceHeat <- function(x,
 #' @param distName Name of categorical distance to apply.
 #' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.
 #' @param catVals character string vector with (ordered) categorical values
-#' @param FUNcluster a function that accepts as first argument a matrix like `x`; second argument specifies number of `k` (k=>2) clusters
-#' This function returns a list with a component named `cluster`, a vector of length `n=nrow(x)` of integers from `1:k` indicating observation cluster assignment.
+#' @param clusterFUN Character string with one of the available clustering implementations.
+#' Available options are: 'pam' (default) from `cluster::pam`, 'diana' from `cluster::diana`, 'fanny' from `cluster::fanny`.
+#' 'agnes-\{average, single, complete, ward, weighted\}' from `cluster::agnes`,
+#' 'hclust-\{ward.D, ward.D2, single, complete, average, mcquitty, median, centroid\}' from `stats::hclust`,
+#' 'kmodes' from `klar::kmodes` (`weighted = FALSE` and `fast= TRUE`).
 #' @param out Specifies the desired output between "heatmap" (default; produce a heatmap), "clusters" (return a `data.frame` with clustering assignments) or "clustersReord" (return a `data.frame` with reorganized clusters)
+#' @param seed Seed number.
 #' @param clusterNames Either `null` or 'renumber'. When `nCl` is a numerical vector, the cluster ordering is rearranged. `NULL` leaves cluster names as their original cluster assignment. 'renumber' respects the rearrangements but relabels the cluster numbers from top to bottom in ascending order.
 #' @param prefObs character string vector of length 1 with a prefix for the observations, in case they come unlabelled or the user wants to anomymize sample IDs.
 #' @param rowNames character vector with names of rows according to `x`. By default, `rownames(x)` will be printed in the plot. `rowNames=NULL` prevents from showing names. `prefObs` option takes precedence if is different to `NULL`.
@@ -141,8 +145,9 @@ ResHeatmap <- function(x,
                        nCl,
                        distName,
                        catVals,
-                       FUNcluster = cluster::pam,
+                       clusterFUN,
                        out = 'heatmap',
+                       seed=NULL,
                        clusterNames = NULL,
                        prefObs = NULL,
                        rowNames = rownames(x),
@@ -164,9 +169,30 @@ ResHeatmap <- function(x,
    if(!is.matrix(x))
       x <- as.matrix(x)
 
+   if(!is.null(seed))
+      set.seed(seed)
+
    if(nCl > 0){
-      AssignedCls <- FUNcluster(x = distancematrix(x, d = distName),
-                                k = nCl)$cluster
+      ## Requesting cluster assignment
+      FUNcluster <- clusterFunSel(clustFun = clusterFUN)
+
+
+      if(!grepl(pattern = '^kmodes.*', x = clusterFUN)){
+         AssignedCls <- FUNcluster(x = distancematrix(x, d = distName),
+                                   k = nCl)$cluster
+      }else{
+
+         PWdistFun <- function(x, y){
+            x <- unlist(x)
+            y <- unlist(y)
+            distancematrix(rbind(x, y), d = distName)[1]
+         }
+
+         AssignedCls <- FUNcluster(x = x,
+                                   k = nCl,
+                                   distFun = PWdistFun)$cluster
+      }
+
    }else{
       AssignedCls <- rep(0, nrow(x))
    }
@@ -234,7 +260,8 @@ ResHeatmap <- function(x,
                                        row_split = rowSplit,
                                        row_title = rowTitle)
       ComplexHeatmap::draw(hmObj,
-                           column_title = paste0("DiscreteClusGap Assignments\n", distName),
+                           column_title = paste0("DiscreteClusGap Assignments\n",
+                                                 "Dist: ", distName, " - Alg: ", clusterFUN),
                            column_title_gp = grid::gpar(fontsize = 12, fontface = "bold"),
                            show_annotation_legend=FALSE)
       grDevices::dev.off()
