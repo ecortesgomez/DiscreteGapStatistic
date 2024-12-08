@@ -128,7 +128,7 @@ distanceHeat(x = massData[, -1], distName = 'bhattacharyya',
 
 # `clusGapDiscr`: The Gap Statistic for discrete data {#chiclust}
 
-The Gap Statistic (GS) in its original formulation by tibshirani et. al aims to determine an optimal number of clusters given a rectangular dataset with continuous columns and a pre-specified clustering method given $k$ number of clusters (i.e. $k$-means clustering or partitioning around medoids (pam)). This is done by comparing the within-cluster dispersion of the data to a randomly generated reference null distribution of the data obtaining estimations via bootstrapping. The idea is to quantify whether the clustering structure observed in the data is considerably different compared to what would be expected by random chance. `clusGap` is a widely used implementation of the GS from the `cluster` package [@maechler2023cluster] with the following basic arguments:
+The Gap Statistic (GS) in its original formulation by Tibshirani et. al aims to determine an optimal number of clusters given a rectangular dataset with continuous columns and a pre-specified clustering method given $k$ number of clusters (i.e. $k$-means clustering or partitioning around medoids (pam)). This is done by comparing the within-cluster dispersion of the data to a randomly generated reference null distribution of the data obtaining estimations via bootstrapping. The idea is to quantify whether the clustering structure observed in the data is considerably different compared to what would be expected by random chance. `clusGap` is a widely used implementation of the GS from the `cluster` package [@maechler2023cluster] with the following basic arguments:
 
 ```{r clusGap, echo=TRUE, eval=FALSE}
 clusGap(x, FUNcluster, K.max, B = 100, 
@@ -140,21 +140,39 @@ clusGap(x, FUNcluster, K.max, B = 100,
 - `K.max`: maximum number of clusters to consider.  
 - `B`: integer indicating the number of times to perform the Montecarlo repetitions. 
 
-The discrete GS (dGS) proposed applies and adapts the principle behind the original formulation, but for categorical data using a distance-based approach. The GS assumes that the distance between observations can be correctly described with the Euclidean distance, since it assumes the data is continuous. In the case of categorical data, this distance assumption is not appropriate and different class of distances needs to be defined. `clusGapDiscr` is the main function that performs and implements the dGS. The first four parameters found in `clusGap` are identical and have the same usage to the ones found in `clusGapDiscr`. Additionally, the function requires a categorical distance from the list mentioned above. Another feature of the dGS is the reference null distribution used, which can be a discrete uniform distribution of the unique column-wise categories found in the data; this setting is defined as the Data Support (DS). In other settings, the categories to be used must be user-specified via a character vector or list. This setting will be referred as the Known Support (KS). 
+The discrete GS (dGS) proposed applies and adapts the principle behind the original formulation, but for categorical data using a distance-based approach. The GS assumes that the distance between observations can be correctly described with the Euclidean distance, since it assumes the data is continuous. In the case of categorical data, this distance assumption is not appropriate and a different class of distances needs to be defined. `clusGapDiscr` is the main function that performs and implements dGS. Parameters `x`, `K.max` and `B` found in `clusGapDiscr` have the same meaning and usage to the ones found in `clusGap`. `clusterFUN` expects the name of a well-known clustering algorithm implementation available in `R` amenable to the proposed methodology. The input options available for this parameter are the following: 
+
+```{r clusterFUNopt, echo=FALSE}
+data.frame(clusterFUN = c('pam', 'fanny', 'diana', 
+                          'agnes-\\{average, single, complete, ward, weighted\\}', 
+                          'hclust-\\{average, single, complete, ward.D, ward.D2,  mcquitty, median, centroid\\}', 
+                          'kmodes-\\{1, 2, ..., \\}'),
+           Package = c(rep('cluster', 4), 'stats', 'klaR')) %>%
+   kbl(caption = 'List of appliable clustering algorithms for DiscreteGapStatistic') %>%
+   kable_paper(full_width = FALSE)
+```
+
+The first four options are straight-forward since originally these functions can output a clustering partition providing a distance matrix and a given number of clusters. The following two implementations use a flexible hierarchical clustering strategy. The number of desired clusters can be obtained appropriately by cutting the resulting hierarchical tree. This parameter requires the name of the implementation and a dash (-) followed by the exact name of the clustering strategy described in the package corresponding R package. Lastly, a k-modes implementation is included using code found on `klaR` with options `fast=TRUE, weighted = FALSE`. The expected string after the dash is a non-negative integer specifying the maximum number of iterations to carry out within the algorithm (`iter.max` option; inputting `kmodes` alone runs `iter.max = 10` by default). 
+
+Additionally, the function requires a categorical distance from the list mentioned above. Another feature of the dGS is the reference null distribution used, which can be a discrete uniform distribution of the unique column-wise categories found in the data; this setting is defined as the Data Support (DS). In other settings, the categories to be used must be user-specified via a character vector or list. This setting will be referred as the Known Support (KS). 
 
 ```{r clusGapDiscr, echo=TRUE, eval=FALSE}
-clusGapDiscr(x, FUNcluster, K.max, B = nrow(x),
+clusGapDiscr(x, clusterFUN, K.max, B = nrow(x),
              distName, value.range = 'DS', 
              verbose = interactive(), useLog = TRUE ...)
 ```
 
-- `distaName`: name of discrete distance. The available options are `'hamming'`, `'chisquare'`, `'cramersV'`, `'bhattacharyya'` and `'hellinger'`.
+- `distName`: name of discrete distance. The available options are `'hamming'`, `'chisquare'`, `'cramersV'`, `'bhattacharyya'` and `'hellinger'`.
 
 - `value.range`: specifies the values of the reference null distribution. Possible values: `'DS'` or a character vector with unique values. `'DS'` option extracts the unique values found in `x`. 
 
 - `useLog`: Binary truth variable specifying whether to evaluate the Gap Statistic with or without $log$ function.
 
 Similar to `clusGap`, `clusGapDiscr` returns a matrix object with `K.max` rows corresponding to the user-specified number of clusters with an estimate of the GS and its corresponding standard error. This information would then determine the number of clusters according to the cluster-selection criterion. The one used in `DiscreteGapStatistic` is the 1-SE criterion implemented by the function `findK`, which accepts `clusGap` objects. The following example applies the dGS on the Math Anxiety data using the Hamming, $\chi^2$, and Cramer's V distances applying the `cluster::pam` algorithm. A plot is then generated displaying the dGS against the number of clusters. Each estimate is accompanied by corresponding standard-error bars and a blue dashed line indicating the chosen number of clusters.  
+
+## Basics
+
+The math anxiety data is further explored under different categorical distances using the `cluster::pam` algorithm. The number of bootstraps `B` is increased to `100` since the sample size for this dataset is not too large. The maximum number of clusters to consider is `9`.
 
 ```{r clusGapDiscrFit, echo=TRUE, eval=TRUE, fig.retina=NULL, out.width=250, dpi=500, echo=TRUE, results='hold', fig.show="hold"}
 ## Recall Cats:
@@ -164,21 +182,21 @@ Similar to `clusGap`, `clusGapDiscr` returns a matrix object with `K.max` rows c
 #                         'Agree', 'Strongly Agree') )
 
 HammRun <- clusGapDiscr(x = massData[, -1],
-                        FUNcluster = cluster::pam,
+                        clusterFUN = 'pam',
                         B = 100,
                         K.max = 9,
                         value.range = 'DS',
                         distName = 'hamming')
 
 chisqRun <- clusGapDiscr(x = massData[, -1],
-                        FUNcluster = cluster::pam,
+                        clusterFUN = 'pam',
                         B = 100,
                         K.max = 9,
                         value.range = Cats,
                         distName = 'chisquare')
 
 crVRun <- clusGapDiscr(x = massData[, -1],
-                        FUNcluster = cluster::pam,
+                        clusterFUN = 'pam',
                         B = 100,
                         K.max = 9,
                         value.range = 'DS',
@@ -206,21 +224,24 @@ Heatmaps can be created to visualize the commonalities within each cluster and t
 
 ```{r resHeatMaps, echo=TRUE, eval=TRUE, fig.retina=NULL,  dpi=500, fig.retina=NULL, out.width=230, dpi=500, results='hold', fig.show="hold"}
 
-ResHeatmap(massData[, -1],
+ResHeatmap(x = massData[, -1],
            distName = 'hamming',
+           clusterFUN = 'pam', 
            catVals = Cats,
            nCl = findK(HammRun),
            out = 'heatmap',
            prefObs = NULL, height = 6)
 
-ResHeatmap(massData[, -1],
+ResHeatmap(x = massData[, -1],
+           clusterFUN = 'pam', 
            distName = 'chisquare',
            catVals = Cats,
            nCl = findK(chisqRun),
            out = 'heatmap',
            prefObs = NULL, height = 6)
 
-ResHeatmap(massData[, -1],
+ResHeatmap(x = massData[, -1],
+           clusterFUN = 'pam', 
            distName = 'cramerV',
            catVals = Cats,
            nCl = findK(crVRun),
@@ -228,25 +249,30 @@ ResHeatmap(massData[, -1],
            prefObs = NULL, height = 6)
 ```
 
+## Re-arranging clusters
+
 Notice that Hamming distance detects subclusters present in Cluster 2 from the $\chi^2$ distance run. To compare the similar clusters side-to-side, the parameter `nCl` can be used to reorder the clusters relative to the given ordering. This case `nCl = 2:1` will alter (invert) the order of the two clusters on the $\chi^2$ based cluster. A third heatmap is displayed relabeling the clusters from the $\chi^2$ run using the `clusterNames = 'renumber'` argument.
 
 ```{r resHeatMaps2, echo=TRUE, eval=TRUE, out.width=230, dpi=500, results='hold', fig.show="hold", message=FALSE, warning=FALSE, error=FALSE}
 
-ResHeatmap(massData[, -1],
+ResHeatmap(x = massData[, -1],
+           clusterFUN = 'pam', 
            distName = 'hamming',
            catVals = Cats,
            nCl = findK(HammRun),
            out = 'heatmap', 
            height = 6)
 
-ResHeatmap(massData[, -1],
+ResHeatmap(x = massData[, -1],
+           clusterFUN = 'pam', 
            distName = 'chisquare',
            catVals = Cats,
            nCl = 2:1,
            out = 'heatmap', 
            height = 6)
 
-ResHeatmap(massData[, -1],
+ResHeatmap(x = massData[, -1],
+           clusterFUN = 'pam', 
            distName = 'chisquare',
            catVals = Cats,
            nCl = 2:1,
@@ -255,4 +281,61 @@ ResHeatmap(massData[, -1],
            height = 6)
 ```
 
+## Alternative clustering algorithms
+
+Other compatible clustering algorithms are considered additional to `cluster::pam` only using the Hamming distance.
+
+### Other `cluster` algorithms: `diana` and `fanny`
+
+```{r clusterRun, echo=TRUE, eval=TRUE, out.width=230, dpi=500, results='hold', fig.show="hold", message=FALSE, warning=FALSE, error=FALSE}
+
+hDiaMa <- clusGapDiscr(massData[, -1], 'diana', K.max = 9, B = 100)
+ResHeatmap(x = massData[, -1],
+           distName = 'hamming',
+           clusterFUN = 'diana',
+           catVals = Cats,
+           nCl = findK(hDiaMa),
+           out = 'heatmap',
+           height = 6)
+
+hFanMa <- clusGapDiscr(massData[, -1], 'fanny', K.max = 9, B = 100)
+ResHeatmap(x = massData[, -1],
+           clusterFUN = 'fanny',
+           distName = 'hamming',
+           catVals = Cats,
+           nCl = findK(hFanMa),
+           out = 'heatmap', 
+           height = 6)
+```
+
+### Hierarchical Clustering
+
+```{r hclustRun, echo=TRUE, eval=TRUE, out.width=230, dpi=500, results='hold', fig.show="hold", message=FALSE, warning=FALSE, error=FALSE}
+hAgnComMa <- clusGapDiscr(massData[, -1], 'agnes-complete', K.max = 9, B = 100)
+ResHeatmap(x = massData[, -1],
+           distName = 'hamming',
+           clusterFUN = 'agnes-complete',
+           catVals = Cats,
+           nCl = findK(hAgnComMa),
+           out = 'heatmap',
+           height = 6)
+
+hhclComMa <- clusGapDiscr(massData[, -1], 'hclust-complete', K.max = 9, B = 100)
+ResHeatmap(x = massData[, -1],
+           distName = 'hamming',
+           clusterFUN = 'hclust-complete',
+           catVals = Cats,
+           nCl = findK(hhclComMa),
+           out = 'heatmap',
+           height = 6)
+
+hhclMcqMa <- clusGapDiscr(massData[, -1], 'hclust-mcquitty', K.max = 9, B = 100)
+ResHeatmap(x = massData[, -1],
+           distName = 'hamming',
+           clusterFUN = 'hclust-mcquitty',
+           catVals = Cats,
+           nCl = findK(hhclMcqMa),
+           out = 'heatmap', 
+           height = 6)
+```
 

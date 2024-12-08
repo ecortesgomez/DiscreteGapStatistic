@@ -255,7 +255,7 @@ kmodesD <- function (data,
 #' A function that generates formatted algorithmic functions that can be plugged to enable run a wide variety of clustering algorithm for `clusGapDiscr` function.
 #' @param clustFun A character string with the following possible options:
 #' 'pam' (default) from `cluster::pam`, 'diana' from `cluster::diana`, 'fanny' from `cluster::fanny`,
-#' 'agnes-\{average, single, complete, ward, weighted\}' from `cluster::fanny`,
+#' 'agnes-\{average, single, complete, ward, weighted\}' from `cluster::agnes`,
 #' 'hclust-\{ward.D, ward.D2, single, complete, average, mcquitty, median, centroid\}' from `base::hclust`,
 #' 'kmodes' from `klar::kmodes` (`iter.max = 10`, `weighted = FALSE` and `fast= TRUE`).
 #' 'kmodes-N' enables to run the `kmodes` algorithm with a given number N of iterations where `iter.max = N`.
