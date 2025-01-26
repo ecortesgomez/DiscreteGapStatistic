@@ -2,8 +2,7 @@
 % Please edit documentation in R/DiscreteClusGapFuns.R
 \name{clusGapDiscr}
 \alias{clusGapDiscr}
-\title{Discrete application of clusGap
-Based on the implementation of the function found in the `cluster` R package.}
+\title{Discrete application of clusGap}
 \usage{
 clusGapDiscr(
   x,
@@ -51,6 +50,5 @@ a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.s
 where gap = E.logW - logW, and SE.sim correspond to the standard error of `gap`.
 }
 \description{
-Discrete application of clusGap
 Based on the implementation of the function found in the `cluster` R package.
 }
