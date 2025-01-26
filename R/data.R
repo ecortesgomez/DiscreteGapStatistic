@@ -1,11 +1,12 @@
 #' mass data
 #'
-#' @format ## `data.frame`
 #' Data extracted from the `likert` R package.
 #' Results from an administration of the Math Anxiety Scale Survey.
 #' First Column records student gender either Female or Male.
-#' All statement answers have 5 possible ordinal categorical items: Strongly Disagree, Disagree,
-#' Neutral, Agree, Strongly Agree.
+#' All statement answers have 5 possible ordinal categorical items:
+#' Strongly Disagree, Disagree, Neutral, Agree, Strongly Agree.
+#'
+#' @format ## `data.frame`
 #' \describe{
 #'   \item{Gender}{Gender}
 #'   \item{I find math interesting.}{Math interesting}
@@ -28,9 +29,11 @@
 
 #' Concussion Data
 #'
-#' @format ## `data.frame`
-#' A data frame with 109 rows and 21 columns.
+#' A data frame with 109 observations and 21 questions.
 #' Severity rating recorded as categorical responses from c1 (none) to c7 (severe).
+#'
+#' @format ## `data.frame`
+#'
 #' \describe{
 #'   \item{Q1: Headache}{Headache}
 #'   \item{Q2: Nausea}{Nausea}

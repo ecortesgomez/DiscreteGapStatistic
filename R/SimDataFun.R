@@ -1,5 +1,8 @@
 #' Simulate Data
 #'
+#' A function to simulate data based on a multinomial vector parameter vector or
+#' a list of parameter vectors.
+#'
 #' @param N Integer. Number of observations.
 #' @param nQ Integer. Number of questions.
 #' @param pi Numeric vector. Vector of probabilities adding up to 1; it is recommended that names of elements are character strings.

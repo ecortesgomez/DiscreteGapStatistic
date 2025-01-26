@@ -2,7 +2,7 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{BhattacharyyaDist}
 \alias{BhattacharyyaDist}
-\title{Bhattacharyya distance core function}
+\title{Bhattacharyya distance}
 \usage{
 BhattacharyyaDist(x, adj = 0.01)
 }

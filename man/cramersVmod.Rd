@@ -2,10 +2,7 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{cramersVmod}
 \alias{cramersVmod}
-\title{Cramer's V modified pairwise vector function based on the function found in lsr package
-This is simple wrapper of the usual chisq.test fun
-This is actually an adjusted version of the pi = sqrt(Chisq2/N)
-guaranteeing that values are within 0 (no association) and 1 (association)}
+\title{Cramer's V modified pairwise vector function based on the function found in lsr package}
 \usage{
 cramersVmod(x, y)
 }
@@ -18,8 +15,7 @@ cramersVmod(x, y)
 numerical value
 }
 \description{
-Cramer's V modified pairwise vector function based on the function found in lsr package
-This is simple wrapper of the usual chisq.test fun
+This is simple wrapper of the usual chisq.test function.
 This is actually an adjusted version of the pi = sqrt(Chisq2/N)
 guaranteeing that values are within 0 (no association) and 1 (association)
 }

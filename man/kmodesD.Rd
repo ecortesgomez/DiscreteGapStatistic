@@ -2,8 +2,7 @@
 % Please edit documentation in R/AuxFuns.R
 \name{kmodesD}
 \alias{kmodesD}
-\title{Adapted kmodes function to accept any categorical distance based on
-the function found in `klaR:kmodes`.}
+\title{Adapted k-modes algorithm}
 \usage{
 kmodesD(data, modes, distFun, iter.max = 10)
 }
@@ -21,6 +20,6 @@ An object of class kmodes as found in `klaR` packages.
 An additional component specifies the categorical distance function found in `distFun`.
 }
 \description{
-Adapted kmodes function to accept any categorical distance based on
+K-modes function to accept any categorical distance based on
 the function found in `klaR:kmodes`.
 }

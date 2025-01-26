@@ -1,8 +1,10 @@
-#' Function invoking discrete distance functions
+#' Calculate categorical distance matrix for discrete data
+#'
+#' Function invoking discrete distance functions.
+#' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'
 #'
 #' @param X Matrix where rows are the observations and columns are discrete features
 #' @param d Name of distance. Distances available: bhattacharyya, chisquare, cramerV, hamming and hellinger
-#' @param na.rm Remove NAs default=TRUE
 #'
 #' @return R distance object
 #' @export
@@ -11,23 +13,26 @@
 #' X = rbind(matrix(paste0("a", rpois(7*5, 1)), nrow=5),
 #'           matrix(paste0("a", rpois(7*5, 3)), nrow=5))
 #' distancematrix(X = X, d = "hellinger")
-distancematrix <- function (X, d, na.rm=TRUE){
+distancematrix <- function (X, d){
 
     if(d == 'bhattacharyya')
-        return(dissbhattacharyya(X, na.rm))
+        return(dissbhattacharyya(X))
     if(d == 'chisquare')
-        return(disschisquare(X, na.rm))
+        return(disschisquare(X))
     if (d == "cramerV")
-         return(disscramerv(X, na.rm))
+         return(disscramerv(X))
     if (d == "hamming") ## General version
-        return(disshamming(X, na.rm))
+        return(disshamming(X))
     if (d == "hellinger")
-        return(disshellinger(X, na.rm))
+        return(disshellinger(X))
 
     stop("Distance metric ", d, " not available")
 }
 
+#' Bhattacharyya distance
+#'
 #' Bhattacharyya distance core function
+#'
 #' @param x Matrix
 #' @param adj Small quantity added to avoid indefinite log(0) values. DEFAULT=0.001
 #'
@@ -60,13 +65,15 @@ BhattacharyyaDist <- function(x, adj = 0.01){
     stats::as.dist(outMat)
 }
 
-#' Bhattacharyya's wrapper Function
+#' Bhattacharyya's distance (wrapper)
+#'
+#' Wrapper of `BhattacharyyaDist`
+#'
 #' @param X Matrix
-#' @param na.rm Remove NAs default=TRUE
 #'
 #' @return Distance R object
 #' @export
-dissbhattacharyya  <-  function (X, na.rm = TRUE) {
+dissbhattacharyya  <-  function (X) {
 
     if (!is.matrix(X)) {
         stop(paste(sQuote("X"), "not a matrix"))
@@ -75,7 +82,10 @@ dissbhattacharyya  <-  function (X, na.rm = TRUE) {
     BhattacharyyaDist(x=X)
 }
 
+#' Chi-square distance
+#'
 #' Chi-square distance core function
+#'
 #' @param x Matrix
 #'
 #' @return Distance R object
@@ -110,13 +120,15 @@ ChisqDist <- function(x){
         stats::as.dist(outMat/myP)
 }
 
-#' Chi-square distance wrapper function
+#' Chi-square distance (wrapper)
+#'
+#' Wrapper of `ChisqDist`
+#'
 #' @param X Matrix
-#' @param na.rm logical
 #'
 #' @return Distance R object
 #' @export
-disschisquare  <-  function (X, na.rm = TRUE) {
+disschisquare  <-  function (X) {
 
     if (!is.matrix(X)) {
         stop(paste(sQuote("X"), "not a matrix"))
@@ -125,15 +137,16 @@ disschisquare  <-  function (X, na.rm = TRUE) {
 }
 
 #' Cramer's V modified pairwise vector function based on the function found in lsr package
-#' This is simple wrapper of the usual chisq.test fun
+#'
+#' This is simple wrapper of the usual chisq.test function.
 #' This is actually an adjusted version of the pi = sqrt(Chisq2/N)
 #' guaranteeing that values are within 0 (no association) and 1 (association)
+#'
 #' @param x vector of size n
 #' @param y vector of size n
 #'
 #' @return numerical value
 #' @export
-
 cramersVmod <- function(x, y){
    if(identical(x, y)){
       return(1)
@@ -152,7 +165,10 @@ cramersVmod <- function(x, y){
    }
 }
 
+#' Cramer's V distance
+#'
 #' Cramer's V core function
+#'
 #' @param X matrix
 #'
 #' @return Distance matrix
@@ -171,13 +187,15 @@ CramerV <- function(X){
     stats::as.dist(matOut)
 }
 
-#' Cramer's V distance wrapper function
+#' Cramer's V distance (wrapper)
+#'
+#' Wrapper of `CramerV`
+#'
 #' @param X Matrix
-#' @param na.rm logical
 #'
 #' @return Distance R object
 #' @export
-disscramerv <-  function (X, na.rm = TRUE) {
+disscramerv <-  function (X) {
 
     if (!is.matrix(X)) {
         stop(paste(sQuote("X"), "not a matrix"))
@@ -187,18 +205,21 @@ disscramerv <-  function (X, na.rm = TRUE) {
 }
 
 #' Hamming distance wrapper function
+#'
 #' Function based on cultevo's package implementation
+#'
 #' @param X matrix
-#' @param na.rm logical
 #'
 #' @return Distance matrix
 #' @export
-disshamming <- function (X, na.rm = TRUE){
+disshamming <- function (X){
 
    out <- cultevo::hammingdists(X)/ncol(X)
    return(out)
 }
 
+#' Hellinger distance
+#'
 #' Hellinger distance core function
 #' @param x matrix
 #'
@@ -208,9 +229,8 @@ HellingerDist <- function(x){
     nRow <- nrow(x)
     myP <- ncol(x)
     compInd <- lapply(sort(unique(as.vector(x))),
-                      ## function(k) diag((x == k) %*% t(x == k))/myP)
-                      function(k) diag((x == k) %*% t(x == k)))
-    names(compInd) <- sort(unique(as.vector(x)))
+                      function(k) rowSums(x == k) )
+   names(compInd) <- sort(unique(as.vector(x)))
 
     myCoords <- utils::combn(1:nRow, m = 2)
     He <- sapply(compInd,
@@ -232,13 +252,15 @@ HellingerDist <- function(x){
     stats::as.dist(outMat)
 }
 
-#' Hellinger's distance wrapper Function
+#' Hellinger distance (wrapper)
+#'
+#' Wrapper of `HellingerDist`
+#'
 #' @param X Matrix
-#' @param na.rm logical
 #'
 #' @return Distance R object
 #' @export
-disshellinger  <-  function (X, na.rm = TRUE) {
+disshellinger  <-  function (X) {
     if (!is.matrix(X)) {
         stop(paste(sQuote("X"), "not a matrix"))
     }

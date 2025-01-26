@@ -2,18 +2,16 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{disscramerv}
 \alias{disscramerv}
-\title{Cramer's V distance wrapper function}
+\title{Cramer's V distance (wrapper)}
 \usage{
-disscramerv(X, na.rm = TRUE)
+disscramerv(X)
 }
 \arguments{
 \item{X}{Matrix}
-
-\item{na.rm}{logical}
 }
 \value{
 Distance R object
 }
 \description{
-Cramer's V distance wrapper function
+Wrapper of `CramerV`
 }

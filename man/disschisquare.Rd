@@ -2,18 +2,16 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{disschisquare}
 \alias{disschisquare}
-\title{Chi-square distance wrapper function}
+\title{Chi-square distance (wrapper)}
 \usage{
-disschisquare(X, na.rm = TRUE)
+disschisquare(X)
 }
 \arguments{
 \item{X}{Matrix}
-
-\item{na.rm}{logical}
 }
 \value{
 Distance R object
 }
 \description{
-Chi-square distance wrapper function
+Wrapper of `ChisqDist`
 }

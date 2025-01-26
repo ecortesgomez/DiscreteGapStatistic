@@ -2,22 +2,21 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{distancematrix}
 \alias{distancematrix}
-\title{Function invoking discrete distance functions}
+\title{Calculate categorical distance matrix for discrete data}
 \usage{
-distancematrix(X, d, na.rm = TRUE)
+distancematrix(X, d)
 }
 \arguments{
 \item{X}{Matrix where rows are the observations and columns are discrete features}
 
 \item{d}{Name of distance. Distances available: bhattacharyya, chisquare, cramerV, hamming and hellinger}
-
-\item{na.rm}{Remove NAs default=TRUE}
 }
 \value{
 R distance object
 }
 \description{
-Function invoking discrete distance functions
+Function invoking discrete distance functions.
+Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'
 }
 \examples{
 X = rbind(matrix(paste0("a", rpois(7*5, 1)), nrow=5),

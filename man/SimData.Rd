@@ -18,7 +18,8 @@ Alternatively, pi can be list of vectors as previously described with length equ
 N x nQ matrix with simulated categories distributed according to vector pi
 }
 \description{
-Simulate Data
+A function to simulate data based on a multinomial vector parameter vector or
+a list of parameter vectors.
 }
 \examples{
 Pix <- setNames(c(0.1, 0.2, 0.3, 0.4, 0), paste0('a', 1:5))

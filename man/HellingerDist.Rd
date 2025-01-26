@@ -2,7 +2,7 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{HellingerDist}
 \alias{HellingerDist}
-\title{Hellinger distance core function}
+\title{Hellinger distance}
 \usage{
 HellingerDist(x)
 }

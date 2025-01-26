@@ -2,20 +2,16 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{disshamming}
 \alias{disshamming}
-\title{Hamming distance wrapper function
-Function based on cultevo's package implementation}
+\title{Hamming distance wrapper function}
 \usage{
-disshamming(X, na.rm = TRUE)
+disshamming(X)
 }
 \arguments{
 \item{X}{matrix}
-
-\item{na.rm}{logical}
 }
 \value{
 Distance matrix
 }
 \description{
-Hamming distance wrapper function
 Function based on cultevo's package implementation
 }

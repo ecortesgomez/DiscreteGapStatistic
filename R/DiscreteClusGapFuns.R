@@ -1,5 +1,7 @@
 #' Discrete application of clusGap - core function.
+#'
 #' Based on the implementation of the function found in the `cluster` R package.
+#'
 #' @param x A matrix object specifying category attributes in the columns and observations in the rows.
 #' @param FUNcluster a function that accepts as first argument a matrix like `x`; second argument specifies number of `k` (k=>2) clusters
 #' This function should return a list with a component named `cluster`, a vector of length `n=nrow(x)` of integers from `1:k` indicating observation cluster assignment.
@@ -216,11 +218,14 @@ clusGapDiscr0 <- function (x,
                           B = B,
                           FUNcluster = FUNcluster,
                           useLog = useLog,
-                          dist = distName)) )
+                          distName = distName,
+                          value.range = value.range)) )
 }
 
 #' Discrete application of clusGap
+#'
 #' Based on the implementation of the function found in the `cluster` R package.
+#'
 #' @param x A matrix object specifying category attributes in the columns and observations in the rows.
 #' @param clusterFUN Character string with one of the available clustering implementations.
 #' Available options are: 'pam' (default) from `cluster::pam`, 'diana' from `cluster::diana`, 'fanny' from `cluster::fanny`,
@@ -361,6 +366,9 @@ clusGapDiscr <- function(x,
 }
 
 #' Criteria to determine number of clusters k
+#'
+#' Same function as found in `cluster` package.
+#'
 #' @import dplyr
 #' @param cG_obj Output object obtained from `clusGapDiscr`
 #' @param meth Method to use to determine optimal k number of clusters.

@@ -2,18 +2,16 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{dissbhattacharyya}
 \alias{dissbhattacharyya}
-\title{Bhattacharyya's wrapper Function}
+\title{Bhattacharyya's distance (wrapper)}
 \usage{
-dissbhattacharyya(X, na.rm = TRUE)
+dissbhattacharyya(X)
 }
 \arguments{
 \item{X}{Matrix}
-
-\item{na.rm}{Remove NAs default=TRUE}
 }
 \value{
 Distance R object
 }
 \description{
-Bhattacharyya's wrapper Function
+Wrapper of `BhattacharyyaDist`
 }

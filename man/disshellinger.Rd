@@ -2,18 +2,16 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{disshellinger}
 \alias{disshellinger}
-\title{Hellinger's distance wrapper Function}
+\title{Hellinger distance (wrapper)}
 \usage{
-disshellinger(X, na.rm = TRUE)
+disshellinger(X)
 }
 \arguments{
 \item{X}{Matrix}
-
-\item{na.rm}{logical}
 }
 \value{
 Distance R object
 }
 \description{
-Hellinger's distance wrapper Function
+Wrapper of `HellingerDist`
 }

@@ -2,11 +2,7 @@
 % Please edit documentation in R/VisualFuns.R
 \name{ResHeatmap}
 \alias{ResHeatmap}
-\title{Heatmap assuming a given a distance function and a known number of clusters.
-Function to display a categorical data matrix given a user defined number of clusters `nCl`, a categorical distance `distName` and a predefined clustering method `FUNcluster`.
-The output displays a heatmap separating and color-labelling resulting clusters vertically in the rows and allowing unsupervised clustering on questions in the columns. Each cell is colored according to the categorical values provided or found in the data.
-The clustergram is based on the `pheatmap` function from the pheatmap R package. Thus, any parameter found in pheatmap can be specified to `clusGapDiscrHeat`.
-This function can be used to examine number of clusters before running `clusGapDiscrHeat` but also after number of clusters is determined.}
+\title{Discrete Data Heatmap}
 \usage{
 ResHeatmap(
   x,
@@ -64,8 +60,15 @@ png file or ComplexHeatmap object
 }
 \description{
 Heatmap assuming a given a distance function and a known number of clusters.
-Function to display a categorical data matrix given a user defined number of clusters `nCl`, a categorical distance `distName` and a predefined clustering method `FUNcluster`.
-The output displays a heatmap separating and color-labelling resulting clusters vertically in the rows and allowing unsupervised clustering on questions in the columns. Each cell is colored according to the categorical values provided or found in the data.
-The clustergram is based on the `pheatmap` function from the pheatmap R package. Thus, any parameter found in pheatmap can be specified to `clusGapDiscrHeat`.
-This function can be used to examine number of clusters before running `clusGapDiscrHeat` but also after number of clusters is determined.
+Function to display a categorical data matrix given a user defined number of
+clusters `nCl`, a categorical distance `distName` and a predefined clustering
+method `FUNcluster`.
+The output displays a heatmap separating and color-labelling resulting
+clusters vertically in the rows and allowing unsupervised clustering on
+questions in the columns. Each cell is colored according to the categorical
+values provided or found in the data.
+The clustergram is based on the `pheatmap` function from the pheatmap R package.
+Thus, any parameter found in pheatmap can be specified to `clusGapDiscrHeat`.
+This function can be used to examine number of clusters before running
+`clusGapDiscrHeat` but also after the number of clusters is determined.
 }

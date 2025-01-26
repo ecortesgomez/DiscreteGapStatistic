@@ -6,11 +6,6 @@
 \title{mass data}
 \format{
 ## `data.frame`
-Data extracted from the `likert` R package.
-Results from an administration of the Math Anxiety Scale Survey.
-First Column records student gender either Female or Male.
-All statement answers have 5 possible ordinal categorical items: Strongly Disagree, Disagree,
-Neutral, Agree, Strongly Agree.
 \describe{
   \item{Gender}{Gender}
   \item{I find math interesting.}{Math interesting}
@@ -36,6 +31,10 @@ Neutral, Agree, Strongly Agree.
 mass
 }
 \description{
-mass data
+Data extracted from the `likert` R package.
+Results from an administration of the Math Anxiety Scale Survey.
+First Column records student gender either Female or Male.
+All statement answers have 5 possible ordinal categorical items:
+Strongly Disagree, Disagree, Neutral, Agree, Strongly Agree.
 }
 \keyword{datasets}

@@ -1,5 +1,8 @@
-#' Adapted kmodes function to accept any categorical distance based on
+#' Adapted k-modes algorithm
+#'
+#' K-modes function to accept any categorical distance based on
 #' the function found in `klaR:kmodes`.
+#'
 #' @param data A matrix or data frame of categorical data. Objects have to be in rows, variables in columns.
 #' @param modes The number of modes
 #' @param distFun Pairwise categorical distance function. A function accepting two categorical vectors.
@@ -252,7 +255,11 @@ kmodesD <- function (data,
    return(result)
 }
 
-#' A function that generates formatted algorithmic functions that can be plugged to enable run a wide variety of clustering algorithm for `clusGapDiscr` function.
+#' Clustering generating function
+#'
+#' A function that generates formatted algorithmic functions that can be plugged
+#' to enable run a wide variety of clustering algorithm for `clusGapDiscr` function.
+#'
 #' @param clustFun A character string with the following possible options:
 #' 'pam' (default) from `cluster::pam`, 'diana' from `cluster::diana`, 'fanny' from `cluster::fanny`,
 #' 'agnes-\{average, single, complete, ward, weighted\}' from `cluster::agnes`,

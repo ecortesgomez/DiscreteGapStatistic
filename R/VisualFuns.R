@@ -1,9 +1,11 @@
-#' Summary Heatmap for categorical/Likert data
+#' Summary Heatmap for categorical data
+#'
 #' Heatmap representation summarizing categorical/likert data.
 #' Modified version of `likert.heat.plot` from `likert` package.
 #' Does not allow different categorical ranges across questions.
 #' The function outputs a ggplot object where additional layers can be added for customization purposes.
 #' The output plot preserves the question order given by columns of `x`.
+#'
 #' @importFrom magrittr %>%
 #' @importFrom reshape2 melt
 #' @import ggplot2
@@ -70,10 +72,17 @@ likert.heat.plot2 <- function (x,
    return(p)
 }
 
+#' Sample-to-sample heatmap
+#'
 #' sample-to-sample heatmap clustering samples according to a given categorical distance
-#' Exploratory tool that helps to visualize/cluster blocks of observations across columns ordered according to given categorical distance. The final output is a clustered distance matrix.
-#' This plot is aimed to guide the `DiscreteClusGap` user to give an idea which type of categorical distance would accommodate better to the inputted data.
-#' `sample2sampleHeat` is based on the `pheatmap` function from the `pheatmap` R package. Thus, any parameter found in pheatmap can be specified to `sample2sampleHeat`.
+#' Exploratory tool that helps to visualize/cluster blocks of observations across
+#' columns ordered according to given categorical distance. The final output is
+#' a clustered distance matrix.
+#' This plot is aimed to guide the `DiscreteClusGap` user to give an idea which
+#' type of categorical distance would accommodate better to the inputted data.
+#' `sample2sampleHeat` is based on the `pheatmap` function from the `pheatmap`
+#' R package. Thus, any parameter found in pheatmap can be specified to `sample2sampleHeat`.
+#'
 #' @importFrom magrittr %>%
 #' @import pheatmap
 #' @param x matrix object or data.frame
@@ -111,11 +120,21 @@ distanceHeat <- function(x,
 
 }
 
+#' Discrete Data Heatmap
+#'
 #' Heatmap assuming a given a distance function and a known number of clusters.
-#' Function to display a categorical data matrix given a user defined number of clusters `nCl`, a categorical distance `distName` and a predefined clustering method `FUNcluster`.
-#' The output displays a heatmap separating and color-labelling resulting clusters vertically in the rows and allowing unsupervised clustering on questions in the columns. Each cell is colored according to the categorical values provided or found in the data.
-#' The clustergram is based on the `pheatmap` function from the pheatmap R package. Thus, any parameter found in pheatmap can be specified to `clusGapDiscrHeat`.
-#' This function can be used to examine number of clusters before running `clusGapDiscrHeat` but also after number of clusters is determined.
+#' Function to display a categorical data matrix given a user defined number of
+#' clusters `nCl`, a categorical distance `distName` and a predefined clustering
+#' method `FUNcluster`.
+#' The output displays a heatmap separating and color-labelling resulting
+#' clusters vertically in the rows and allowing unsupervised clustering on
+#' questions in the columns. Each cell is colored according to the categorical
+#' values provided or found in the data.
+#' The clustergram is based on the `pheatmap` function from the pheatmap R package.
+#' Thus, any parameter found in pheatmap can be specified to `clusGapDiscrHeat`.
+#' This function can be used to examine number of clusters before running
+#' `clusGapDiscrHeat` but also after the number of clusters is determined.
+#'
 #' @importFrom magrittr %>%
 #' @import pheatmap
 #' @import Polychrome

@@ -2,12 +2,7 @@
 % Please edit documentation in R/VisualFuns.R
 \name{likert.heat.plot2}
 \alias{likert.heat.plot2}
-\title{Summary Heatmap for categorical/Likert data
-Heatmap representation summarizing categorical/likert data.
-Modified version of `likert.heat.plot` from `likert` package.
-Does not allow different categorical ranges across questions.
-The function outputs a ggplot object where additional layers can be added for customization purposes.
-The output plot preserves the question order given by columns of `x`.}
+\title{Summary Heatmap for categorical data}
 \usage{
 likert.heat.plot2(
   x,
@@ -38,7 +33,6 @@ likert.heat.plot2(
 ggplot object.
 }
 \description{
-Summary Heatmap for categorical/Likert data
 Heatmap representation summarizing categorical/likert data.
 Modified version of `likert.heat.plot` from `likert` package.
 Does not allow different categorical ranges across questions.

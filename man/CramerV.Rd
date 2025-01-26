@@ -2,7 +2,7 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{CramerV}
 \alias{CramerV}
-\title{Cramer's V core function}
+\title{Cramer's V distance}
 \usage{
 CramerV(X)
 }

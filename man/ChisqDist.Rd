@@ -2,7 +2,7 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{ChisqDist}
 \alias{ChisqDist}
-\title{Chi-square distance core function}
+\title{Chi-square distance}
 \usage{
 ChisqDist(x)
 }

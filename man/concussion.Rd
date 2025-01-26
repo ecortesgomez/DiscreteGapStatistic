@@ -6,8 +6,7 @@
 \title{Concussion Data}
 \format{
 ## `data.frame`
-A data frame with 109 rows and 21 columns.
-Severity rating recorded as categorical responses from c1 (none) to c7 (severe).
+
 \describe{
   \item{Q1: Headache}{Headache}
   \item{Q2: Nausea}{Nausea}
@@ -36,6 +35,7 @@ Severity rating recorded as categorical responses from c1 (none) to c7 (severe).
 concussion
 }
 \description{
-Concussion Data
+A data frame with 109 observations and 21 questions.
+Severity rating recorded as categorical responses from c1 (none) to c7 (severe).
 }
 \keyword{datasets}

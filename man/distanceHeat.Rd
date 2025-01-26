@@ -2,10 +2,7 @@
 % Please edit documentation in R/VisualFuns.R
 \name{distanceHeat}
 \alias{distanceHeat}
-\title{sample-to-sample heatmap clustering samples according to a given categorical distance
-Exploratory tool that helps to visualize/cluster blocks of observations across columns ordered according to given categorical distance. The final output is a clustered distance matrix.
-This plot is aimed to guide the `DiscreteClusGap` user to give an idea which type of categorical distance would accommodate better to the inputted data.
-`sample2sampleHeat` is based on the `pheatmap` function from the `pheatmap` R package. Thus, any parameter found in pheatmap can be specified to `sample2sampleHeat`.}
+\title{Sample-to-sample heatmap}
 \usage{
 distanceHeat(
   x,
@@ -32,7 +29,11 @@ clustered heatmap
 }
 \description{
 sample-to-sample heatmap clustering samples according to a given categorical distance
-Exploratory tool that helps to visualize/cluster blocks of observations across columns ordered according to given categorical distance. The final output is a clustered distance matrix.
-This plot is aimed to guide the `DiscreteClusGap` user to give an idea which type of categorical distance would accommodate better to the inputted data.
-`sample2sampleHeat` is based on the `pheatmap` function from the `pheatmap` R package. Thus, any parameter found in pheatmap can be specified to `sample2sampleHeat`.
+Exploratory tool that helps to visualize/cluster blocks of observations across
+columns ordered according to given categorical distance. The final output is
+a clustered distance matrix.
+This plot is aimed to guide the `DiscreteClusGap` user to give an idea which
+type of categorical distance would accommodate better to the inputted data.
+`sample2sampleHeat` is based on the `pheatmap` function from the `pheatmap`
+R package. Thus, any parameter found in pheatmap can be specified to `sample2sampleHeat`.
 }
