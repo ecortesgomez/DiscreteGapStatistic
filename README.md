@@ -41,37 +41,38 @@ library(dplyr)
 #>     intersect, setdiff, setequal, union
 ```
 
+``` r
+library(ggplot2)
+```
+
 Libraries are uploaded. Questions are lightly reformatted and the
 categories are shortened.
 
 ``` r
 ## mass dataset is loaded automatically with DiscreteGapStatistic
 
-massQ <- colnames(mass)
-massQsh <- c('Gender',
-             'Q1: Math Interesting', 'Q2: Uptight Math Test', 'Q3: Use Math In Future',
-             'Q4: Mind Goes Blank', 'Q5: Math Relates to Life', 'Q6: Ability Solve Math Probls',
-             'Q7: Sinking Feeling', 'Q8: Math Challenging', 'Q9: Math Makes Me Nervous',
-             'Q10: Take More Math Classes', 'Q11: Math Makes Me Uneasy','Q12: Math Favorite Subj.',
-             'Q13: Enjoy Learning Math', 'Q14: Math Makes Feel Confused')
+data(mass)
 
-massData <- mass
-colnames(massData) <- massQsh
-Cats <- setNames(object = c('SD', 'D', 'N', 'A', 'SA'),
-                 nm = c('Strongly Disagree', 'Disagree', 
-                        'Neutral', 
-                        'Agree', 'Strongly Agree') )
-massData <- data.frame(Gender = massData$Gender,
-                       apply(massData[, -1], 2,
-                             function(x) Cats[as.character(x)] %>%
-                                factor(levels = Cats)),
-                       check.names=FALSE)
+massSh <- mass[, -1]
 
-rownames(massData) <- c(paste0('F', 1:2), paste0('M', 1),
-                        paste0('F', 3:11), paste0('M', 2),
-                        paste0('F', 12), paste0('M', 3),
-                        paste0('F', 13), paste0('M', 4:5),
-                        paste0('F', 14), paste0('M', 6))
+sID <- substring(mass$Gender, 1, 1) ## Removing Gender variable
+sID[sID == 'F'] <- paste0(sID[sID == 'F'], 1:sum(sID == 'F'))
+sID[sID == 'M'] <- paste0(sID[sID == 'M'], 1:sum(sID == 'M'))
+rownames(massSh) <- sID
+
+Cats <- setNames(c('SD', 'D', 'N', 'A', 'SA'),
+   c('Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree') )
+
+massSh <- data.frame(apply(massSh, 2,
+   function(x) Cats[as.character(x)] %>%
+   factor(levels = Cats)),
+   check.names=FALSE, row.names = sID)
+colnames(massSh) <- c('Q1: Math Interesting', 'Q2: Uptight Math Test',
+   'Q3: Use Math In Future', 'Q4: Mind Goes Blank', 'Q5: Math Relates to Life',
+   'Q6: Ability Solve Math Probls', 'Q7: Sinking Feeling', 'Q8: Math Challenging',
+   'Q9: Math Makes Me Nervous', 'Q10: Take More Math Classes',
+   'Q11: Math Makes Me Uneasy','Q12: Math Favorite Subj.',
+   'Q13: Enjoy Learning Math', 'Q14: Math Makes Feel Confused')
 ```
 
 ## Likert Heatmap
@@ -80,8 +81,7 @@ The dataset is visualized using a heatmap similar to the one produced by
 `likert::likert.heatmap.plot`.
 
 ``` r
-library(ggplot2)
-likert.heat.plot2(massData[, -1],
+likert.heat.plot2(massSh,
                   allLevels = Cats,
                   text.size = 1.5)+
    labs(title = 'Math Anxiety Data Likert Heatmap Summary')+
@@ -172,26 +172,40 @@ according to `pheatmap`’s options. Different aesthetic options are
 exemplified in the plots below using the introduced distances.
 
 ``` r
-distanceHeat(x = massData[, -1], distName = 'hamming',
-             main = 'Hamming Distance\nMath Anxiety Data', fontsize = 6.5)
+distanceHeat(x = massSh, 
+             distName = 'hamming',
+             main = 'Hamming Distance\nMath Anxiety Data', 
+             fontsize = 6.5)
 
-distanceHeat(x = massData[, -1], distName = 'cramerV',
-             main = "Cramer's V Distance\nMath Anxiety Data", fontsize = 6.5, 
-             show_rownames = FALSE, cluster_rows = FALSE, cluster_cols=FALSE)
+distanceHeat(x = massSh, 
+             distName = 'cramerV',
+             main = "Cramer's V Distance\nMath Anxiety Data", 
+             fontsize = 6.5, 
+             show_rownames = FALSE, 
+             cluster_rows = FALSE, 
+             cluster_cols=FALSE)
 ```
 
 <img src="man/figures/README-DistanceMats1-1.png" width="360" /><img src="man/figures/README-DistanceMats1-2.png" width="360" />
 
 ``` r
-distanceHeat(x = massData[, -1], distName = 'hellinger',
-             main = 'Hellinger Distance\nMath Anxiety Data', fontsize = 6.5, 
-             show_rownames = TRUE, border_color = 'black', 
-             , cluster_rows = FALSE, cluster_cols=FALSE)
+distanceHeat(x = massSh, 
+             distName = 'hellinger',
+             main = 'Hellinger Distance\nMath Anxiety Data', 
+             fontsize = 6.5, 
+             show_rownames = TRUE, 
+             border_color = 'black', 
+             cluster_rows = FALSE, 
+             cluster_cols=FALSE)
 
-distanceHeat(x = massData[, -1], distName = 'bhattacharyya',
-             main = 'Bhattacharyya Distance\nMath Anxiety Data', fontsize = 6.5, 
-              show_rownames = TRUE, border_color = 'lightgrey', 
-             , cluster_rows = FALSE, cluster_cols=FALSE)
+distanceHeat(x = massSh, 
+             distName = 'bhattacharyya',
+             main = 'Bhattacharyya Distance\nMath Anxiety Data', 
+             fontsize = 6.5, 
+             show_rownames = TRUE, 
+             border_color = 'lightgrey', 
+             cluster_rows = FALSE, 
+             cluster_cols=FALSE)
 ```
 
 <img src="man/figures/README-DistanceMats2-1.png" width="360" /><img src="man/figures/README-DistanceMats2-2.png" width="360" />
@@ -212,8 +226,12 @@ the `cluster` package \[@maechler2023cluster\] with the following basic
 arguments:
 
 ``` r
-clusGap(x, FUNcluster, K.max, B = 100, 
-        verbose = interactive(), ...)
+clusGap(x, 
+        FUNcluster, 
+        K.max, 
+        B = 100, 
+        verbose = interactive(), 
+        ...)
 ```
 
 - `x`: argument can be `data.frame` or `matrix` object where rows
@@ -331,9 +349,14 @@ must be user-specified via a character vector or list. This setting will
 be referred as the Known Support (KS).
 
 ``` r
-clusGapDiscr(x, clusterFUN, K.max, B = nrow(x),
-             distName, value.range = 'DS', 
-             verbose = interactive(), useLog = TRUE ...)
+clusGapDiscr(x, 
+             clusterFUN, 
+             K.max, 
+             B = nrow(x),
+             distName, 
+             value.range = 'DS', 
+             verbose = interactive(), 
+             useLog = TRUE ...)
 ```
 
 - `distName`: name of discrete distance. The available options are
@@ -374,7 +397,7 @@ too large. The maximum number of clusters to consider is `9`.
 #                         'Neutral', 
 #                         'Agree', 'Strongly Agree') )
 
-HammRun <- clusGapDiscr(x = massData[, -1],
+HammRun <- clusGapDiscr(x = massSh,
                         clusterFUN = 'pam',
                         B = 100,
                         K.max = 9,
@@ -385,7 +408,7 @@ HammRun <- clusGapDiscr(x = massData[, -1],
 
 ``` r
 
-chisqRun <- clusGapDiscr(x = massData[, -1],
+chisqRun <- clusGapDiscr(x = massSh,
                         clusterFUN = 'pam',
                         B = 100,
                         K.max = 9,
@@ -396,7 +419,7 @@ chisqRun <- clusGapDiscr(x = massData[, -1],
 
 ``` r
 
-crVRun <- clusGapDiscr(x = massData[, -1],
+crVRun <- clusGapDiscr(x = massSh,
                         clusterFUN = 'pam',
                         B = 100,
                         K.max = 9,
@@ -409,17 +432,26 @@ crVRun <- clusGapDiscr(x = massData[, -1],
 
 plot(HammRun,
      main = "Discrete Gap statistic: Hamming Distance\nMath Anxiety Data",
-     cex = 2, cex.lab=1.2, cex.axis=1.5, cex.main=1.5)
+     cex = 2, 
+     cex.lab=1.2, 
+     cex.axis=1.5, 
+     cex.main=1.5)
 abline(v = findK(HammRun), lty=3, lwd=2, col="Blue")
 
 plot(chisqRun,
      main = "Discrete Gap statistic: chi-square Distance\nMath Anxiety Data",
-     cex = 2, cex.lab=1.2, cex.axis=1.5, cex.main=1.5)
+     cex = 2, 
+     cex.lab=1.2, 
+     cex.axis=1.5, 
+     cex.main=1.5)
 abline(v = findK(chisqRun), lty=3, lwd=2, col="Blue")
 
 plot(crVRun,
      main = "Discrete Gap statistic: Cramer's V Distance\nMath Anxiety Data",
-     cex = 2, cex.lab=1.2, cex.axis=1.5, cex.main=1.5)
+     cex = 2, 
+     cex.lab=1.2, 
+     cex.axis=1.5, 
+     cex.main=1.5)
 abline(v = findK(crVRun), lty=3, lwd=2, col="Blue")
 ```
 
@@ -434,7 +466,7 @@ cluster and the differences between them.
 
 ``` r
 
-ResHeatmap(x = massData[, -1],
+ResHeatmap(x = massSh,
            distName = 'hamming',
            clusterFUN = 'pam', 
            catVals = Cats,
@@ -448,7 +480,7 @@ ResHeatmap(x = massData[, -1],
 
 ``` r
 
-ResHeatmap(x = massData[, -1],
+ResHeatmap(x = massSh,
            clusterFUN = 'pam', 
            distName = 'chisquare',
            catVals = Cats,
@@ -462,7 +494,7 @@ ResHeatmap(x = massData[, -1],
 
 ``` r
 
-ResHeatmap(x = massData[, -1],
+ResHeatmap(x = massSh,
            clusterFUN = 'pam', 
            distName = 'cramerV',
            catVals = Cats,
@@ -488,7 +520,7 @@ using the `clusterNames = 'renumber'` argument.
 
 ``` r
 
-ResHeatmap(x = massData[, -1],
+ResHeatmap(x = massSh,
            clusterFUN = 'pam', 
            distName = 'hamming',
            catVals = Cats,
@@ -496,7 +528,7 @@ ResHeatmap(x = massData[, -1],
            out = 'heatmap', 
            height = 6)
 
-ResHeatmap(x = massData[, -1],
+ResHeatmap(x = massSh,
            clusterFUN = 'pam', 
            distName = 'chisquare',
            catVals = Cats,
@@ -504,7 +536,7 @@ ResHeatmap(x = massData[, -1],
            out = 'heatmap', 
            height = 6)
 
-ResHeatmap(x = massData[, -1],
+ResHeatmap(x = massSh,
            clusterFUN = 'pam', 
            distName = 'chisquare',
            catVals = Cats,
@@ -525,8 +557,11 @@ Other compatible clustering algorithms are considered additional to
 
 ``` r
 
-hDiaMa <- clusGapDiscr(massData[, -1], 'diana', K.max = 9, B = 100)
-ResHeatmap(x = massData[, -1],
+hDiaMa <- clusGapDiscr(massSh, 
+                       clusterFUN = 'diana', 
+                       K.max = 9, 
+                       B = 100)
+ResHeatmap(x = massSh,
            distName = 'hamming',
            clusterFUN = 'diana',
            catVals = Cats,
@@ -534,8 +569,11 @@ ResHeatmap(x = massData[, -1],
            out = 'heatmap',
            height = 6)
 
-hFanMa <- clusGapDiscr(massData[, -1], 'fanny', K.max = 9, B = 100)
-ResHeatmap(x = massData[, -1],
+hFanMa <- clusGapDiscr(massSh, 
+                       clusterFUN = 'fanny', 
+                       K.max = 9, 
+                       B = 100)
+ResHeatmap(x = massSh,
            clusterFUN = 'fanny',
            distName = 'hamming',
            catVals = Cats,
@@ -549,8 +587,11 @@ ResHeatmap(x = massData[, -1],
 ### Hierarchical Clustering
 
 ``` r
-hAgnComMa <- clusGapDiscr(massData[, -1], 'agnes-complete', K.max = 9, B = 100)
-ResHeatmap(x = massData[, -1],
+hAgnComMa <- clusGapDiscr(massSh, 
+                          clusterFUN = 'agnes-complete', 
+                          K.max = 9, 
+                          B = 100)
+ResHeatmap(x = massSh,
            distName = 'hamming',
            clusterFUN = 'agnes-complete',
            catVals = Cats,
@@ -558,8 +599,11 @@ ResHeatmap(x = massData[, -1],
            out = 'heatmap',
            height = 6)
 
-hhclComMa <- clusGapDiscr(massData[, -1], 'hclust-complete', K.max = 9, B = 100)
-ResHeatmap(x = massData[, -1],
+hhclComMa <- clusGapDiscr(massSh, 
+                          clusterFUN = 'hclust-complete', 
+                          K.max = 9, 
+                          B = 100)
+ResHeatmap(x = massSh,
            distName = 'hamming',
            clusterFUN = 'hclust-complete',
            catVals = Cats,
@@ -567,8 +611,11 @@ ResHeatmap(x = massData[, -1],
            out = 'heatmap',
            height = 6)
 
-hhclMcqMa <- clusGapDiscr(massData[, -1], 'hclust-mcquitty', K.max = 9, B = 100)
-ResHeatmap(x = massData[, -1],
+hhclMcqMa <- clusGapDiscr(massSh, 
+                          clusterFUN = 'hclust-mcquitty', 
+                          K.max = 9, 
+                          B = 100)
+ResHeatmap(x = massSh,
            distName = 'hamming',
            clusterFUN = 'hclust-mcquitty',
            catVals = Cats,
