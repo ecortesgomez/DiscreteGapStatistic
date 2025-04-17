@@ -27,6 +27,11 @@ distancematrix <- function (X, d){
         return(disshellinger(X))
 
    ## nomclust functions
+   ## It does not like the usual matrix format!
+   ## Transform to data.frame
+   if(grepl('nmcl_.+', d))
+      X <- as.data.frame(X)
+
    if (d == "nmcl_anderberg")
       return(nomclust::anderberg(X))
    if (d == "nmcl_burnaby")
