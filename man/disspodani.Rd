@@ -2,15 +2,15 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{disspodani}
 \alias{disspodani}
-\title{####################
-Ordinal distances ##
-####################
-Podani's distance function}
+\title{Podani's distance function}
 \usage{
 disspodani(X, M = NULL)
 }
 \arguments{
-\item{X}{matrix}
+\item{X}{Numerical matrix with integer/ordinal values.}
+
+\item{M}{numeric Number of largest category. If `M = NULL`, `M` is determined
+for each variable of the data.}
 }
 \value{
 Distance matrix

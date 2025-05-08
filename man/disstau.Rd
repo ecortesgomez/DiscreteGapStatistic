@@ -2,12 +2,12 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{disstau}
 \alias{disstau}
-\title{Kendall's tau distance wrapper function}
+\title{Kendall's Tau distance wrapper function}
 \usage{
 disstau(X)
 }
 \arguments{
-\item{X}{matrix}
+\item{X}{Numerical matrix with integer/ordinal values.}
 }
 \value{
 Distance matrix
