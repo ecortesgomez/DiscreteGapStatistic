@@ -14,6 +14,9 @@
 #'           matrix(paste0("a", rpois(7*5, 3)), nrow=5))
 #' distancematrix(X = X, d = "hellinger")
 distancematrix <- function (X, d){
+   #####################
+   # Nominal distances #
+   #####################
 
     if(d == 'bhattacharyya')
         return(dissbhattacharyya(X))
@@ -26,11 +29,15 @@ distancematrix <- function (X, d){
     if (d == "hellinger")
         return(disshellinger(X))
 
-   ## nomclust functions
-   ## It does not like the usual matrix format!
+   ## nomclust functions do not like the matrix class!
    ## Transform to data.frame
-   if(grepl('nmcl_.+', d))
-      X <- as.data.frame(X)
+   if(grepl('nmcl_.+', d)){
+      if(grepl('nmcl_good.*', d)){ ## goodall diss need special treatment
+         X <- data.frame(X, check.names=FALSE) %>% apply(2, factor)
+      }else{
+         X <- as.data.frame(X)
+      }
+   }
 
    if (d == "nmcl_anderberg")
       return(nomclust::anderberg(X))
@@ -65,9 +72,44 @@ distancematrix <- function (X, d){
    if (d == "nmcl_vm")
       return(nomclust::vm(X))
 
-    stop("Distance metric ", d, " not available")
+   #####################
+   # Ordinal distances #
+   #####################
+
+   if(d == 'gordon')
+      return(dissgordon(X))
+
+   if(d == 'ks')
+      return(dissks(X))
+
+   if (grepl('podani', d)){
+      if(grepl('_[0-9]+', d))
+         myM <- sub(pattern = 'podani_', replacement = '', x = d) %>%
+         as.numeric
+      else
+         myM <- NULL
+      return(disspodani(X, M = myM))
+   }
+   if (d == "spearman")
+      return(dissspearman(X))
+
+   if (d == 'tau')
+      return(disstau(X))
+
+   if (grepl('wasserstein', d)){
+      if(grepl('_[0-9]+', d))
+         myM <- sub(pattern = 'wasserstein_', replacement = '', x = d) %>%
+            as.numeric
+      else
+         myM <- 1
+      return(dissWass(X, p = myM))
+   }
+
+
+   stop("Distance metric ", d, " not available")
 }
 
+#' Nominal Distances
 #' Bhattacharyya distance
 #'
 #' Bhattacharyya distance core function
@@ -305,4 +347,156 @@ disshellinger  <-  function (X) {
     }
 
     HellingerDist(X)
+}
+
+#' ####################
+#' Ordinal distances ##
+#' ####################
+
+#' Gordon distance
+#'
+#' Gordon distance for ordinal data
+#' @param X Numerical matrix with integer/ordinal values.
+#'
+#' @return Distance matrix
+#' @export
+
+dissgordon <- function(X){
+
+   stopifnot(is.integer(X))
+   n <- nrow(X)
+   p <- ncol(X)
+
+   ## The difference between the squared component-wise differences have weights w_i
+   ## Here w_i = 1 for i = 1, ..., p
+   ## max(length(w)-1, 1) is (k_i - 1)
+   ## Avoiding division by 0 when normalizing each component
+   ecdfMat <- apply(X,
+                    2,
+                    function(w) stats::ecdf(w)(w)/max(length(unique(w))-1, 1))
+   stats::dist(ecdfMat, method = 'euclidean')
+
+}
+
+#' KS ordinal pairwise distance
+#'
+#' KS-ordinal pairwise function
+#' @param X Numerical matrix with integer/ordinal values.
+#'
+#' @return Distance matrix
+#' @export
+dissks <- function(X){
+
+   stopifnot(is.integer(X))
+
+   n <- nrow(X)
+   p <- ncol(X)
+   dist_mat <- matrix(NA, nrow = n, ncol = n)
+   ecdfL <- apply(X, 1, function(w) stats::ecdf(w))
+   for (i in 1:(n-1)) {
+      for (j in (i+1):n) {
+         lvls <- sort(unique(c(X[i, ], X[j, ]))) ## This step is unavoidable!!
+         # Fx <- stats::ecdf(X[i, ])(lvls)
+         # Fy <- stats::ecdf(X[j, ])(lvls)
+         Fx <- ecdfL[[i]](lvls)
+         Fy <- ecdfL[[j]](lvls)
+         dist_mat[i, j] <- max(abs(Fx - Fy))
+         dist_mat[j, i] <- dist_mat[i, j]
+      }
+   }
+   return(stats::as.dist(dist_mat))
+}
+
+#' Podani's distance function
+#'
+#' R implementation of Podani's distance.
+#'
+#' @param X Numerical matrix with integer/ordinal values.
+#' @param M numeric Number of largest category. If `M = NULL`, `M` is determined
+#' for each variable of the data.
+#' @return Distance matrix
+#' @export
+#'
+disspodani <- function(X, M=NULL) {
+   ### SHOULD BE REVISED!!
+   ## This distance can't be data-driven!
+   ## Need to make sure the number attr vals. is accurate.
+   ## That can be done inputting a data.frame with only factors.
+
+   n <- nrow(X)
+   p <- ncol(X)
+   dist_mat <- matrix(0, n, n)
+
+   if(is.null(M)){
+      ## Dynamic option!
+      ## message('Automatic detection of number of categories.')
+      MminusOne <- apply(X, 2, function(y) max(unique(y) - 1, 1) )
+      ## message(paste0('Detected number: ', paste0(MminusOne, collapse = ', ') ))
+   }else{
+      MminusOne <- M - 1
+   }
+
+   for (i in 1:(n-1)) {
+      for (j in (i+1):n) {
+         diffs <- abs(X[i, ] - X[j, ]) / MminusOne
+         dist_mat[i, j] <- mean(diffs, na.rm = TRUE)
+         dist_mat[j, i] <- dist_mat[i, j]
+      }
+   }
+   return(stats::as.dist(dist_mat))
+}
+
+#' Spearman distance wrapper function
+#'
+#' Function based on bioDist's package implementation.
+#'
+#' @param X Numerical matrix with integer/ordinal values.
+#'
+#' @return Distance matrix
+#' @export
+dissspearman <- function (X){
+   stopifnot(is.integer(X))
+   # X <-  data.frame(X, check.names=FALSE) %>%
+   #    apply(2, function(y) factor(y) %>% as.numeric)
+   out <- bioDist::spearman.dist(X, abs = FALSE)
+   return(out)
+}
+
+#' Kendall's Tau distance wrapper function
+#'
+#' Function based on bioDist's package implementation.
+#'
+#' @param X Numerical matrix with integer/ordinal values.
+#'
+#' @return Distance matrix
+#' @export
+disstau <- function (X){
+   # X <-  data.frame(X, check.names=FALSE) %>%
+   #    apply(2, function(y) factor(y) %>% as.numeric)
+   out <- bioDist::tau.dist(X, abs = FALSE)
+   return(out)
+}
+
+#' Wasserstein's distance function
+#'
+#' Using transport's R package implementation
+#'
+#' @param X Numerical matrix with integer/ordinal values.
+#' @param p numeric Order of the distance
+#' @return Distance matrix
+#' @export
+#'
+dissWass <- function(X, p=1){
+   n <- nrow(X)
+   p <- ncol(X)
+   dist_mat <- matrix(0, n, n)
+
+   for (i in 1:(n-1)) {
+      for (j in (i+1):n) {
+         dist_mat[i, j] <- transport::wasserstein1d(X[i, ], X[j, ],
+                                                    p = p)
+      dist_mat[j, i] <- dist_mat[i, j]
+      }
+   }
+   return(stats::as.dist(dist_mat))
 }

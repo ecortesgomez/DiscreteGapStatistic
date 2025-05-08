@@ -1,6 +1,7 @@
 #' Discrete application of clusGap - core function.
 #'
 #' Based on the implementation of the function found in the `cluster` R package.
+#' This function assumes that all attributes have identical categories.
 #'
 #' @param x A matrix object specifying category attributes in the columns and observations in the rows.
 #' @param FUNcluster a function that accepts as first argument a matrix like `x`; second argument specifies number of `k` (k=>2) clusters
@@ -22,6 +23,7 @@
 #' @param B Number of bootstrap samples. By default B = nrow(x).
 #' @param verbose Integer or logical. Determines whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.
 #' @param useLog Logical. Use log function after estimating `W.k`. Following the original formulation `useLog=TRUE` by default.
+#' @param dataClass character. Either 'nom' for nominal or 'ord' for ordinal.
 #' @param ... optionally further arguments for `FUNcluster()`
 #'
 #' @return a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.sim",
@@ -36,6 +38,7 @@ clusGapDiscr0 <- function (x,
                           distName = "hamming",
                           useLog = TRUE,
                           Input2Alg = 'distMatr',
+                          dataClass = 'nom',
                           ...){
 
    stopifnot(is.function(FUNcluster),
@@ -50,17 +53,24 @@ clusGapDiscr0 <- function (x,
    uniLevs <- unique(as.vector(x))
    uniLevs <- sort(uniLevs)
 
-   if (is.numeric(x)) {
+   ## Nominal case
+   ## The only way inside of nominal functions is with character vector!
+   if (is.numeric(x) & grepl('^nom', dataClass)) {
       message(paste0("x array is numerical and has ", length(uniLevs),
                      " levels."))
-      stopifnot(length(uniLevs) < 10)
+      ## stopifnot(length(uniLevs) < 10) ## why?
       message("Array values would be transformed to categorical levels: ")
       myCats <- paste0(paste0(uniLevs, " -> c", uniLevs), collapse = ", ")
       message(myCats)
       x <- apply(x, 1, function(y) paste0('c', y)) %>% t ## Transformed matrix
-   }
-   else {
+
+      message(paste0("Resulting levels: ", paste0(uniLevs, collapse = ", ")))
+   }else if(is.numeric(x) & grepl('^ord', dataClass) ){
+      ## Ordinal case
+      ## Only way to pass ordinal data is with numerical vector.
       message(paste0("Found levels: ", paste0(uniLevs, collapse = ", ")))
+   }else if(is.character(x) & grepl('^ord', dataClass) ){
+      stopifnot(!is.character(x) & grepl('^ord', dataClass))
    }
 
    if (B != (B. <- as.integer(B)) || (B <- B.) <= 0)
@@ -142,29 +152,53 @@ clusGapDiscr0 <- function (x,
    if (verbose)
       cat("done\n")
 
-   if(is.numeric(value.range)){
-      ## If value.range are numeric, turn them into c0, c1, ...
-      message('value.range cannot be numerical and will be transformed to characters.')
-      vals <- as.character(paste0('c', value.range))
-   }else if (is.character(value.range) &
+   if(grepl('^nom', dataClass)){
+      ## Nominal case
+      if(is.numeric(value.range)) {
+         ## If value.range are numeric, turn them into c0, c1, ...
+         message('value.range cannot be numerical and will be transformed to characters.')
+         vals <- as.character(paste0('c', value.range))
+      }else if (is.character(value.range) &
              !is.list(value.range) &
              value.range[1] == "DS" & length(value.range) == 1) {
-      ## Data-Support null option
-      vals <- NULL
-      rng.x1 <- lapply(1:ncol(x), function(i) unique(x[, i]))
-   }
-   else if (all(is.character(value.range)) &
+         ## Data-Support null option
+         vals <- NULL
+         rng.x1 <- lapply(1:ncol(x), function(i) unique(x[, i]))
+      }
+      else if (all(is.character(value.range)) &
             !is.list(value.range) &
             (length(value.range) > 1)) {
-      ## User-defined single range
-      vals <- value.range
+         ## User-defined single range
+         vals <- NULL
+         rng.x1 <- value.range
+      }
+      else if (!is.character(value.range) & is.list(value.range)) {
+         ## When user defines the value range for each question
+         message('Known Support has variability between attributes.')
+         message('Experimental option. Use it own risk!')
+         stopifnot(ncol(x) == length(value.range))
+         vals <- value.range
+      }
    }
-   else if (!is.character(value.range) & is.list(value.range)) {
-      ## When user defines the value range for each question
-      stopifnot(ncol(x) == length(value.range))
-      vals <- value.range
+   else if(grepl('^ord', dataClass)){
+      ## Ordinal case
+      if(is.numeric(value.range)){
+         message('KS: value.range is numerical for ordinal data')
+         vals <- value.range
+      }
+      else if(value.range == 'DS'){
+         vals <- NULL
+         rng.x1 <- lapply(1:ncol(x), function(i) unique(x[, i]))
+      }
+      else if (!is.numeric(value.range) & is.list(value.range)) {
+         ## When user defines the value range for each question
+         message('Known Support has variability between attributes.')
+         message('Experimental option. Use it own risk!')
+         stopifnot(ncol(x) == length(value.range))
+         vals <- NULL
+         rng.x1 <- value.range
+      }
    }
-
    logWks <- matrix(0, B, K.max)
    if (verbose)
       cat("Bootstrapping, b = 1,2,..., B (= ", B, ")  [one \".\" per sample]:\n",
@@ -245,6 +279,7 @@ clusGapDiscr0 <- function (x,
 #' @param B Number of bootstrap samples. By default B = nrow(x).
 #' @param verbose Integer or logical. Determines whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.
 #' @param useLog Logical. Use log function after estimating `W.k`. Following the original formulation `useLog=TRUE` by default.
+#' @param dataClass character. Either 'nom' for nominal or 'ord' for ordinal.
 #' @param ... optionally further arguments for `FUNcluster()`
 #'
 #' @return a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.sim",
@@ -259,6 +294,7 @@ clusGapDiscr <- function(x,
                          verbose = interactive(),
                          distName = "hamming",
                          useLog = TRUE,
+                         dataClass = 'nom',
                          ...){
 
    if(clusterFUN == 'pam'){
@@ -270,6 +306,7 @@ clusGapDiscr <- function(x,
                     verbose = verbose,
                     distName = distName,
                     useLog = useLog,
+                    dataClass = dataClass,
                      ...)
 
    }else if(clusterFUN == 'fanny'){
@@ -281,6 +318,7 @@ clusGapDiscr <- function(x,
                     verbose = verbose,
                     distName = distName,
                     useLog = useLog,
+                    dataClass = dataClass,
                     ...)
 
    }else if(clusterFUN == 'diana'){
@@ -298,6 +336,7 @@ clusGapDiscr <- function(x,
                     verbose = verbose,
                     distName = distName,
                     useLog = useLog,
+                    dataClass = dataClass,
                     ...)
 
    }else if(grepl(pattern = '^agnes-.+', x = clusterFUN)){
@@ -319,6 +358,7 @@ clusGapDiscr <- function(x,
                     verbose = verbose,
                     distName = distName,
                     useLog = useLog,
+                    dataClass = dataClass,
                     ...)
 
    }else if(grepl(pattern = '^hclust-.+', x = clusterFUN)){
@@ -338,6 +378,7 @@ clusGapDiscr <- function(x,
                     verbose = verbose,
                     distName = distName,
                     useLog = useLog,
+                    dataClass = dataClass,
                     ...)
 
    }else if(grepl(pattern = '^kmodes.*', x = clusterFUN)){
@@ -359,6 +400,7 @@ clusGapDiscr <- function(x,
                     distName = distName,
                     useLog = useLog,
                     Input2Alg = 'distFun',
+                    dataClass = dataClass,
                     ...)
    }else
       message('Clustering algorithm not available.')

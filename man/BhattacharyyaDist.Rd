@@ -2,7 +2,8 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{BhattacharyyaDist}
 \alias{BhattacharyyaDist}
-\title{Bhattacharyya distance}
+\title{Nominal Distances
+Bhattacharyya distance}
 \usage{
 BhattacharyyaDist(x, adj = 0.01)
 }

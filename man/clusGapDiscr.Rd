@@ -13,6 +13,7 @@ clusGapDiscr(
   verbose = interactive(),
   distName = "hamming",
   useLog = TRUE,
+  dataClass = "nom",
   ...
 )
 }
@@ -42,6 +43,8 @@ If a list with category character vectors is provided, it has to have the same n
 Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.}
 
 \item{useLog}{Logical. Use log function after estimating `W.k`. Following the original formulation `useLog=TRUE` by default.}
+
+\item{dataClass}{character. Either 'nom' for nominal or 'ord' for ordinal.}
 
 \item{...}{optionally further arguments for `FUNcluster()`}
 }

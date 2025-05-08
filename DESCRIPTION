@@ -27,7 +27,9 @@ Imports:
    ComplexHeatmap,
    cluster,
    stats, 
-   nomclust
+   nomclust,
+   bioDist, 
+   transport
 Suggests:
     kableExtra,
     knitr,
