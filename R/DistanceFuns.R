@@ -83,14 +83,9 @@ distancematrix <- function (X, d){
    if(d == 'ks')
       return(dissks(X))
 
-   if (grepl('podani', d)){
-      if(grepl('_[0-9]+', d))
-         myM <- sub(pattern = 'podani_', replacement = '', x = d) %>%
-         as.numeric
-      else
-         myM <- NULL
-      return(disspodani(X, M = myM))
-   }
+   if(d == 'podani')
+      return(disspodani(X))
+
    if (d == "spearman")
       return(dissspearman(X))
 
@@ -105,7 +100,6 @@ distancematrix <- function (X, d){
          myM <- 1
       return(dissWass(X, p = myM))
    }
-
 
    stop("Distance metric ", d, " not available")
 }
@@ -408,43 +402,19 @@ dissks <- function(X){
    return(stats::as.dist(dist_mat))
 }
 
-#' Podani's distance function
+#' Podani distance wrapper function
 #'
-#' R implementation of Podani's distance.
+#' Function based on FD's implementation
 #'
 #' @param X Numerical matrix with integer/ordinal values.
-#' @param M numeric Number of largest category. If `M = NULL`, `M` is determined
-#' for each variable of the data.
+#'
 #' @return Distance matrix
 #' @export
-#'
-disspodani <- function(X, M=NULL) {
-   ### SHOULD BE REVISED!!
-   ## This distance can't be data-driven!
-   ## Need to make sure the number attr vals. is accurate.
-   ## That can be done inputting a data.frame with only factors.
+disspodani <- function (X){
+   stopifnot(is.integer(X))
 
-   n <- nrow(X)
-   p <- ncol(X)
-   dist_mat <- matrix(0, n, n)
-
-   if(is.null(M)){
-      ## Dynamic option!
-      ## message('Automatic detection of number of categories.')
-      MminusOne <- apply(X, 2, function(y) max(unique(y) - 1, 1) )
-      ## message(paste0('Detected number: ', paste0(MminusOne, collapse = ', ') ))
-   }else{
-      MminusOne <- M - 1
-   }
-
-   for (i in 1:(n-1)) {
-      for (j in (i+1):n) {
-         diffs <- abs(X[i, ] - X[j, ]) / MminusOne
-         dist_mat[i, j] <- mean(diffs, na.rm = TRUE)
-         dist_mat[j, i] <- dist_mat[i, j]
-      }
-   }
-   return(stats::as.dist(dist_mat))
+   out <- FD::gowdis(X, ord = 'podani')
+   return(out)
 }
 
 #' Spearman distance wrapper function

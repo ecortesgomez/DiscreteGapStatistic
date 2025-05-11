@@ -2,19 +2,16 @@
 % Please edit documentation in R/DistanceFuns.R
 \name{disspodani}
 \alias{disspodani}
-\title{Podani's distance function}
+\title{Podani distance wrapper function}
 \usage{
-disspodani(X, M = NULL)
+disspodani(X)
 }
 \arguments{
 \item{X}{Numerical matrix with integer/ordinal values.}
-
-\item{M}{numeric Number of largest category. If `M = NULL`, `M` is determined
-for each variable of the data.}
 }
 \value{
 Distance matrix
 }
 \description{
-R implementation of Podani's distance.
+Function based on FD's implementation
 }
