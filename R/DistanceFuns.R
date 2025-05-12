@@ -426,10 +426,12 @@ disspodani <- function (X){
 #' @return Distance matrix
 #' @export
 dissspearman <- function (X){
-   stopifnot(is.integer(X))
-   # X <-  data.frame(X, check.names=FALSE) %>%
-   #    apply(2, function(y) factor(y) %>% as.numeric)
    out <- bioDist::spearman.dist(X, abs = FALSE)
+   if(any(is.na(out))){
+      out <- as.matrix(out)
+      out[is.na(out)] <- 0
+      out <- as.dist(out)
+   }
    return(out)
 }
 
@@ -442,9 +444,12 @@ dissspearman <- function (X){
 #' @return Distance matrix
 #' @export
 disstau <- function (X){
-   # X <-  data.frame(X, check.names=FALSE) %>%
-   #    apply(2, function(y) factor(y) %>% as.numeric)
    out <- bioDist::tau.dist(X, abs = FALSE)
+   if(any(is.na(out))){
+      out <- as.matrix(out)
+      out[is.na(out)] <- 0
+      out <- as.dist(out)
+   }
    return(out)
 }
 
