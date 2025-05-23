@@ -4,15 +4,23 @@
 \alias{SimData}
 \title{Simulate Data}
 \usage{
-SimData(N, nQ, pi)
+SimData(N, nQ, pi, dataClass = "nominal", seed = NULL)
 }
 \arguments{
 \item{N}{Integer. Number of observations.}
 
 \item{nQ}{Integer. Number of questions.}
 
-\item{pi}{Numeric vector. Vector of probabilities adding up to 1; it is recommended that names of elements are character strings.
-Alternatively, pi can be list of vectors as previously described with length equal to `nQ`. Notice that the list elements need not have same vector names. The order of pi vectors in the list will be reflected in the resulting simulated matrix. This alternative ideally assumes that questions are independently distributed.}
+\item{pi}{Numeric vector. Vector of probabilities adding up to 1.
+Alternatively, pi can be list of vectors as previously described with length equal to `nQ`.
+This case, notice that that the vectors within the list can be different.
+The order of the pi vectors in the list will be reflected in the resulting column names.
+If `dataClass = 'ordinal'` it is required that vector names of `pi` be integers and decimals or other numeric values should be avoided.
+If `dataClass = nominal` and pi vector names are numerical, these will remain characters.}
+
+\item{dataClass}{Character. Either 'nominal' or 'ordinal'.}
+
+\item{seed}{Integer. Numerical seed for the RNG.}
 }
 \value{
 N x nQ matrix with simulated categories distributed according to vector pi
@@ -26,11 +34,14 @@ Pix <- setNames(c(0.1, 0.2, 0.3, 0.4, 0), paste0('a', 1:5))
 X <- SimData(N=10, nQ=5, Pix)
 head(X)
 
-Piy <- setNames(c(0.3, 0.2, 0.4, 0, 0.1), paste0('a', 1:5))
+Piy <- setNames(c(0.3, 0.2, 0.5), paste0('b', 1:3))
 Y <- SimData(N=10, nQ=3, Piy)
 head(Y)
 
-PiZ <- list(x1 = Pix, x2 = Pix, y1 = Piy, y2 = Piy)
-Z <- SimData(N=10, nQ=length(PiZ), PiZ)
+PiZ <- list(x1 = Pix, y1 = Piy, y2 = Piy)
+Z <- SimData(N = 10, nQ = length(PiZ), PiZ)
 
+Piw <- setNames(Piy, 1:3)
+W <- SimData(N=10, nQ=3, Piw, dataClass = 'ord')
+head(W)
 }
