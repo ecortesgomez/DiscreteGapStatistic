@@ -426,7 +426,8 @@ disspodani <- function (X){
 #' @return Distance matrix
 #' @export
 dissspearman <- function (X){
-   out <- bioDist::spearman.dist(X, abs = FALSE)
+   ## out <- bioDist::spearman.dist(X, abs = FALSE)
+   out <- bioDist::spearman.dist(X, abs = TRUE)
    if(any(is.na(out))){
       out <- as.matrix(out)
       out[is.na(out)] <- 0
@@ -444,7 +445,8 @@ dissspearman <- function (X){
 #' @return Distance matrix
 #' @export
 disstau <- function (X){
-   out <- bioDist::tau.dist(X, abs = FALSE)
+   ## out <- bioDist::tau.dist(X, abs = FALSE)
+   out <- bioDist::tau.dist(X, abs = TRUE)
    if(any(is.na(out))){
       out <- as.matrix(out)
       out[is.na(out)] <- 0
