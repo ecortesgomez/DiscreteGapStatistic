@@ -362,15 +362,15 @@ disshellinger  <-  function (X) {
 dissabs <- function(X){
 
    stopifnot(is.integer(X))
-   n <- nrow(X)
+   nCol <- ncol(X)
 
-   ecdfMat <- apply(X,
-                    2,
-                    function(w){
+   ecdfMat <- apply(X = X,
+                    MARGIN = 2,
+                    FUN = function(w){
                        stats::ecdf(w)(w)
                        }
                     )
-   stats::dist(ecdfMat, method = 'manhattan')
+   stats::dist(ecdfMat, method = 'manhattan')/nCol
 
 }
 
