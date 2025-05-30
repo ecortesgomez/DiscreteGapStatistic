@@ -1,3 +1,5 @@
+utils::globalVariables(c('Dim1', 'Dim2', 'rowNames'))
+
 #' Summary Heatmap for categorical data
 #'
 #' Heatmap representation summarizing categorical/likert data.
@@ -304,3 +306,113 @@ ResHeatmap <- function(x,
    }
 }
 
+#' MDS Plots for Categorical Data
+#'
+#' Function to visualize the distribution and spread of categorical data in two dimensions
+#' starting from the distance matrix.
+#' A cluster assignment vector needs to be provided to show color coded points.
+#'
+#' @importFrom magrittr %>%
+#' @import ggplot2
+#' @import ggrepel
+#' @param x dist object
+#' @param cl character Vector with clustering assignments. Important: the vector order should match.
+#' number (and if possible names) as the observed data matrix used to generate the distance object `x`.
+#' @param type character String specifying the class of MDS: either classic `'MDS'` (default) or
+#' Non-metrical Dimensional Scaling `'NMDS'`. The core `MDS` function used is `stats::cmdscale(x, k = 2)` and
+#' `vegan::metaMDS(comm = x, distance = "none", k = 2, trymax = 100, autotransform = FALSE)` for `NMDS`,
+#' which uses `vegan::monoMDS` by default.
+#' @param dotSize numerical String specifying the point size. `dotSize = 3` by default.
+#' @param cols character Vector of colors to use with clustering labels. Cluster names should match.
+#' to the ones provided in `cl`. The by default (`cols = NULL`) de functions produces highly contrasting colors.
+#' @param LabTitle character String for the plot's title. By default `LabTitle = type`.
+#' @param filename character string with name of file output. `filename = paste0(type, 'plot.png')` by default.
+#' @param outDir character string with the directory path to save output file. `outDir = './'` by default.
+#' @param addRowNames logical Single value indicating whether to place observation names next to points.
+#' The labels used are the names found in `cl`. If `names(cl) == NULL`, the samples
+#' will be labelled in number of appearance. ggrepel package is used to locate the labels.
+#' @param labSize numeric Single value indicating the size of labels. `labSize = 3` by default.
+#' Non-functional if `addRowNames = FALSE`.
+#' @param out character String specify output to obtain: `'plot'` (default), `'data.frame'` or `'object'`. Either
+#' `plot` return the resulting ggplot object or
+#' `data.frame` for a data.frame with coordinates and corresponding clustering assignments or
+#' `object` to obtain raw objects from the chosen `type` above.
+#' @return png file and either a data.frame with coordinates and labels or either a list with
+#' related MDS results or a `metaMDS` object, depending on the `out` option.
+#'
+plotMDS2 <- function(x,
+                     cl,
+                     type = 'MDS',
+                     cols = NULL,
+                     dotSize = 3,
+                     LabTitle = type,
+                     outDir = './',
+                     filename = paste0(type, 'plot.png'),
+                     addRowNames = FALSE,
+                     labSize = 3,
+                     out = 'plot'){
+
+   if(type == 'MDS'){
+      mdsRaw <- stats::cmdscale(x, k = 2)
+      mdsIn <- mdsRaw %>%
+         data.frame(row.names = rownames(x))
+   }else if(type == 'NMDS'){
+      mdsRaw <- vegan::metaMDS(comm = x,
+                               distance = "none",
+                               k = 2,
+                               trymax = 100,
+                               autotransform = FALSE)
+
+      mdsIn <- mdsRaw$points %>%
+         data.frame(row.names = rownames(x))
+   }
+   colnames(mdsIn)  <- c('Dim1', 'Dim2')
+   mdsIn$cl <- cl
+
+   if(is.null(cols)){
+      myCols <- c('orange',  'gray80', 'slateblue', 'gray60',  'firebrick', 'gray40', 'cyan',
+                  'yellow', 'gray20', 'linen', 'tomato', 'navy', 'lightgreen', 'blue', 'darkolivegreen')
+
+      Labs <- if(is.factor(cl)) levels(cl) else unique(cl)
+      cols <- stats::setNames(object = myCols, nm = Labs)
+   }
+
+   ggOut <- ggplot(data = mdsIn,
+                   mapping = aes(x = Dim1,
+                                 y = Dim2,
+                                 fill = cl)) +
+      geom_point(shape = 21,
+                 size = dotSize,
+                 alpha = 0.7) +
+      scale_fill_manual(values = cols) +
+      theme_bw()+
+      labs(title = LabTitle)+
+      theme(legend.position = 'bottom')
+
+   if(addRowNames){
+      if(!is.null(names(cl)))
+         mdsIn$rowNames <- names(cl)
+      else
+         mdsIn$rowNames <- rownames(mdsIn)
+
+      ggOut <- ggOut +
+         geom_text_repel(data = mdsIn,
+                         mapping = aes(x = Dim1,
+                                       y = Dim2,
+                                       label = rowNames),
+                         size = labSize,
+                         max.overlaps = Inf)
+   }
+
+   ggsave(paste0(outDir, '/', filename, '.png'),
+          ggOut,
+          width = 7, height = 7.3)
+
+   if(out == 'data.frame')
+      return(mdsIn)
+   else if(out == 'object')
+      return(mdsRaw)
+   else if(out == 'plot')
+      ggOut
+
+}

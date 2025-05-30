@@ -17,7 +17,8 @@ Imports:
    cultevo,
    magrittr,
    utils,
-   ggplot2, 
+   ggplot2,
+   ggrepel,
    pheatmap, 
    dplyr,
    Polychrome,
@@ -28,7 +29,8 @@ Imports:
    cluster,
    stats, 
    nomclust,
-   bioDist, 
+   bioDist,
+   vegan,
    FD
 Suggests:
     kableExtra,
