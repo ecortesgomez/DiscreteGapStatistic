@@ -4,16 +4,21 @@
 \alias{dissWass}
 \title{Wasserstein's distance function}
 \usage{
-dissWass(X, p = 1)
+dissWass(X, type = "DS", m = NULL, p = 1)
 }
 \arguments{
-\item{X}{Numerical matrix with integer/ordinal values.}
+\item{X}{numerical matrix containing integer/ordinal values.}
 
-\item{p}{numeric Order of the distance}
+\item{type}{character Select between three WD implementations: `KS` (Known Support),
+`DS` (Data Support), `R` (Rank).}
+
+\item{m}{integer Specifies the number of nominal categories for `type='KS'` option.}
+
+\item{p}{numeric Order of the distance. p=1 by default}
 }
 \value{
 Distance matrix
 }
 \description{
-Using transport's R package implementation
+Wrapper for the proposed Wasserstein's distance types
 }

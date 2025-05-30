@@ -77,8 +77,8 @@ distancematrix <- function (X, d){
    # Ordinal distances #
    #####################
 
-   if(d == 'gordon')
-      return(dissgordon(X))
+   if(d == 'absolute')
+      return(dissabs(X))
 
    if(d == 'ks')
       return(dissks(X))
@@ -93,12 +93,15 @@ distancematrix <- function (X, d){
       return(disstau(X))
 
    if (grepl('wasserstein', d)){
-      if(grepl('_[0-9]+', d))
-         myM <- sub(pattern = 'wasserstein_', replacement = '', x = d) %>%
+      if(grepl('wass.+KS[0-9]+', d)){
+         myM <- sub(pattern = 'wass.+KS', replacement = '', x = d) %>%
             as.numeric
-      else
-         myM <- 1
-      return(dissWass(X, p = myM))
+         return(dissWass(X, type = 'KS', m = myM))
+      }else if(grepl('wass.+DS$', d)){
+         return(dissWass(X, type = 'DS'))
+      }else if(grepl('wass.+R$', d)){
+         return(dissWass(X, type = 'R'))
+      }
    }
 
    stop("Distance metric ", d, " not available")
@@ -348,28 +351,26 @@ disshellinger  <-  function (X) {
 #' Ordinal distances ##
 #' ####################
 
-#' Gordon distance
+#' Absolute distance
 #'
-#' Gordon distance for ordinal data
+#' Absolute distance for ordinal data
 #' @param X Numerical matrix with integer/ordinal values.
 #'
 #' @return Distance matrix
 #' @export
 
-dissgordon <- function(X){
+dissabs <- function(X){
 
    stopifnot(is.integer(X))
    n <- nrow(X)
-   p <- ncol(X)
 
-   ## The difference between the squared component-wise differences have weights w_i
-   ## Here w_i = 1 for i = 1, ..., p
-   ## max(length(w)-1, 1) is (k_i - 1)
-   ## Avoiding division by 0 when normalizing each component
    ecdfMat <- apply(X,
                     2,
-                    function(w) stats::ecdf(w)(w)/max(length(unique(w))-1, 1))
-   stats::dist(ecdfMat, method = 'euclidean')
+                    function(w){
+                       stats::ecdf(w)(w)
+                       }
+                    )
+   stats::dist(ecdfMat, method = 'manhattan')
 
 }
 
@@ -430,8 +431,8 @@ dissspearman <- function (X){
    out <- bioDist::spearman.dist(X, abs = TRUE)
    if(any(is.na(out))){
       out <- as.matrix(out)
-      out[is.na(out)] <- 0
-      out <- as.dist(out)
+      out[is.na(out)] <- 0 ## Constant vectors
+      out <- stats::as.dist(out)
    }
    return(out)
 }
@@ -447,34 +448,125 @@ dissspearman <- function (X){
 disstau <- function (X){
    ## out <- bioDist::tau.dist(X, abs = FALSE)
    out <- bioDist::tau.dist(X, abs = TRUE)
+
    if(any(is.na(out))){
       out <- as.matrix(out)
-      out[is.na(out)] <- 0
-      out <- as.dist(out)
+      out[is.na(out)] <- 0 ## Constant vectors
+      out <- stats::as.dist(out)
    }
    return(out)
 }
 
-#' Wasserstein's distance function
+#' Wasserstein's DS distance function
 #'
-#' Using transport's R package implementation
+#' Estimates eCDF based on the union of observed values
 #'
-#' @param X Numerical matrix with integer/ordinal values.
-#' @param p numeric Order of the distance
+#' @param X numeric Matrix with integer values.
+#' @param p numeric Order of the distance. p=1 by default.
 #' @return Distance matrix
 #' @export
 #'
-dissWass <- function(X, p=1){
-   n <- nrow(X)
-   p <- ncol(X)
-   dist_mat <- matrix(0, n, n)
+dissWassDS <- function(X, p=1){
+   stopifnot(is.integer(X))
 
+   n <- nrow(X)
+   dist_mat <- matrix(NA, nrow = n, ncol = n)
+   ecdfL <- apply(X, 1, function(w) stats::ecdf(w))
    for (i in 1:(n-1)) {
       for (j in (i+1):n) {
-         dist_mat[i, j] <- transport::wasserstein1d(X[i, ], X[j, ],
-                                                    p = p)
-      dist_mat[j, i] <- dist_mat[i, j]
+         lvls <- sort(unique(c(X[i, ], X[j, ])))
+         Fx <- ecdfL[[i]](lvls)
+         Fy <- ecdfL[[j]](lvls)
+         dist_mat[i, j] <- (mean((abs(Fx - Fy))^p))^(1/p)
+         dist_mat[j, i] <- dist_mat[i, j]
       }
    }
    return(stats::as.dist(dist_mat))
 }
+
+#' Wasserstein's Ranked-based distance function
+#'
+#' Estimates eCDF based on the union of observed values
+#'
+#' @param X numeric Matrix with integer values.
+#' @param p numeric Order of the distance. p=1 by default.
+#' @return Distance matrix
+#' @export
+#'
+dissWassR <- function(X, p=1){
+   stopifnot(is.integer(X))
+
+   n <- nrow(X)
+   dist_mat <- matrix(NA, nrow = n, ncol = n)
+   ecdfL <- apply(X, 1, function(w) stats::ecdf(w))
+   for (i in 1:(n-1)) {
+      for (j in (i+1):n) {
+         dist_mat[i, j] <- mean(abs(sort(rank(X[i, ])) - sort(rank(X[j, ]))^p))^(1/p)
+         dist_mat[j, i] <- dist_mat[i, j]
+      }
+   }
+   return(stats::as.dist(dist_mat))
+}
+
+#' Wasserstein's KS distance function
+#'
+#' Assumes known and identical number of ordinal categories `maxM`
+#'
+#' @param X numeric Matrix with integer values.
+#' @param maxM integer Number of ordinal values which will range from 1 to `maxM`
+#' @param p numeric Order of the distance. p=1 by default
+#' @return Distance matrix
+#' @export
+#'
+dissWassKS <- function(X, maxM, p=1){
+   ## Based on all available values
+   ## eCDF based
+   stopifnot(is.integer(X))
+
+   n <- nrow(X)
+   dist_mat <- matrix(NA, nrow = n, ncol = n)
+   ecdfL <- apply(X, 1, function(w) stats::ecdf(w))
+   for (i in 1:(n-1)) {
+      for (j in (i+1):n) {
+         lvls <- 1:maxM
+         Fx <- ecdfL[[i]](lvls)
+         Fy <- ecdfL[[j]](lvls)
+         dist_mat[i, j] <- (mean((abs(Fx - Fy))^p))^(1/p)
+         dist_mat[j, i] <- dist_mat[i, j]
+      }
+   }
+   return(stats::as.dist(dist_mat))
+}
+
+#' Wasserstein's distance function
+#'
+#' Wrapper for the proposed Wasserstein's distance types
+#'
+#' @param X numerical matrix containing integer/ordinal values.
+#' @param type character Select between three WD implementations: `KS` (Known Support),
+#' `DS` (Data Support), `R` (Rank).
+#' @param m integer Specifies the number of nominal categories for `type='KS'` option.
+#' @param p numeric Order of the distance. p=1 by default
+#' @return Distance matrix
+#' @export
+#'
+dissWass <- function(X, type='DS', m=NULL, p=1){
+   n <- nrow(X)
+   dist_mat <- matrix(0, n, n)
+
+   if(type == 'DS'){
+      dist_mat <- dissWassDS(X = X, p = p)
+
+   }else if(type == 'KS'){
+      m <- as.integer(m)
+      dist_mat <- dissWassKS(X = X, maxM = m, p = p)
+
+   }else if(type == 'R'){
+      dist_mat <- dissWassR(X = X, p = p)
+
+   }
+   return(dist_mat)
+
+}
+
+

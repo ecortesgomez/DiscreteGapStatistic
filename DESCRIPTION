@@ -29,7 +29,6 @@ Imports:
    stats, 
    nomclust,
    bioDist, 
-   transport, 
    FD
 Suggests:
     kableExtra,
