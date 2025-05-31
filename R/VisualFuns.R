@@ -339,7 +339,7 @@ ResHeatmap <- function(x,
 #' `object` to obtain raw objects from the chosen `type` above.
 #' @return png file and either a data.frame with coordinates and labels or either a list with
 #' related MDS results or a `metaMDS` object, depending on the `out` option.
-#'
+#' @export
 plotMDS2 <- function(x,
                      cl,
                      type = 'MDS',
