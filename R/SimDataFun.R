@@ -19,11 +19,11 @@
 #'
 #' @examples
 #' Pix <- setNames(c(0.1, 0.2, 0.3, 0.4, 0), paste0('a', 1:5))
-#' X <- SimData(N=10, nQ=5, Pix)
+#' X <- SimData(N=10, nQ=5, Pix, dataClass = 'nominal')
 #' head(X)
 #'
 #' Piy <- setNames(c(0.3, 0.2, 0.5), paste0('b', 1:3))
-#' Y <- SimData(N=10, nQ=3, Piy)
+#' Y <- SimData(N=10, nQ=3, Piy, dataClass = 'nominal')
 #' head(Y)
 #'
 #' PiZ <- list(x1 = Pix, y1 = Piy, y2 = Piy)
@@ -43,7 +43,9 @@ SimData <- function(N, nQ, pi,
    if(dataClass == 'nominal' | grepl('^nom', dataClass, ignore.case=TRUE)){
 
       if(is.numeric(pi)){ ## Just a numerical vector
-         stopifnot(sum(pi) == 1 )
+         ## stopifnot(sum(pi) == 1 )
+         stopifnot( (sum(pi) %>% round(digits = 5)) == 1 )
+
          out <- matrix(sample(names(pi), N*nQ, replace=TRUE, prob = pi),
                        nrow = N,
                        dimnames = list(paste0('s', 1:N),
@@ -52,7 +54,9 @@ SimData <- function(N, nQ, pi,
 
       }else if(is.list(pi) & length(pi) == nQ){
 
-         stopifnot(all(lapply(pi, sum) == 1))
+         ## stopifnot(all(lapply(pi, sum) == 1))
+         stopifnot(all(lapply(pi, function(x) sum(x) %>% round(digits = 5)) == 1 ))
+
          out <-lapply(pi,
                       function(y) sample(x = names(y),
                                          size = N,
@@ -75,7 +79,9 @@ SimData <- function(N, nQ, pi,
    }else if(dataClass == 'ordinal' | grepl('^ord', dataClass, ignore.case=TRUE)){
 
       if(is.numeric(pi) ){ ## Just a vector
-         stopifnot(sum(pi) == 1)
+         ## stopifnot(sum(pi) == 1)
+         stopifnot( (sum(pi) %>% round(digits = 5)) == 1 )
+
          out <- matrix(sample(names(pi) %>% as.integer,
                               N*nQ,
                               replace=TRUE,

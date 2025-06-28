@@ -21,7 +21,7 @@ plotMDS2(
 \arguments{
 \item{x}{dist object}
 
-\item{cl}{character Vector with clustering assignments. Important: the vector order should match.
+\item{cl}{character Vector with clustering assignments. Important: the vector order should match
 number (and if possible names) as the observed data matrix used to generate the distance object `x`.}
 
 \item{type}{character String specifying the class of MDS: either classic `'MDS'` (default) or

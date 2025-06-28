@@ -316,7 +316,7 @@ ResHeatmap <- function(x,
 #' @import ggplot2
 #' @import ggrepel
 #' @param x dist object
-#' @param cl character Vector with clustering assignments. Important: the vector order should match.
+#' @param cl character Vector with clustering assignments. Important: the vector order should match
 #' number (and if possible names) as the observed data matrix used to generate the distance object `x`.
 #' @param type character String specifying the class of MDS: either classic `'MDS'` (default) or
 #' Non-metrical Dimensional Scaling `'NMDS'`. The core `MDS` function used is `stats::cmdscale(x, k = 2)` and
@@ -370,8 +370,9 @@ plotMDS2 <- function(x,
    mdsIn$cl <- cl
 
    if(is.null(cols)){
-      myCols <- c('orange',  'gray80', 'slateblue', 'gray60',  'firebrick', 'gray40', 'cyan',
-                  'yellow', 'gray20', 'linen', 'tomato', 'navy', 'lightgreen', 'blue', 'darkolivegreen')
+      myCols <- c('orange',  'gray80', 'slateblue', 'firebrick', 'cyan',
+                  'yellow', 'linen', 'gray60', 'tomato', 'navy', 'lightgreen', 'gray40',
+                  'blue', 'darkolivegreen', 'gray20')
 
       Labs <- if(is.factor(cl)) levels(cl) else unique(cl)
       cols <- stats::setNames(object = myCols, nm = Labs)
@@ -400,6 +401,8 @@ plotMDS2 <- function(x,
                          mapping = aes(x = Dim1,
                                        y = Dim2,
                                        label = rowNames),
+                         segment.alpha = 0.3,
+                         segment.size = 0.3,
                          size = labSize,
                          max.overlaps = Inf)
    }

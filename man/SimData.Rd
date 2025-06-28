@@ -31,11 +31,11 @@ a list of parameter vectors.
 }
 \examples{
 Pix <- setNames(c(0.1, 0.2, 0.3, 0.4, 0), paste0('a', 1:5))
-X <- SimData(N=10, nQ=5, Pix)
+X <- SimData(N=10, nQ=5, Pix, dataClass = 'nominal')
 head(X)
 
 Piy <- setNames(c(0.3, 0.2, 0.5), paste0('b', 1:3))
-Y <- SimData(N=10, nQ=3, Piy)
+Y <- SimData(N=10, nQ=3, Piy, dataClass = 'nominal')
 head(Y)
 
 PiZ <- list(x1 = Pix, y1 = Piy, y2 = Piy)
