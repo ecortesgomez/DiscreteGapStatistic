@@ -414,10 +414,11 @@ clusGapDiscr <- function(x,
 #' @import dplyr
 #' @param cG_obj Output object obtained from `clusGapDiscr`
 #' @param meth Method to use to determine optimal k number of clusters.
+#' @param SE.fact Standard Error Factor generalizing the 1-SE rule.
 #' @return A numerical value from 1 to K.max, contained in the input `cG_obj` object.
 #' @export
 
-findK <- function (cG_obj, meth = "Tibs2001SEmax"){
+findK <- function (cG_obj, meth = "Tibs2001SEmax", SE.fact = 1){
    logW <- gap <- SE.sim <- NULL
    if (!meth %in% c("minSE", "minGap", "maxChange")) {
 
@@ -435,7 +436,8 @@ findK <- function (cG_obj, meth = "Tibs2001SEmax"){
       selK <- with(myTab,
                    cluster::maxSE(f = gap,
                                   SE.f = SE.sim,
-                                  method = meth) )
+                                  method = meth,
+                                  SE.factor = SE.fact) )
       myTab[selK, 'nClus']
 
    }
