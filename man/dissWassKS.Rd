@@ -9,7 +9,7 @@ dissWassKS(X, maxM, p = 1)
 \arguments{
 \item{X}{numeric Matrix with integer values.}
 
-\item{maxM}{integer Number of ordinal values which will range from 1 to `maxM`}
+\item{maxM}{integer Number of ordinal values which will range from 1 to \code{maxM}}
 
 \item{p}{numeric Order of the distance. p=1 by default}
 }
@@ -17,5 +17,5 @@ dissWassKS(X, maxM, p = 1)
 Distance matrix
 }
 \description{
-Assumes known and identical number of ordinal categories `maxM`
+Assumes known and identical number of ordinal categories \code{maxM}
 }

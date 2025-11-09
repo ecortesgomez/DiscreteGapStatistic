@@ -13,5 +13,5 @@ disschisquare(X)
 Distance R object
 }
 \description{
-Wrapper of `ChisqDist`
+Wrapper of \code{ChisqDistRcpp}
 }

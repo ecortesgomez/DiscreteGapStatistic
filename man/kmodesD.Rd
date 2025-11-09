@@ -16,10 +16,10 @@ kmodesD(data, modes, distFun, iter.max = 10)
 \item{iter.max}{The maximum number of iterations allowed.}
 }
 \value{
-An object of class kmodes as found in `klaR` packages.
-An additional component specifies the categorical distance function found in `distFun`.
+An object of class kmodes as found in \code{klaR} packages.
+An additional component specifies the categorical distance function found in \code{distFun}.
 }
 \description{
 K-modes function to accept any categorical distance based on
-the function found in `klaR:kmodes`.
+the function found in \code{klaR:kmodes}.
 }

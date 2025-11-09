@@ -19,9 +19,9 @@ likert.heat.plot2(
 
 \item{allLevels}{vector with all categorical (ordered) levels.}
 
-\item{low.color}{string; name of color assigned to the first level found in `allLevels`.}
+\item{low.color}{string; name of color assigned to the first level found in \code{allLevels}.}
 
-\item{high.color}{string; name of color assigned to the last level found in `allLevels`.}
+\item{high.color}{string; name of color assigned to the last level found in \code{allLevels}.}
 
 \item{text.color}{string; text color of numbers within cells.}
 
@@ -34,8 +34,8 @@ ggplot object.
 }
 \description{
 Heatmap representation summarizing categorical/likert data.
-Modified version of `likert.heat.plot` from `likert` package.
+Modified version of \code{likert.heat.plot} from \code{likert} package.
 Does not allow different categorical ranges across questions.
 The function outputs a ggplot object where additional layers can be added for customization purposes.
-The output plot preserves the question order given by columns of `x`.
+The output plot preserves the question order given by columns of \code{x}.
 }

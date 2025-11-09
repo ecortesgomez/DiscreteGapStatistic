@@ -14,17 +14,18 @@ clusGapDiscr0(
   distName = "hamming",
   useLog = TRUE,
   Input2Alg = "distMatr",
+  dataClass = "nom",
   ...
 )
 }
 \arguments{
 \item{x}{A matrix object specifying category attributes in the columns and observations in the rows.}
 
-\item{FUNcluster}{a function that accepts as first argument a matrix like `x`; second argument specifies number of `k` (k=>2) clusters
-This function should return a list with a component named `cluster`, a vector of length `n=nrow(x)` of integers from `1:k` indicating observation cluster assignment.
-Make sure `FUNcluster` and `Input2Alg` agree.}
+\item{FUNcluster}{a function that accepts as first argument a matrix like \code{x}; second argument specifies number of \code{k} (k=>2) clusters
+This function should return a list with a component named \code{cluster}, a vector of length \code{n=nrow(x)} of integers from \code{1:k} indicating observation cluster assignment.
+Make sure \code{FUNcluster} and \code{Input2Alg} agree.}
 
-\item{K.max}{Integer. Maximum number of clusters `k` to consider}
+\item{K.max}{Integer. Maximum number of clusters \code{k} to consider}
 
 \item{B}{Number of bootstrap samples. By default B = nrow(x).}
 
@@ -39,19 +40,22 @@ If a list with category character vectors is provided, it has to have the same n
 \item{distName}{String. Name of categorical distance to apply.
 Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.}
 
-\item{useLog}{Logical. Use log function after estimating `W.k`. Following the original formulation `useLog=TRUE` by default.}
+\item{useLog}{Logical. Use log function after estimating \code{W.k}. Following the original formulation \code{useLog=TRUE} by default.}
 
-\item{Input2Alg}{Specifies the kind of input provided to the algorithm function in `FUNcluster`.
-For algorithms that only accept a distance matrix use `'distMatr'` option (default).
-For algorithms that require the dataset and a prespecified distance function (e.g. `stats::dist`) use the `'distFun'` option.
-This case the distance function is defined internally and determined by parameter `distName`.}
+\item{Input2Alg}{Specifies the kind of input provided to the algorithm function in \code{FUNcluster}.
+For algorithms that only accept a distance matrix use \code{'distMatr'} option (default).
+For algorithms that require the dataset and a prespecified distance function (e.g. \code{stats::dist}) use the \code{'distFun'} option.
+This case the distance function is defined internally and determined by parameter \code{distName}.}
 
-\item{...}{optionally further arguments for `FUNcluster()`}
+\item{dataClass}{character. Either 'nom' for nominal or 'ord' for ordinal.}
+
+\item{...}{optionally further arguments for \code{FUNcluster()}}
 }
 \value{
 a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.sim",
-where gap = E.logW - logW, and SE.sim correspond to the standard error of `gap`.
+where gap = E.logW - logW, and SE.sim correspond to the standard error of \code{gap}.
 }
 \description{
-Based on the implementation of the function found in the `cluster` R package.
+Based on the implementation of the function found in the \code{cluster} R package.
+This function assumes that all attributes have identical categories.
 }

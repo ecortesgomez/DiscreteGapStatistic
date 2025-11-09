@@ -13,5 +13,5 @@ disscramerv(X)
 Distance R object
 }
 \description{
-Wrapper of `CramerV`
+Wrapper of \code{CramerV}
 }

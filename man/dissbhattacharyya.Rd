@@ -13,5 +13,5 @@ dissbhattacharyya(X)
 Distance R object
 }
 \description{
-Wrapper of `BhattacharyyaDist`
+Wrapper of \code{BhattacharyyaDist}
 }

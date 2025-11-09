@@ -9,10 +9,10 @@ dissWass(X, type = "DS", m = NULL, p = 1)
 \arguments{
 \item{X}{numerical matrix containing integer/ordinal values.}
 
-\item{type}{character Select between three WD implementations: `KS` (Known Support),
-`DS` (Data Support), `R` (Rank).}
+\item{type}{character Select between three WD implementations: \code{KS} (Known Support),
+\code{DS} (Data Support), \code{R} (Rank).}
 
-\item{m}{integer Specifies the number of nominal categories for `type='KS'` option.}
+\item{m}{integer Specifies the number of nominal categories for \code{type='KS'} option.}
 
 \item{p}{numeric Order of the distance. p=1 by default}
 }

@@ -21,13 +21,13 @@ clusGapDiscr(
 \item{x}{A matrix object specifying category attributes in the columns and observations in the rows.}
 
 \item{clusterFUN}{Character string with one of the available clustering implementations.
-Available options are: 'pam' (default) from `cluster::pam`, 'diana' from `cluster::diana`, 'fanny' from `cluster::fanny`,
-'agnes-\{average, single, complete, ward, weighted\}' from `cluster::fanny`,
-'hclust-\{ward.D, ward.D2, single, complete, average, mcquitty, median, centroid\}' from `stats::hclust`,
-'kmodes' from `klar::kmodes` (`iter.max = 10`, `weighted = FALSE` and `fast= TRUE`).
-'kmodes-N' enables to run the `kmodes` algorithm with a given number N of iterations where `iter.max = N`.}
+Available options are: 'pam' (default) from \code{cluster::pam}, 'diana' from \code{cluster::diana}, 'fanny' from \code{cluster::fanny},
+'agnes-\{average, single, complete, ward, weighted\}' from \code{cluster::fanny},
+'hclust-\{ward.D, ward.D2, single, complete, average, mcquitty, median, centroid\}' from \code{stats::hclust},
+'kmodes' from \code{klar::kmodes} (\code{iter.max = 10}, \code{weighted = FALSE} and \code{fast= TRUE}).
+'kmodes-N' enables to run the \code{kmodes} algorithm with a given number N of iterations where \code{iter.max = N}.}
 
-\item{K.max}{Integer. Maximum number of clusters `k` to consider}
+\item{K.max}{Integer. Maximum number of clusters \code{k} to consider}
 
 \item{B}{Number of bootstrap samples. By default B = nrow(x).}
 
@@ -42,16 +42,16 @@ If a list with category character vectors is provided, it has to have the same n
 \item{distName}{String. Name of categorical distance to apply.
 Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.}
 
-\item{useLog}{Logical. Use log function after estimating `W.k`. Following the original formulation `useLog=TRUE` by default.}
+\item{useLog}{Logical. Use log function after estimating \code{W.k}. Following the original formulation \code{useLog=TRUE} by default.}
 
 \item{dataClass}{character. Either 'nom' for nominal or 'ord' for ordinal.}
 
-\item{...}{optionally further arguments for `FUNcluster()`}
+\item{...}{optionally further arguments for \code{FUNcluster()}}
 }
 \value{
 a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.sim",
-where gap = E.logW - logW, and SE.sim correspond to the standard error of `gap`.
+where gap = E.logW - logW, and SE.sim correspond to the standard error of \code{gap}.
 }
 \description{
-Based on the implementation of the function found in the `cluster` R package.
+Based on the implementation of the function found in the \code{cluster} R package.
 }

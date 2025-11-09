@@ -144,6 +144,21 @@ BhattacharyyaDist <- function(x, adj = 0.01){
     stats::as.dist(outMat)
 }
 
+#' Bhattacharyya distance via Rcpp
+#'
+#' Bhattacharyya distance core function
+#'
+#' @param X character matrix of categorical data
+#' @param offset small value to avoid cases when log(0*0)
+#' @return A numeric matrix of pairwise distances
+#' @export
+#' @useDynLib DiscreteGapStatistic, .registration = TRUE
+#' @importFrom Rcpp sourceCpp
+BhattacharyyaDistRcpp <- function(X, offset = 1e-8){
+   D_rcpp <- BhattacharyyaDist_rcpp(x = X, offset = offset)
+   stats::as.dist(D_rcpp)
+}
+
 #' Bhattacharyya's distance (wrapper)
 #'
 #' Wrapper of `BhattacharyyaDist`
@@ -158,7 +173,8 @@ dissbhattacharyya  <-  function (X) {
         stop(paste(sQuote("X"), "not a matrix"))
     }
 
-    BhattacharyyaDist(x=X)
+    ## BhattacharyyaDist(X)
+   BhattacharyyaDistRcpp(X = X)
 }
 
 #' Chi-square distance
@@ -199,9 +215,23 @@ ChisqDist <- function(x){
         stats::as.dist(outMat/myP)
 }
 
+#' Chi-square distance via Rcpp
+#'
+#' Chi-square distance core function
+#'
+#' @param X character matrix of categorical data
+#' @return A numeric matrix of pairwise distances
+#' @export
+#' @useDynLib DiscreteGapStatistic, .registration = TRUE
+#' @importFrom Rcpp sourceCpp
+ChisqDistRcpp <- function(X){
+   D_rcpp <- ChisqDist_rcpp(X)
+   stats::as.dist(D_rcpp)
+}
+
 #' Chi-square distance (wrapper)
 #'
-#' Wrapper of `ChisqDist`
+#' Wrapper of `ChisqDistRcpp`
 #'
 #' @param X Matrix
 #'
@@ -212,7 +242,8 @@ disschisquare  <-  function (X) {
     if (!is.matrix(X)) {
         stop(paste(sQuote("X"), "not a matrix"))
     }
-    ChisqDist(X)
+    ChisqDistRcpp(X)
+    ## ChisqDist(X)
 }
 
 #' Cramer's V modified pairwise vector function based on the function found in lsr package

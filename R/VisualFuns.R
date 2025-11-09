@@ -407,7 +407,7 @@ plotMDS2 <- function(x,
                          max.overlaps = Inf)
    }
 
-   ggsave(paste0(outDir, '/', filename, '.png'),
+   ggsave(paste0(outDir, '/', filename),
           ggOut,
           width = 7, height = 7.3)
 

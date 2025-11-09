@@ -12,11 +12,11 @@ SimData(N, nQ, pi, dataClass = "nominal", seed = NULL)
 \item{nQ}{Integer. Number of questions.}
 
 \item{pi}{Numeric vector. Vector of probabilities adding up to 1.
-Alternatively, pi can be list of vectors as previously described with length equal to `nQ`.
+Alternatively, pi can be list of vectors as previously described with length equal to \code{nQ}.
 This case, notice that that the vectors within the list can be different.
 The order of the pi vectors in the list will be reflected in the resulting column names.
-If `dataClass = 'ordinal'` it is required that vector names of `pi` be integers and decimals or other numeric values should be avoided.
-If `dataClass = nominal` and pi vector names are numerical, these will remain characters.}
+If \code{dataClass = 'ordinal'} it is required that vector names of \code{pi} be integers and decimals or other numeric values should be avoided.
+If \code{dataClass = nominal} and pi vector names are numerical, these will remain characters.}
 
 \item{dataClass}{Character. Either 'nominal' or 'ordinal'.}
 

@@ -7,15 +7,15 @@
 findK(cG_obj, meth = "Tibs2001SEmax", SE.fact = 1)
 }
 \arguments{
-\item{cG_obj}{Output object obtained from `clusGapDiscr`}
+\item{cG_obj}{Output object obtained from \code{clusGapDiscr}}
 
 \item{meth}{Method to use to determine optimal k number of clusters.}
 
 \item{SE.fact}{Standard Error Factor generalizing the 1-SE rule.}
 }
 \value{
-A numerical value from 1 to K.max, contained in the input `cG_obj` object.
+A numerical value from 1 to K.max, contained in the input \code{cG_obj} object.
 }
 \description{
-Same function as found in `cluster` package.
+Same function as found in \code{cluster} package.
 }

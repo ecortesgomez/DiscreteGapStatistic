@@ -32,8 +32,8 @@ sample-to-sample heatmap clustering samples according to a given categorical dis
 Exploratory tool that helps to visualize/cluster blocks of observations across
 columns ordered according to given categorical distance. The final output is
 a clustered distance matrix.
-This plot is aimed to guide the `DiscreteClusGap` user to give an idea which
+This plot is aimed to guide the \code{DiscreteClusGap} user to give an idea which
 type of categorical distance would accommodate better to the inputted data.
-`sample2sampleHeat` is based on the `pheatmap` function from the `pheatmap`
-R package. Thus, any parameter found in pheatmap can be specified to `sample2sampleHeat`.
+\code{sample2sampleHeat} is based on the \code{pheatmap} function from the \code{pheatmap}
+R package. Thus, any parameter found in pheatmap can be specified to \code{sample2sampleHeat}.
 }

@@ -22,39 +22,39 @@ plotMDS2(
 \item{x}{dist object}
 
 \item{cl}{character Vector with clustering assignments. Important: the vector order should match
-number (and if possible names) as the observed data matrix used to generate the distance object `x`.}
+number (and if possible names) as the observed data matrix used to generate the distance object \code{x}.}
 
-\item{type}{character String specifying the class of MDS: either classic `'MDS'` (default) or
-Non-metrical Dimensional Scaling `'NMDS'`. The core `MDS` function used is `stats::cmdscale(x, k = 2)` and
-`vegan::metaMDS(comm = x, distance = "none", k = 2, trymax = 100, autotransform = FALSE)` for `NMDS`,
-which uses `vegan::monoMDS` by default.}
+\item{type}{character String specifying the class of MDS: either classic \code{'MDS'} (default) or
+Non-metrical Dimensional Scaling \code{'NMDS'}. The core \code{MDS} function used is \code{stats::cmdscale(x, k = 2)} and
+\code{vegan::metaMDS(comm = x, distance = "none", k = 2, trymax = 100, autotransform = FALSE)} for \code{NMDS},
+which uses \code{vegan::monoMDS} by default.}
 
 \item{cols}{character Vector of colors to use with clustering labels. Cluster names should match.
-to the ones provided in `cl`. The by default (`cols = NULL`) de functions produces highly contrasting colors.}
+to the ones provided in \code{cl}. The by default (\code{cols = NULL}) de functions produces highly contrasting colors.}
 
-\item{dotSize}{numerical String specifying the point size. `dotSize = 3` by default.}
+\item{dotSize}{numerical String specifying the point size. \code{dotSize = 3} by default.}
 
-\item{LabTitle}{character String for the plot's title. By default `LabTitle = type`.}
+\item{LabTitle}{character String for the plot's title. By default \code{LabTitle = type}.}
 
-\item{outDir}{character string with the directory path to save output file. `outDir = './'` by default.}
+\item{outDir}{character string with the directory path to save output file. \code{outDir = './'} by default.}
 
-\item{filename}{character string with name of file output. `filename = paste0(type, 'plot.png')` by default.}
+\item{filename}{character string with name of file output. \code{filename = paste0(type, 'plot.png')} by default.}
 
 \item{addRowNames}{logical Single value indicating whether to place observation names next to points.
-The labels used are the names found in `cl`. If `names(cl) == NULL`, the samples
+The labels used are the names found in \code{cl}. If \code{names(cl) == NULL}, the samples
 will be labelled in number of appearance. ggrepel package is used to locate the labels.}
 
-\item{labSize}{numeric Single value indicating the size of labels. `labSize = 3` by default.
-Non-functional if `addRowNames = FALSE`.}
+\item{labSize}{numeric Single value indicating the size of labels. \code{labSize = 3} by default.
+Non-functional if \code{addRowNames = FALSE}.}
 
-\item{out}{character String specify output to obtain: `'plot'` (default), `'data.frame'` or `'object'`. Either
-`plot` return the resulting ggplot object or
-`data.frame` for a data.frame with coordinates and corresponding clustering assignments or
-`object` to obtain raw objects from the chosen `type` above.}
+\item{out}{character String specify output to obtain: \code{'plot'} (default), \code{'data.frame'} or \code{'object'}. Either
+\code{plot} return the resulting ggplot object or
+\code{data.frame} for a data.frame with coordinates and corresponding clustering assignments or
+\code{object} to obtain raw objects from the chosen \code{type} above.}
 }
 \value{
 png file and either a data.frame with coordinates and labels or either a list with
-related MDS results or a `metaMDS` object, depending on the `out` option.
+related MDS results or a \code{metaMDS} object, depending on the \code{out} option.
 }
 \description{
 Function to visualize the distribution and spread of categorical data in two dimensions

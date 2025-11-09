@@ -8,17 +8,17 @@ clusterFunSel(clustFun)
 }
 \arguments{
 \item{clustFun}{A character string with the following possible options:
-'pam' (default) from `cluster::pam`, 'diana' from `cluster::diana`, 'fanny' from `cluster::fanny`,
-'agnes-\{average, single, complete, ward, weighted\}' from `cluster::agnes`,
-'hclust-\{ward.D, ward.D2, single, complete, average, mcquitty, median, centroid\}' from `base::hclust`,
-'kmodes' from `klar::kmodes` (`iter.max = 10`, `weighted = FALSE` and `fast= TRUE`).
-'kmodes-N' enables to run the `kmodes` algorithm with a given number N of iterations where `iter.max = N`.}
+'pam' (default) from \code{cluster::pam}, 'diana' from \code{cluster::diana}, 'fanny' from \code{cluster::fanny},
+'agnes-\{average, single, complete, ward, weighted\}' from \code{cluster::agnes},
+'hclust-\{ward.D, ward.D2, single, complete, average, mcquitty, median, centroid\}' from \code{base::hclust},
+'kmodes' from \code{klar::kmodes} (\code{iter.max = 10}, \code{weighted = FALSE} and \code{fast= TRUE}).
+'kmodes-N' enables to run the \code{kmodes} algorithm with a given number N of iterations where \code{iter.max = N}.}
 }
 \value{
-An object of class kmodes as found in `klaR` packages.
-An additional component specifies the categorical distance function found in `distFun`.
+An object of class kmodes as found in \code{klaR} packages.
+An additional component specifies the categorical distance function found in \code{distFun}.
 }
 \description{
 A function that generates formatted algorithmic functions that can be plugged
-to enable run a wide variety of clustering algorithm for `clusGapDiscr` function.
+to enable run a wide variety of clustering algorithm for \code{clusGapDiscr} function.
 }

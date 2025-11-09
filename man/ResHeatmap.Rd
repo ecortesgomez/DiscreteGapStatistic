@@ -24,7 +24,7 @@ ResHeatmap(
 \arguments{
 \item{x}{matrix object or data.frame}
 
-\item{nCl}{number of clusters to plot; if `nCl` is a permutation vector of the first lN integers will rearrange clusters according to the original given ordering.}
+\item{nCl}{number of clusters to plot; if \code{nCl} is a permutation vector of the first lN integers will rearrange clusters according to the original given ordering.}
 
 \item{distName}{Name of categorical distance to apply.
 Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.}
@@ -32,20 +32,20 @@ Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hel
 \item{catVals}{character string vector with (ordered) categorical values}
 
 \item{clusterFUN}{Character string with one of the available clustering implementations.
-Available options are: 'pam' (default) from `cluster::pam`, 'diana' from `cluster::diana`, 'fanny' from `cluster::fanny`.
-'agnes-\{average, single, complete, ward, weighted\}' from `cluster::agnes`,
-'hclust-\{ward.D, ward.D2, single, complete, average, mcquitty, median, centroid\}' from `stats::hclust`,
-'kmodes' from `klar::kmodes` (`weighted = FALSE` and `fast= TRUE`).}
+Available options are: 'pam' (default) from \code{cluster::pam}, 'diana' from \code{cluster::diana}, 'fanny' from \code{cluster::fanny}.
+'agnes-\{average, single, complete, ward, weighted\}' from \code{cluster::agnes},
+'hclust-\{ward.D, ward.D2, single, complete, average, mcquitty, median, centroid\}' from \code{stats::hclust},
+'kmodes' from \code{klar::kmodes} (\code{weighted = FALSE} and \code{fast= TRUE}).}
 
-\item{out}{Specifies the desired output between "heatmap" (default; produce a heatmap), "clusters" (return a `data.frame` with clustering assignments) or "clustersReord" (return a `data.frame` with reorganized clusters)}
+\item{out}{Specifies the desired output between "heatmap" (default; produce a heatmap), "clusters" (return a \code{data.frame} with clustering assignments) or "clustersReord" (return a \code{data.frame} with reorganized clusters)}
 
 \item{seed}{Seed number.}
 
-\item{clusterNames}{Either `null` or 'renumber'. When `nCl` is a numerical vector, the cluster ordering is rearranged. `NULL` leaves cluster names as their original cluster assignment. 'renumber' respects the rearrangements but relabels the cluster numbers from top to bottom in ascending order.}
+\item{clusterNames}{Either \code{null} or 'renumber'. When \code{nCl} is a numerical vector, the cluster ordering is rearranged. \code{NULL} leaves cluster names as their original cluster assignment. 'renumber' respects the rearrangements but relabels the cluster numbers from top to bottom in ascending order.}
 
 \item{prefObs}{character string vector of length 1 with a prefix for the observations, in case they come unlabelled or the user wants to anomymize sample IDs.}
 
-\item{rowNames}{character vector with names of rows according to `x`. By default, `rownames(x)` will be printed in the plot. `rowNames=NULL` prevents from showing names. `prefObs` option takes precedence if is different to `NULL`.}
+\item{rowNames}{character vector with names of rows according to \code{x}. By default, \code{rownames(x)} will be printed in the plot. \code{rowNames=NULL} prevents from showing names. \code{prefObs} option takes precedence if is different to \code{NULL}.}
 
 \item{filename}{character string with name of file output}
 
@@ -61,14 +61,14 @@ png file or ComplexHeatmap object
 \description{
 Heatmap assuming a given a distance function and a known number of clusters.
 Function to display a categorical data matrix given a user defined number of
-clusters `nCl`, a categorical distance `distName` and a predefined clustering
-method `FUNcluster`.
+clusters \code{nCl}, a categorical distance \code{distName} and a predefined clustering
+method \code{FUNcluster}.
 The output displays a heatmap separating and color-labelling resulting
 clusters vertically in the rows and allowing unsupervised clustering on
 questions in the columns. Each cell is colored according to the categorical
 values provided or found in the data.
-The clustergram is based on the `pheatmap` function from the pheatmap R package.
-Thus, any parameter found in pheatmap can be specified to `clusGapDiscrHeat`.
+The clustergram is based on the \code{pheatmap} function from the pheatmap R package.
+Thus, any parameter found in pheatmap can be specified to \code{clusGapDiscrHeat}.
 This function can be used to examine number of clusters before running
-`clusGapDiscrHeat` but also after the number of clusters is determined.
+\code{clusGapDiscrHeat} but also after the number of clusters is determined.
 }

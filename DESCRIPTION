@@ -31,7 +31,8 @@ Imports:
    nomclust,
    bioDist,
    vegan,
-   FD
+   FD, 
+   Rcpp (>= 1.0.12)
 Suggests:
     kableExtra,
     knitr,
@@ -40,3 +41,5 @@ Suggests:
 Config/testthat/edition: 3
 Depends: 
     R (>= 4.2.0)
+LinkingTo: Rcpp
+Roxygen: list(markdown = TRUE, roclets = c("namespace", "rd"))

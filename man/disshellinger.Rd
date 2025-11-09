@@ -13,5 +13,5 @@ disshellinger(X)
 Distance R object
 }
 \description{
-Wrapper of `HellingerDist`
+Wrapper of \code{HellingerDist}
 }
