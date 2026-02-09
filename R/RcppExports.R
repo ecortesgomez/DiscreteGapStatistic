@@ -3,8 +3,9 @@
 
 #' Bhattacharyya Distance
 #'
+#' @name BhattacharyyaDist_rcpp
 #' @title Bhattacharyya Distance via Rcpp
-#' @description Computes pairwise Chi-square distance between rows.
+#' @description Computes pairwise Bhattacharyya distance between rows.
 #' @param x n X p character matrix.
 #' @param offset small offset for log(0*0) cases.
 #' @return Distance matrix between rows.
@@ -13,6 +14,7 @@ NULL
 
 #' Chi-square Distance
 #'
+#' @name ChisqDist_rcpp
 #' @title Chi-square Distance via Rcpp
 #' @description Computes pairwise Chi-square distance between rows.
 #' @param x n X p character matrix.

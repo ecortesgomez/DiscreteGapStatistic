@@ -11,8 +11,8 @@ plotMDS2(
   cols = NULL,
   dotSize = 3,
   LabTitle = type,
-  outDir = "./",
-  filename = paste0(type, "plot.png"),
+  outDir = NULL,
+  filename = NULL,
   addRowNames = FALSE,
   labSize = 3,
   out = "plot"
@@ -36,9 +36,12 @@ to the ones provided in \code{cl}. The by default (\code{cols = NULL}) de functi
 
 \item{LabTitle}{character String for the plot's title. By default \code{LabTitle = type}.}
 
-\item{outDir}{character string with the directory path to save output file. \code{outDir = './'} by default.}
+\item{outDir}{character string with the directory path to save output file.
+\code{outDir = NULL} is default option avoiding generating a plot.}
 
-\item{filename}{character string with name of file output. \code{filename = paste0(type, 'plot.png')} by default.}
+\item{filename}{character string with name of file output.
+\code{filename = NULL} by default avoiding generating a plot.
+This parameter should have a valid \code{ggplot2} output graphical format extension like \code{'FileName.{png,pdf,ps,...}'}.}
 
 \item{addRowNames}{logical Single value indicating whether to place observation names next to points.
 The labels used are the names found in \code{cl}. If \code{names(cl) == NULL}, the samples

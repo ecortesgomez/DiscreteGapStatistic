@@ -7,19 +7,18 @@
 distancematrix(X, d)
 }
 \arguments{
-\item{X}{Matrix where rows are the observations and columns are discrete features}
+\item{X}{Matrix where rows are observations and columns are discrete features.}
 
-\item{d}{Name of distance. Distances available: bhattacharyya, chisquare, cramerV, hamming and hellinger}
+\item{d}{Character scalar naming the distance.}
 }
 \value{
-R distance object
+An object of class \code{dist}.
 }
 \description{
-Function invoking discrete distance functions.
-Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'
+Dispatcher for discrete distance functions (nominal + ordinal).
 }
 \examples{
-X = rbind(matrix(paste0("a", rpois(7*5, 1)), nrow=5),
-          matrix(paste0("a", rpois(7*5, 3)), nrow=5))
+X <- rbind(matrix(paste0("a", rpois(7*5, 1)), nrow=5),
+           matrix(paste0("a", rpois(7*5, 3)), nrow=5))
 distancematrix(X = X, d = "hellinger")
 }

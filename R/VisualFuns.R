@@ -23,12 +23,12 @@ utils::globalVariables(c('Dim1', 'Dim2', 'rowNames'))
 #' @return ggplot object.
 #' @export
 likert.heat.plot2 <- function (x,
-                              allLevels,
-                              low.color = "white",
-                              high.color = "blue",
-                              text.color = "black",
-                              text.size = 4,
-                              textLen = 50){
+                               allLevels,
+                               low.color = "white",
+                               high.color = "blue",
+                               text.color = "black",
+                               text.size = 4,
+                               textLen = 50){
 
    myPer <- function(x) round(100*x/sum(x), 2)
    Item <- variable <- value <- label <- Freq <- Var1 <- NULL
@@ -96,10 +96,10 @@ likert.heat.plot2 <- function (x,
 #' @return clustered heatmap
 #' @export
 distanceHeat <- function(x,
-                        distName,
-                        clustering_method = 'complete',
-                        border_color = NA,
-                        ...){
+                         distName,
+                         clustering_method = 'complete',
+                         border_color = NA,
+                         ...){
    x0 <- x
    if(!is.matrix(x))
       x <- as.matrix(x)
@@ -112,13 +112,13 @@ distanceHeat <- function(x,
 
    hmcol <- grDevices::colorRampPalette(colors = rev(RColorBrewer::brewer.pal(8, "Blues")))(87)
    pheatmap(mat = distMatr,
-                      color = hmcol,
-                      clustering_distance_rows = myDist,
-                      clustering_distance_cols = myDist,
-                      clustering_method = clustering_method,
-                      border_color = border_color,
-                      treeheight_row=0,
-                      ...)
+            color = hmcol,
+            clustering_distance_rows = myDist,
+            clustering_distance_cols = myDist,
+            clustering_method = clustering_method,
+            border_color = border_color,
+            treeheight_row=0,
+            ...)
 
 }
 
@@ -269,6 +269,7 @@ ResHeatmap <- function(x,
    rowTitle <- paste0('Cluster ', unique(data$Clust))
 
    if(!is.null(outDir) & !is.null(filename) ){
+
       grDevices::png(paste0(outDir, '/', filename,'.png'),
                      width = width, height = height, units = 'in', res=500)
 
@@ -326,8 +327,11 @@ ResHeatmap <- function(x,
 #' @param cols character Vector of colors to use with clustering labels. Cluster names should match.
 #' to the ones provided in `cl`. The by default (`cols = NULL`) de functions produces highly contrasting colors.
 #' @param LabTitle character String for the plot's title. By default `LabTitle = type`.
-#' @param filename character string with name of file output. `filename = paste0(type, 'plot.png')` by default.
-#' @param outDir character string with the directory path to save output file. `outDir = './'` by default.
+#' @param filename character string with name of file output.
+#' `filename = NULL` by default avoiding generating a plot.
+#' This parameter should have a valid `ggplot2` output graphical format extension like `'FileName.{png,pdf,ps,...}'`.
+#' @param outDir character string with the directory path to save output file.
+#' `outDir = NULL` is default option avoiding generating a plot.
 #' @param addRowNames logical Single value indicating whether to place observation names next to points.
 #' The labels used are the names found in `cl`. If `names(cl) == NULL`, the samples
 #' will be labelled in number of appearance. ggrepel package is used to locate the labels.
@@ -346,8 +350,8 @@ plotMDS2 <- function(x,
                      cols = NULL,
                      dotSize = 3,
                      LabTitle = type,
-                     outDir = './',
-                     filename = paste0(type, 'plot.png'),
+                     outDir = NULL,
+                     filename = NULL,
                      addRowNames = FALSE,
                      labSize = 3,
                      out = 'plot'){
@@ -407,9 +411,11 @@ plotMDS2 <- function(x,
                          max.overlaps = Inf)
    }
 
-   ggsave(paste0(outDir, '/', filename),
-          ggOut,
-          width = 7, height = 7.3)
+   if( !is.null(outDir) & !is.null(filename) ){
+      ggsave(paste0(outDir, '/', filename),
+             ggOut,
+             width = 7, height = 7.3)
+   }
 
    if(out == 'data.frame')
       return(mdsIn)

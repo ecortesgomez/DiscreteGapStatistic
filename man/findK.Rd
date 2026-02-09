@@ -17,5 +17,5 @@ findK(cG_obj, meth = "Tibs2001SEmax", SE.fact = 1)
 A numerical value from 1 to K.max, contained in the input \code{cG_obj} object.
 }
 \description{
-Same function as found in \code{cluster} package.
+Similar to \code{maxSE} function found the \code{cluster} package.
 }

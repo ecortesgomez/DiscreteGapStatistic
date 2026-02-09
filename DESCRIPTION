@@ -28,11 +28,9 @@ Imports:
    ComplexHeatmap,
    cluster,
    stats, 
-   nomclust,
    bioDist,
    vegan,
-   FD, 
-   Rcpp (>= 1.0.12)
+   FD
 Suggests:
     kableExtra,
     knitr,
