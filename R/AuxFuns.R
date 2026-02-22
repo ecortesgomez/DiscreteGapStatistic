@@ -1,3 +1,66 @@
+#' Clustering generating function
+#'
+#' A function that generates formatted algorithmic functions that can be plugged
+#' to enable run a wide variety of clustering algorithm for `clusGapDiscr` function.
+#'
+#' @param clustFun A character string with the following possible options:
+#' 'pam' (default) from `cluster::pam`, 'diana' from `cluster::diana`, 'fanny' from `cluster::fanny`,
+#' 'agnes-\{average, single, complete, ward, weighted\}' from `cluster::agnes`,
+#' 'hclust-\{ward.D, ward.D2, single, complete, average, mcquitty, median, centroid\}' from `base::hclust`,
+#' 'kmodes' from `klar::kmodes` (`iter.max = 10`, `weighted = FALSE` and `fast= TRUE`).
+#' 'kmodes-N' enables to run the `kmodes` algorithm with a given number N of iterations where `iter.max = N`.
+#' @return An object of class kmodes as found in `klaR` packages.
+#' An additional component specifies the categorical distance function found in `distFun`.
+#' @export
+
+clusterFunSel <- function(clustFun ){
+   if(clustFun  == 'pam'){
+      return(cluster::pam)
+
+   }else if(clustFun  == 'fanny'){
+      return(cluster::fanny)
+
+   }else if(clustFun  == 'diana'){
+      dianaK <- function(x, k){
+         out <- cluster::diana(x = x) %>%
+            stats::cutree(k = k)
+         list(cluster = out)
+      }
+      return(dianaK)
+
+   }else if(grepl(pattern = '^agnes-.+', x = clustFun  )){
+      cMeth <- sub('agnes-', '', clustFun  )
+      agnesK <- function(x, k){
+         out <- cluster::agnes(x = x,
+                               diss = TRUE,
+                               method = cMeth) %>%
+            stats::cutree(k = k)
+         list(cluster = out)
+      }
+      return(agnesK)
+
+   }else if(grepl(pattern = '^hclust-.+', x = clustFun )){
+      cMeth <- sub('hclust-', '', clustFun )
+      hClustK <- function(x, k){
+         out <- stats::hclust(d = x, method = cMeth) %>%
+            stats::cutree(k = k)
+         list(cluster = out)
+      }
+      return(hClustK)
+
+   }else if(grepl(pattern = '^kmodes.*', x = clustFun )){
+
+      cIter <- ifelse(grepl(pattern = 'kmodes-.+',  x = clustFun ),
+                      as.numeric(sub('kmodes-', '', clustFun )),
+                      10)
+      kmodesD_ <- function(x, k, distFun){
+         kmodesD(data = x, modes = k, distFun = distFun, iter.max = cIter)
+      }
+      return(kmodesD_)
+
+   }
+}
+
 #' Adapted k-modes algorithm
 #'
 #' K-modes function to accept any categorical distance based on
@@ -253,67 +316,4 @@ kmodesD <- function (data,
                   distFun = distFun)
    class(result) <- "kmodes"
    return(result)
-}
-
-#' Clustering generating function
-#'
-#' A function that generates formatted algorithmic functions that can be plugged
-#' to enable run a wide variety of clustering algorithm for `clusGapDiscr` function.
-#'
-#' @param clustFun A character string with the following possible options:
-#' 'pam' (default) from `cluster::pam`, 'diana' from `cluster::diana`, 'fanny' from `cluster::fanny`,
-#' 'agnes-\{average, single, complete, ward, weighted\}' from `cluster::agnes`,
-#' 'hclust-\{ward.D, ward.D2, single, complete, average, mcquitty, median, centroid\}' from `base::hclust`,
-#' 'kmodes' from `klar::kmodes` (`iter.max = 10`, `weighted = FALSE` and `fast= TRUE`).
-#' 'kmodes-N' enables to run the `kmodes` algorithm with a given number N of iterations where `iter.max = N`.
-#' @return An object of class kmodes as found in `klaR` packages.
-#' An additional component specifies the categorical distance function found in `distFun`.
-#' @export
-
-clusterFunSel <- function(clustFun ){
-   if(clustFun  == 'pam'){
-         return(cluster::pam)
-
-   }else if(clustFun  == 'fanny'){
-         return(cluster::fanny)
-
-   }else if(clustFun  == 'diana'){
-      dianaK <- function(x, k){
-         out <- cluster::diana(x = x) %>%
-            stats::cutree(k = k)
-         list(cluster = out)
-      }
-      return(dianaK)
-
-   }else if(grepl(pattern = '^agnes-.+', x = clustFun  )){
-      cMeth <- sub('agnes-', '', clustFun  )
-      agnesK <- function(x, k){
-         out <- cluster::agnes(x = x,
-                               diss = TRUE,
-                               method = cMeth) %>%
-            stats::cutree(k = k)
-         list(cluster = out)
-      }
-      return(agnesK)
-
-   }else if(grepl(pattern = '^hclust-.+', x = clustFun )){
-      cMeth <- sub('hclust-', '', clustFun )
-      hClustK <- function(x, k){
-         out <- stats::hclust(d = x, method = cMeth) %>%
-            stats::cutree(k = k)
-         list(cluster = out)
-      }
-      return(hClustK)
-
-   }else if(grepl(pattern = '^kmodes.*', x = clustFun )){
-
-      cIter <- ifelse(grepl(pattern = 'kmodes-.+',  x = clustFun ),
-                      as.numeric(sub('kmodes-', '', clustFun )),
-                      10)
-      kmodesD_ <- function(x, k, distFun){
-         kmodesD(data = x, modes = k, distFun = distFun, iter.max = cIter)
-      }
-      return(kmodesD_)
-
-   }
 }

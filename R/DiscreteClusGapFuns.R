@@ -175,7 +175,7 @@ clusGapDiscr0 <- function (x,
       else if (!is.character(value.range) & is.list(value.range)) {
          ## When user defines the value range for each question
          message('Known Support has variability between attributes.')
-         message('Experimental option. Use it own risk!')
+         message('Experimental option. Use it at own risk!')
          stopifnot(ncol(x) == length(value.range))
          vals <- value.range
       }
@@ -193,7 +193,7 @@ clusGapDiscr0 <- function (x,
       else if (!is.numeric(value.range) & is.list(value.range)) {
          ## When user defines the value range for each question
          message('Known Support has variability between attributes.')
-         message('Experimental option. Use it own risk!')
+         message('Experimental option. Use it at own risk!')
          stopifnot(ncol(x) == length(value.range))
          vals <- NULL
          rng.x1 <- value.range

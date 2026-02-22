@@ -141,11 +141,11 @@ distanceHeat <- function(x,
 #' @import pheatmap
 #' @import Polychrome
 #' @import RColorBrewer
-#' @param x matrix object or data.frame
+#' @param x matrix object
 #' @param nCl number of clusters to plot; if `nCl` is a permutation vector of the first lN integers will rearrange clusters according to the original given ordering.
 #' @param distName Name of categorical distance to apply.
-#' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.
-#' @param catVals character string vector with (ordered) categorical values
+#' Available distances: Check available list.
+#' @param catVals vector with (ordered) categorical values.
 #' @param clusterFUN Character string with one of the available clustering implementations.
 #' Available options are: 'pam' (default) from `cluster::pam`, 'diana' from `cluster::diana`, 'fanny' from `cluster::fanny`.
 #' 'agnes-\{average, single, complete, ward, weighted\}' from `cluster::agnes`,
@@ -178,6 +178,8 @@ ResHeatmap <- function(x,
    ## To Do: specify option where the input data is plotted without any cluster rearrangement
    ## To Do: Specify arbitrary cluster labels.
 
+   stopifnot(is.matrix(x))
+
    Clust <- NULL
 
    if(length(nCl) > 1){
@@ -187,9 +189,6 @@ ResHeatmap <- function(x,
       clOrd <- NULL
    }
 
-   if(!is.matrix(x))
-      x <- as.matrix(x)
-
    if(!is.null(seed))
       set.seed(seed)
 
@@ -197,12 +196,11 @@ ResHeatmap <- function(x,
       ## Requesting cluster assignment
       FUNcluster <- clusterFunSel(clustFun = clusterFUN)
 
-
       if(!grepl(pattern = '^kmodes.*', x = clusterFUN)){
          AssignedCls <- FUNcluster(x = distancematrix(x, d = distName),
                                    k = nCl)$cluster
       }else{
-
+         ## For kmodes
          PWdistFun <- function(x, y){
             x <- unlist(x)
             y <- unlist(y)
@@ -218,6 +216,17 @@ ResHeatmap <- function(x,
       AssignedCls <- rep(0, nrow(x))
    }
 
+   ## Now that we have the assignments, the data can be modified!
+   if(is.integer(x)){
+      ## When submitting an ordinal dataset with integer values.
+      x0 <- x
+      x <- paste0('o', x)
+      catVals <- paste0('o', catVals)
+
+      dim(x) <- dim(x0)
+      dimnames(x) <- dimnames(x0)
+   }
+
    if(!is.null(prefObs)){
       row.names(data) <- paste0(prefObs, 1:nrow(x))
       rownames(x) <- paste0(prefObs, 1:nrow(x))
@@ -230,7 +239,8 @@ ResHeatmap <- function(x,
          rownames(x) <- rowNames
       }
    }
-   ## Notice that data is reorganized according to clusters!
+
+   ## Notice that data is reorganized according to clusters!!
    if(is.null(rownames(x)))
       row.names(x) <- 1:nrow(x)
 
@@ -259,7 +269,7 @@ ResHeatmap <- function(x,
    if(out == 'clustersReord')
       return(data[, 1:2])
 
-   ## Tones of green
+   ## Set tones of green
    myCols = stats::setNames(object = RColorBrewer::brewer.pal(n = length(catVals),
                                                               name = 'Greens'),
                             nm = catVals)
@@ -267,6 +277,9 @@ ResHeatmap <- function(x,
 
    rowSplit <- subset(data, select = 'Clust')
    rowTitle <- paste0('Cluster ', unique(data$Clust))
+
+   clusterRows = FALSE
+   clusterCols = FALSE
 
    if(!is.null(outDir) & !is.null(filename) ){
 
@@ -279,6 +292,8 @@ ResHeatmap <- function(x,
                                        show_row_names = showRownames,
                                        # row_labels = rowNames,
                                        show_heatmap_legend=c(TRUE) ,
+                                       cluster_rows = clusterRows,
+                                       cluster_columns = clusterCols,
                                        row_split = rowSplit,
                                        row_title = rowTitle)
       ComplexHeatmap::draw(hmObj,
@@ -298,6 +313,8 @@ ResHeatmap <- function(x,
                                         ## row_title = ' ',
                                         row_split = rowSplit,
                                         row_title = rowTitle,
+                                        cluster_rows = clusterRows,
+                                        cluster_columns = clusterCols,
                                         heatmap_width = unit(width, "in"),
                                         heatmap_height = unit(height, "in"))
       ComplexHeatmap::draw(hmObj,
@@ -358,8 +375,8 @@ plotMDS2 <- function(x,
 
    if(type == 'MDS'){
       mdsRaw <- stats::cmdscale(x, k = 2)
-      mdsIn <- mdsRaw %>%
-         data.frame(row.names = rownames(x))
+      mdsIn <- mdsRaw %>% data.frame(check.names = FALSE)
+      ## data.frame(row.names = rownames(x))
    }else if(type == 'NMDS'){
       mdsRaw <- vegan::metaMDS(comm = x,
                                distance = "none",
@@ -367,9 +384,11 @@ plotMDS2 <- function(x,
                                trymax = 100,
                                autotransform = FALSE)
 
-      mdsIn <- mdsRaw$points %>%
-         data.frame(row.names = rownames(x))
+      mdsIn <- mdsRaw$points %>% data.frame(check.names = FALSE)
+      ## data.frame(row.names = rownames(x))
    }
+
+   rownames(mdsIn) <- rownames(x)
    colnames(mdsIn)  <- c('Dim1', 'Dim2')
    mdsIn$cl <- cl
 

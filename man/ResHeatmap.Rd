@@ -22,14 +22,14 @@ ResHeatmap(
 )
 }
 \arguments{
-\item{x}{matrix object or data.frame}
+\item{x}{matrix object}
 
 \item{nCl}{number of clusters to plot; if \code{nCl} is a permutation vector of the first lN integers will rearrange clusters according to the original given ordering.}
 
 \item{distName}{Name of categorical distance to apply.
-Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.}
+Available distances: Check available list.}
 
-\item{catVals}{character string vector with (ordered) categorical values}
+\item{catVals}{vector with (ordered) categorical values.}
 
 \item{clusterFUN}{Character string with one of the available clustering implementations.
 Available options are: 'pam' (default) from \code{cluster::pam}, 'diana' from \code{cluster::diana}, 'fanny' from \code{cluster::fanny}.

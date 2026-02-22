@@ -35,7 +35,8 @@ Suggests:
     kableExtra,
     knitr,
     rmarkdown,
-    testthat
+    testthat,
+    nomclust
 Config/testthat/edition: 3
 Depends: 
     R (>= 4.2.0)

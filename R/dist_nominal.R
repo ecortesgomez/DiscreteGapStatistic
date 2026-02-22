@@ -134,8 +134,28 @@
 }
 
 .nomclust_distance <- function(X, d) {
+   if (!requireNamespace("nomclust", quietly = TRUE)) {
+      stop("Distance metric '", d, "' requires the 'nomclust' package. Install it with install.packages('nomclust').",
+           call. = FALSE)
+   }
+
    df <- .nomclust_prepare(X, d)
    metric <- sub("^nmcl_", "", d)
-   fn <- get(metric, envir = asNamespace("nomclust"), inherits = FALSE)
-   fn(df)
+
+   # Prefer exported-value lookup (works even if nomclust is not attached)
+   fn <- tryCatch(getExportedValue("nomclust", metric),
+                  error = function(e) NULL)
+
+   if (is.null(fn) || !is.function(fn)) {
+      stop("Unknown nomclust distance '", d, "'. ",
+           "Expected 'nmcl_' followed by an exported function name from the 'nomclust' package (e.g., 'nmcl_goodall1').",
+           call. = FALSE)
+   }
+
+   out <- fn(df)
+
+   # Ensure output matches the rest of DGSA distances (a 'dist' object)
+   if (!inherits(out, "dist")) out <- stats::as.dist(out)
+   out
 }
+

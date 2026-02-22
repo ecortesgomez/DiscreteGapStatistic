@@ -23,6 +23,7 @@ distancematrix <- function(X, d) {
    if (!is.null(fun)) return(fun(X))
 
    # nomclust family
+   # if (grepl("^nmcl_.+", d)) return(row.names = rownames(X, d))
    if (grepl("^nmcl_.+", d)) return(.nomclust_distance(X, d))
 
    # wasserstein family (legacy strings include 'wasserstein' + suffix)
