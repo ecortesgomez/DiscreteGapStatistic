@@ -388,7 +388,7 @@ plotMDS2 <- function(x,
       ## data.frame(row.names = rownames(x))
    }
 
-   rownames(mdsIn) <- rownames(x)
+   rownames(mdsIn) <- names(x)
    colnames(mdsIn)  <- c('Dim1', 'Dim2')
    mdsIn$cl <- cl
 
