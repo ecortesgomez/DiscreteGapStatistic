@@ -8,11 +8,10 @@
 #' This function should return a list with a component named `cluster`, a vector of length `n=nrow(x)` of integers from `1:k` indicating observation cluster assignment.
 #' Make sure `FUNcluster` and `Input2Alg` agree.
 #' @param K.max Integer. Maximum number of clusters `k` to consider
-#' @param value.range String, character vector or a list of character vectors with the length matching the number of columns (nQ) of the array.
-#' A vector with all categories to consider when bootstrapping the null distribution sample (KS: Known Support option).
-#' By DEFAULT vals=NULL, meaning unique range of categories found in the data will be used when drawing the null (DS: Data Support option).
-#' If a character vector of categories is provided, these values would be used for the null distribution drawing across the array.
-#' If a list with category character vectors is provided, it has to have the same number of columns as the input array. The order of list element corresponds to the array's columns.
+#' @param value.range A length 1 character string, a character string vector or a list of character vector with the length matching the number of columns (nQ) of the array.
+#' By DEFAULT value.range = 'DS' (Data Support null model).
+#' A vector with all categories (either character for nominal or integer ordinal data) to consider when bootstrapping the null distribution sample (KS: Known Support option).
+#' If a list with category vectors is provided, it has to have the same number of columns as the input array. The order of list element corresponds to the array's columns.
 #' @param verbose Integer or logical. Determines if “progress” output should be printed. The default prints one bit per bootstrap sample.
 #' @param distName String. Name of categorical distance to apply.
 #' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.
@@ -20,10 +19,12 @@
 #' For algorithms that only accept a distance matrix use `'distMatr'` option (default).
 #' For algorithms that require the dataset and a prespecified distance function (e.g. `stats::dist`) use the `'distFun'` option.
 #' This case the distance function is defined internally and determined by parameter `distName`.
-#' @param B Number of bootstrap samples. By default B = nrow(x).
+#' @param B Number of bootstrap samples. By default `B = nrow(x)`.
 #' @param verbose Integer or logical. Determines whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.
 #' @param useLog Logical. Use log function after estimating `W.k`. Following the original formulation `useLog=TRUE` by default.
 #' @param dataClass character. Either 'nom' for nominal or 'ord' for ordinal.
+#' @param offset numerical. A small constant value added to W.k to avoid NAs when running `useLog=TRUE`
+#' for clusters with extremely low variability. `offset = 0` is set by default.
 #' @param ... optionally further arguments for `FUNcluster()`
 #'
 #' @return a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.sim",
@@ -39,12 +40,13 @@ clusGapDiscr0 <- function (x,
                           useLog = TRUE,
                           Input2Alg = 'distMatr',
                           dataClass = 'nom',
+                          offset = 0,
                           ...){
 
    stopifnot(is.function(FUNcluster),
              length(dim(x)) == 2,
              K.max >= 2,
-             (n <- nrow(x)) >= 1,
+             (n <- nrow(x)) >= 1, ## Define n !!
              ncol(x) >= 1)
 
    if(!is.matrix(x))
@@ -139,7 +141,7 @@ clusGapDiscr0 <- function (x,
 
    for (k in 1:K.max){
       if(useLog){
-         logW[k] <- log(W.k(x, k))
+         logW[k] <- log(W.k(x, k) + offset)
       }else{
          logW[k] <- W.k(x, k)
       }
@@ -153,79 +155,61 @@ clusGapDiscr0 <- function (x,
       cat("done\n")
 
    if(grepl('^nom', dataClass)){
+
       ## Nominal case
       if(is.numeric(value.range)) {
-         ## If value.range are numeric, turn them into c0, c1, ...
-         message('value.range cannot be numerical and will be transformed to characters.')
-         vals <- as.character(paste0('c', value.range))
-      }else if (is.character(value.range) &
-             !is.list(value.range) &
+         stop('value.range cannot be numerical and will be transformed to characters.')
+      }
+      else if (is.character(value.range) & !is.list(value.range) &
              value.range[1] == "DS" & length(value.range) == 1) {
          ## Data-Support null option
-         vals <- NULL
+
          rng.x1 <- lapply(1:ncol(x), function(i) unique(x[, i]))
       }
-      else if (all(is.character(value.range)) &
-            !is.list(value.range) &
-            (length(value.range) > 1)) {
-         ## User-defined single range
-         vals <- NULL
-         rng.x1 <- value.range
+      else if (all(is.character(value.range)) & !is.list(value.range) & (length(value.range) > 1)) {
+         ## KS: User-defined vector
+
+         rng.x1 <- rep(x = list(value.range), times = ncol(x))
       }
       else if (!is.character(value.range) & is.list(value.range)) {
          ## When user defines the value range for each question
+
          message('Known Support has variability between attributes.')
-         message('Experimental option. Use it at own risk!')
          stopifnot(ncol(x) == length(value.range))
-         vals <- value.range
+         rng.x1 <- value.range
+
       }
-   }
-   else if(grepl('^ord', dataClass)){
+   }else if(grepl('^ord', dataClass)){
       ## Ordinal case
-      if(is.numeric(value.range)){
-         message('KS: value.range is numerical for ordinal data')
-         vals <- value.range
-      }
-      else if(value.range == 'DS'){
-         vals <- NULL
+
+      if(!is.list(value.range) & value.range[1] == 'DS' & length(value.range) == 1){
          rng.x1 <- lapply(1:ncol(x), function(i) unique(x[, i]))
       }
-      else if (!is.numeric(value.range) & is.list(value.range)) {
+      else if(is.integer(value.range) & is.vector(value.range)){
+         ## KS case
+
+         rng.x1 <- rep(x = list(value.range), times = ncol(x))
+        }
+      else if (!is.integer(value.range) & is.list(value.range)) {
          ## When user defines the value range for each question
          message('Known Support has variability between attributes.')
-         message('Experimental option. Use it at own risk!')
          stopifnot(ncol(x) == length(value.range))
-         vals <- NULL
          rng.x1 <- value.range
       }
    }
    logWks <- matrix(0, B, K.max)
+
    if (verbose)
       cat("Bootstrapping, b = 1,2,..., B (= ", B, ")  [one \".\" per sample]:\n",
           sep = "")
 
    for (b in 1:B) {
-      if (is.null(vals)) {
-         ## Data-Support case. Notice that rng.x1 is a list with individual values ranges.
-         z <- lapply(rng.x1, function(M, nn) sample(size = nn,
-                                                    x = M,
-                                                    replace = TRUE),
+         z <- lapply(rng.x1,
+                     function(M, nn) sample(size = nn,
+                                            x = M,
+                                            replace = TRUE),
                      nn = n) %>%
             do.call(what = cbind)
-      }
-      else if (!is.list(vals) & length(vals) > 2) {
-         ## KS: Known-Support User-specified categories as vector.
-         z <- matrix(sample(x = vals, size = nrow(x) * ncol(x),
-                            replace = TRUE), nrow = nrow(x))
-      }
-      else if (is.list(vals)) {
-         ## User-defined categories as list (length nQ)
-         z <- sapply(1:length(vals),
-                     function(i, nn) sample(size = nn,
-                                            x = vals[[i]],
-                                            replace = TRUE),
-                     nn = n)
-      }
 
       for (k in 1:K.max) {
          if(useLog){
@@ -235,11 +219,13 @@ clusGapDiscr0 <- function (x,
          }
       }
       if (verbose)
-         cat(".", if (b%%50 == 0)
-            paste(b, "\n"))
+         cat(".",
+             if (b%%50 == 0) paste(b, "\n"))
    }
+
    if (verbose && (B%%50 != 0))
       cat("", B, "\n")
+
    E.logW <- colMeans(logWks)
    SE.sim <- sqrt((1 + 1/B) * apply(logWks, 2, stats::var))
 
@@ -268,18 +254,19 @@ clusGapDiscr0 <- function (x,
 #' 'kmodes' from `klar::kmodes` (`iter.max = 10`, `weighted = FALSE` and `fast= TRUE`).
 #' 'kmodes-N' enables to run the `kmodes` algorithm with a given number N of iterations where `iter.max = N`.
 #' @param K.max Integer. Maximum number of clusters `k` to consider
-#' @param value.range String character vector or a list of character vector with the length matching the number of columns (nQ) of the array.
-#' A vector with all categories to consider when bootstrapping the null distribution sample (KS: Known Support option).
-#' By DEFAULT vals=NULL, meaning unique range of categories found in the data will be used when drawing the null (DS: Data Support option).
-#' If a character vector of categories is provided, these values would be used for the null distribution drawing across the array.
-#' If a list with category character vectors is provided, it has to have the same number of columns as the input array. The order of list element corresponds to the array's columns.
+#' @param value.range A length 1 character string, a character string vector or a list of character vector with the length matching the number of columns (nQ) of the array.
+#' By DEFAULT value.range = 'DS' (Data Support null model).
+#' A vector with all categories (either character for nominal or integer ordinal data) to consider when bootstrapping the null distribution sample (KS: Known Support option).
+#' If a list with category vectors is provided, it has to have the same number of columns as the input array. The order of list element corresponds to the array's columns.
 #' @param verbose Integer or logical. Determines if “progress” output should be printed. The default prints one bit per bootstrap sample.
 #' @param distName String. Name of categorical distance to apply.
 #' Available distances: 'bhattacharyya', 'chisquare', 'cramerV', 'hamming' and 'hellinger'.
-#' @param B Number of bootstrap samples. By default B = nrow(x).
+#' @param B Number of bootstrap samples. By default `B = nrow(x)`.
 #' @param verbose Integer or logical. Determines whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.
 #' @param useLog Logical. Use log function after estimating `W.k`. Following the original formulation `useLog=TRUE` by default.
 #' @param dataClass character. Either 'nom' for nominal or 'ord' for ordinal.
+#' @param offset numerical. A small constant value added to W.k to avoid NAs when running `useLog=TRUE`
+#' for clusters with extremely low variability. `offset = 0` is set by default.
 #' @param ... optionally further arguments for `FUNcluster()`
 #'
 #' @return a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.sim",
@@ -295,6 +282,7 @@ clusGapDiscr <- function(x,
                          distName = "hamming",
                          useLog = TRUE,
                          dataClass = 'nom',
+                         offset = 0,
                          ...){
 
    if(clusterFUN == 'pam'){
@@ -307,6 +295,7 @@ clusGapDiscr <- function(x,
                     distName = distName,
                     useLog = useLog,
                     dataClass = dataClass,
+                    offset = offset,
                      ...)
 
    }else if(clusterFUN == 'fanny'){
@@ -319,6 +308,7 @@ clusGapDiscr <- function(x,
                     distName = distName,
                     useLog = useLog,
                     dataClass = dataClass,
+                    offset = offset,
                     ...)
 
    }else if(clusterFUN == 'diana'){
@@ -337,6 +327,7 @@ clusGapDiscr <- function(x,
                     distName = distName,
                     useLog = useLog,
                     dataClass = dataClass,
+                    offset = offset,
                     ...)
 
    }else if(grepl(pattern = '^agnes-.+', x = clusterFUN)){
@@ -359,6 +350,7 @@ clusGapDiscr <- function(x,
                     distName = distName,
                     useLog = useLog,
                     dataClass = dataClass,
+                    offset = offset,
                     ...)
 
    }else if(grepl(pattern = '^hclust-.+', x = clusterFUN)){
@@ -379,6 +371,7 @@ clusGapDiscr <- function(x,
                     distName = distName,
                     useLog = useLog,
                     dataClass = dataClass,
+                    offset,
                     ...)
 
    }else if(grepl(pattern = '^kmodes.*', x = clusterFUN)){
@@ -401,6 +394,7 @@ clusGapDiscr <- function(x,
                     useLog = useLog,
                     Input2Alg = 'distFun',
                     dataClass = dataClass,
+                    offset = offset,
                     ...)
    }else
       message('Clustering algorithm not available.')

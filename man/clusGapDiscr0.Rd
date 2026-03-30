@@ -15,6 +15,7 @@ clusGapDiscr0(
   useLog = TRUE,
   Input2Alg = "distMatr",
   dataClass = "nom",
+  offset = 0,
   ...
 )
 }
@@ -27,13 +28,12 @@ Make sure \code{FUNcluster} and \code{Input2Alg} agree.}
 
 \item{K.max}{Integer. Maximum number of clusters \code{k} to consider}
 
-\item{B}{Number of bootstrap samples. By default B = nrow(x).}
+\item{B}{Number of bootstrap samples. By default \code{B = nrow(x)}.}
 
-\item{value.range}{String, character vector or a list of character vectors with the length matching the number of columns (nQ) of the array.
-A vector with all categories to consider when bootstrapping the null distribution sample (KS: Known Support option).
-By DEFAULT vals=NULL, meaning unique range of categories found in the data will be used when drawing the null (DS: Data Support option).
-If a character vector of categories is provided, these values would be used for the null distribution drawing across the array.
-If a list with category character vectors is provided, it has to have the same number of columns as the input array. The order of list element corresponds to the array's columns.}
+\item{value.range}{A length 1 character string, a character string vector or a list of character vector with the length matching the number of columns (nQ) of the array.
+By DEFAULT value.range = 'DS' (Data Support null model).
+A vector with all categories (either character for nominal or integer ordinal data) to consider when bootstrapping the null distribution sample (KS: Known Support option).
+If a list with category vectors is provided, it has to have the same number of columns as the input array. The order of list element corresponds to the array's columns.}
 
 \item{verbose}{Integer or logical. Determines whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.}
 
@@ -48,6 +48,9 @@ For algorithms that require the dataset and a prespecified distance function (e.
 This case the distance function is defined internally and determined by parameter \code{distName}.}
 
 \item{dataClass}{character. Either 'nom' for nominal or 'ord' for ordinal.}
+
+\item{offset}{numerical. A small constant value added to W.k to avoid NAs when running \code{useLog=TRUE}
+for clusters with extremely low variability. \code{offset = 0} is set by default.}
 
 \item{...}{optionally further arguments for \code{FUNcluster()}}
 }
