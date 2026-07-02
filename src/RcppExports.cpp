@@ -10,6 +10,17 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// HammingDist_rcpp
+NumericMatrix HammingDist_rcpp(CharacterMatrix x);
+RcppExport SEXP _DiscreteGapStatistic_HammingDist_rcpp(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterMatrix >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(HammingDist_rcpp(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // BhattacharyyaDist_rcpp
 NumericMatrix BhattacharyyaDist_rcpp(CharacterMatrix x, double offset);
 RcppExport SEXP _DiscreteGapStatistic_BhattacharyyaDist_rcpp(SEXP xSEXP, SEXP offsetSEXP) {
@@ -33,10 +44,87 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// HellingerDist_rcpp
+NumericMatrix HellingerDist_rcpp(CharacterMatrix x);
+RcppExport SEXP _DiscreteGapStatistic_HellingerDist_rcpp(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterMatrix >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(HellingerDist_rcpp(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// CramerVDist_rcpp
+NumericMatrix CramerVDist_rcpp(CharacterMatrix x);
+RcppExport SEXP _DiscreteGapStatistic_CramerVDist_rcpp(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< CharacterMatrix >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(CramerVDist_rcpp(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// KSDist_rcpp
+NumericMatrix KSDist_rcpp(IntegerMatrix x);
+RcppExport SEXP _DiscreteGapStatistic_KSDist_rcpp(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerMatrix >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(KSDist_rcpp(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// WassersteinDS_rcpp
+NumericMatrix WassersteinDS_rcpp(IntegerMatrix x, double power);
+RcppExport SEXP _DiscreteGapStatistic_WassersteinDS_rcpp(SEXP xSEXP, SEXP powerSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerMatrix >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type power(powerSEXP);
+    rcpp_result_gen = Rcpp::wrap(WassersteinDS_rcpp(x, power));
+    return rcpp_result_gen;
+END_RCPP
+}
+// WassersteinKS_rcpp
+NumericMatrix WassersteinKS_rcpp(IntegerMatrix x, int maxM, double power);
+RcppExport SEXP _DiscreteGapStatistic_WassersteinKS_rcpp(SEXP xSEXP, SEXP maxMSEXP, SEXP powerSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerMatrix >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type maxM(maxMSEXP);
+    Rcpp::traits::input_parameter< double >::type power(powerSEXP);
+    rcpp_result_gen = Rcpp::wrap(WassersteinKS_rcpp(x, maxM, power));
+    return rcpp_result_gen;
+END_RCPP
+}
+// WassersteinRank_rcpp
+NumericMatrix WassersteinRank_rcpp(IntegerMatrix x, double power);
+RcppExport SEXP _DiscreteGapStatistic_WassersteinRank_rcpp(SEXP xSEXP, SEXP powerSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< IntegerMatrix >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type power(powerSEXP);
+    rcpp_result_gen = Rcpp::wrap(WassersteinRank_rcpp(x, power));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_DiscreteGapStatistic_HammingDist_rcpp", (DL_FUNC) &_DiscreteGapStatistic_HammingDist_rcpp, 1},
     {"_DiscreteGapStatistic_BhattacharyyaDist_rcpp", (DL_FUNC) &_DiscreteGapStatistic_BhattacharyyaDist_rcpp, 2},
     {"_DiscreteGapStatistic_ChisqDist_rcpp", (DL_FUNC) &_DiscreteGapStatistic_ChisqDist_rcpp, 1},
+    {"_DiscreteGapStatistic_HellingerDist_rcpp", (DL_FUNC) &_DiscreteGapStatistic_HellingerDist_rcpp, 1},
+    {"_DiscreteGapStatistic_CramerVDist_rcpp", (DL_FUNC) &_DiscreteGapStatistic_CramerVDist_rcpp, 1},
+    {"_DiscreteGapStatistic_KSDist_rcpp", (DL_FUNC) &_DiscreteGapStatistic_KSDist_rcpp, 1},
+    {"_DiscreteGapStatistic_WassersteinDS_rcpp", (DL_FUNC) &_DiscreteGapStatistic_WassersteinDS_rcpp, 2},
+    {"_DiscreteGapStatistic_WassersteinKS_rcpp", (DL_FUNC) &_DiscreteGapStatistic_WassersteinKS_rcpp, 3},
+    {"_DiscreteGapStatistic_WassersteinRank_rcpp", (DL_FUNC) &_DiscreteGapStatistic_WassersteinRank_rcpp, 2},
     {NULL, NULL, 0}
 };
 

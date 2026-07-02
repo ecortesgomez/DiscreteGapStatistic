@@ -2,16 +2,19 @@
 % Please edit documentation in R/RcppExports.R
 \name{ChisqDist_rcpp}
 \alias{ChisqDist_rcpp}
-\title{Chi-square Distance via Rcpp}
+\title{Chi-square distance via Rcpp}
+\usage{
+ChisqDist_rcpp(x)
+}
 \arguments{
-\item{x}{n X p character matrix.}
+\item{x}{n x p character matrix.}
 }
 \value{
-Distance matrix between rows.
+Numeric n x n distance matrix.
 }
 \description{
-Computes pairwise Chi-square distance between rows.
+Computes pairwise chi-square distances between row-wise category counts, divided by the number of columns.
 }
 \details{
-Chi-square Distance
+Chi-square distance
 }

@@ -2,18 +2,21 @@
 % Please edit documentation in R/RcppExports.R
 \name{BhattacharyyaDist_rcpp}
 \alias{BhattacharyyaDist_rcpp}
-\title{Bhattacharyya Distance via Rcpp}
+\title{Bhattacharyya distance via Rcpp}
+\usage{
+BhattacharyyaDist_rcpp(x, offset = 0.01)
+}
 \arguments{
-\item{x}{n X p character matrix.}
+\item{x}{n x p character matrix.}
 
-\item{offset}{small offset for log(0*0) cases.}
+\item{offset}{small positive offset added before log; use 0.01 for strict equivalence with the original R fallback.}
 }
 \value{
-Distance matrix between rows.
+Numeric n x n distance matrix.
 }
 \description{
-Computes pairwise Bhattacharyya distance between rows.
+Computes pairwise Bhattacharyya distances between row-wise category frequency profiles.
 }
 \details{
-Bhattacharyya Distance
+Bhattacharyya distance
 }

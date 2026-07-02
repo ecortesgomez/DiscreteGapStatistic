@@ -14,7 +14,7 @@ clusGapDiscr(
   distName = "hamming",
   useLog = TRUE,
   dataClass = "nom",
-  offset = 1e-07,
+  offset = 0,
   ...
 )
 }

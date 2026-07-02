@@ -10,9 +10,16 @@
 
 .ks_ordinal_dist <- function(X) {
    .assert_integer_matrix(X)
+   .use_rcpp_or_fallback(
+      .as_dist_with_names(KSDist_rcpp(x = X), X),
+      function() .KSDist_R(X),
+      "ks"
+   )
+}
 
+.KSDist_R <- function(X) {
    n <- nrow(X)
-   dist_mat <- matrix(NA_real_, nrow = n, ncol = n)
+   dist_mat <- matrix(NA_real_, nrow = n, ncol = n, dimnames = list(rownames(X), rownames(X)))
    ecdfL <- apply(X, 1, function(w) stats::ecdf(w))
 
    for (i in 1:(n - 1)) {
