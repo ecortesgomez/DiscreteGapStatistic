@@ -514,27 +514,68 @@ clusGapDiscr <- function(x,
 #' @return A numerical value from 1 to K.max, contained in the input `cG_obj` object.
 #' @export
 
-findK <- function (cG_obj, meth = "Tibs2001SEmax", SE.fact = 1){
-   logW <- gap <- SE.sim <- NULL
+findK <- function(cG_obj,
+                  meth = "Tibs2001SEmax",
+                  SE.fact = 1,
+                  fallback = 1L) {
 
-   outDF <- data.frame(cG_obj['Tab'])
-   outDF[, 'nClus'] <- 1:nrow(outDF)
-   colnames(outDF) <- c('logW', 'E.logW', 'gap', 'SE.sim', 'nClus')
+   if (is.null(cG_obj$Tab)) {
+      stop("cG_obj does not contain a Tab component.")
+   }
 
-   myTab <- outDF %>%
-      subset(is.finite(logW) & is.finite(gap) & is.finite(SE.sim))
+   fullTab <- as.data.frame(cG_obj$Tab)
 
-   if (nrow(myTab) < 1L) {
+   required <- c("logW", "gap", "SE.sim")
+   if (!all(required %in% names(fullTab))) {
       stop(
-         "No finite logW, gap, and SE.sim values are available for cluster ",
-         "selection."
+         "The clusGap table must contain the columns: ",
+         paste(required, collapse = ", "),
+         "."
       )
    }
 
-   selK <- with(myTab,
-                cluster::maxSE(f = gap,
-                               SE.f = SE.sim,
-                               method = meth,
-                               SE.factor = SE.fact) )
-   myTab[selK, 'nClus']
+   fullTab$nClus <- seq_len(nrow(fullTab))
+
+   finite.row <- is.finite(fullTab$logW) &
+      is.finite(fullTab$gap) &
+      is.finite(fullTab$SE.sim)
+
+   ## Use only the contiguous finite prefix k = 1, ..., K.max.used.
+   first.bad <- match(FALSE, finite.row, nomatch = length(finite.row) + 1L)
+   K.max.used <- first.bad - 1L
+
+   if (K.max.used < 1L) {
+      warning(
+         "No finite logW, gap, and SE.sim values were available. ",
+         "Returning the conservative fallback k = ", fallback, ".",
+         call. = FALSE
+      )
+      return(as.integer(fallback))
+   }
+
+   myTab <- fullTab[seq_len(K.max.used), , drop = FALSE]
+
+   if (K.max.used < nrow(fullTab)) {
+      warning(
+         "Cluster selection used results only through k = ", K.max.used,
+         " because a non-finite value occurred at k = ", K.max.used + 1L,
+         ".",
+         call. = FALSE
+      )
+   }
+
+   ## maxSE is unnecessary when only k = 1 is available.
+   if (K.max.used == 1L) {
+      return(1L)
+   }
+
+   selK <- cluster::maxSE(
+      f = myTab$gap,
+      SE.f = myTab$SE.sim,
+      method = meth,
+      SE.factor = SE.fact
+   )
+
+   as.integer(myTab$nClus[selK])
 }
+
