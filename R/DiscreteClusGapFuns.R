@@ -23,12 +23,14 @@
 #' @param verbose Integer or logical. Determines whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.
 #' @param useLog Logical. Use log function after estimating `W.k`. Following the original formulation `useLog=TRUE` by default.
 #' @param dataClass character. Either 'nom' for nominal or 'ord' for ordinal.
-#' @param offset numerical. A small constant value added to W.k to avoid NAs when running `useLog=TRUE`
-#' for clusters with extremely low variability. `offset = 0` is set by default.
+#' @param offset Numeric. A nonnegative constant added to both observed and bootstrap W.k
+#' before taking logarithms when `useLog=TRUE`. `offset = 0` by default.
 #' @param ... optionally further arguments for `FUNcluster()`
 #'
-#' @return a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.sim",
-#' where gap = E.logW - logW, and SE.sim correspond to the standard error of `gap`.
+#' @return A `clusGap` object. Normally its `Tab` component has `K.max` rows. If a
+#' non-finite observed or bootstrap dispersion is encountered, the table is truncated to
+#' the largest contiguous finite value of k. The object records `K.max.requested`,
+#' `K.max.used`, and `truncated`.
 
 clusGapDiscr0 <- function (x,
                           FUNcluster,
@@ -77,7 +79,14 @@ clusGapDiscr0 <- function (x,
 
    if (B != (B. <- as.integer(B)) || (B <- B.) <= 0)
       stop("'B' has to be a positive integer")
-   cl. <- match.call
+
+   if (length(offset) != 1L || !is.numeric(offset) ||
+       !is.finite(offset) || offset < 0) {
+      stop("'offset' must be one finite, nonnegative numeric value")
+   }
+
+   K.max.requested <- as.integer(K.max)
+   cl. <- match.call()
 
    ii <- seq_len(n)
 
@@ -134,22 +143,48 @@ clusGapDiscr0 <- function (x,
 
    }
 
-   logW <- E.logW <- SE.sim <- numeric(K.max)
-   if (verbose)
-      cat("Clustering k = 1,2,..., K.max (= ", K.max, "): .. ",
-          sep = "")
-
-   for (k in 1:K.max){
-      if(useLog){
-         logW[k] <- log(W.k(x, k) + offset)
-      }else{
-         logW[k] <- W.k(x, k)
+   transform_W <- function(w) {
+      if (useLog) {
+         log(w + offset)
+      } else {
+         w
       }
    }
 
-   ## If all distances are 0; option 1.
-   ## if(any(!is.finite(logW)))
-   ##     logW[!is.finite(logW)] <- min(logW[is.finite(logW)])
+   logW <- rep(NA_real_, K.max.requested)
+   K.max.used <- K.max.requested
+   limiting.event <- NULL
+
+   if (verbose)
+      cat("Clustering k = 1,2,..., K.max (= ", K.max.requested,
+          "): .. ", sep = "")
+
+   ## Observed-data dispersions are evaluated first. Once a non-finite value
+   ## occurs, larger k values are not used because the valid range must be a
+   ## contiguous sequence 1, ..., K.max.used.
+   for (k in seq_len(K.max.requested)) {
+      wk <- W.k(x, k)
+      logW[k] <- transform_W(wk)
+
+      if (!is.finite(logW[k])) {
+         K.max.used <- k - 1L
+         limiting.event <- list(
+            source = "observed data",
+            k = k,
+            bootstrap = NA_integer_,
+            W.k = wk
+         )
+         break
+      }
+   }
+
+   if (K.max.used < 1L) {
+      stop(
+         "Non-finite ", if (useLog) "logW" else "W.k",
+         " occurred at k = 1 for the observed data. No valid gap-statistic ",
+         "range is available. Consider a positive offset or useLog = FALSE."
+      )
+   }
 
    if (verbose)
       cat("done\n")
@@ -197,49 +232,114 @@ clusGapDiscr0 <- function (x,
          rng.x1 <- value.range
       }
    }
-   logWks <- matrix(0, B, K.max)
+
+   logWks <- matrix(
+      NA_real_,
+      nrow = B,
+      ncol = K.max.used
+   )
 
    if (verbose)
-      cat("Bootstrapping, b = 1,2,..., B (= ", B, ")  [one \".\" per sample]:\n",
-          sep = "")
+      cat("Bootstrapping, b = 1,2,..., B (= ", B,
+          ")  [one \".\" per sample]:\n", sep = "")
 
-   for (b in 1:B) {
-         z <- lapply(rng.x1,
-                     function(M, nn) sample(size = nn,
-                                            x = M,
-                                            replace = TRUE),
-                     nn = n) %>%
-            do.call(what = cbind)
+   for (b in seq_len(B)) {
+      z <- lapply(
+         rng.x1,
+         function(M, nn) sample(size = nn, x = M, replace = TRUE),
+         nn = n
+      ) %>%
+         do.call(what = cbind)
 
-      for (k in 1:K.max) {
-         if(useLog){
-            logWks[b, k] <- log(W.k(z, k))
-         }else{
-            logWks[b, k] <- W.k(z, k)
+      ## K.max.used can decrease during bootstrapping. Each bootstrap sample is
+      ## evaluated only over the currently valid contiguous range.
+      for (k in seq_len(K.max.used)) {
+         wk <- W.k(z, k)
+         logWks[b, k] <- transform_W(wk)
+
+         if (!is.finite(logWks[b, k])) {
+            new.K.max <- k - 1L
+
+            if (new.K.max < 1L) {
+               stop(
+                  "Non-finite ", if (useLog) "bootstrap logW" else "bootstrap W.k",
+                  " occurred at bootstrap sample ", b, ", k = 1. No valid ",
+                  "gap-statistic range is available. Consider a positive offset ",
+                  "or useLog = FALSE."
+               )
+            }
+
+            K.max.used <- new.K.max
+            limiting.event <- list(
+               source = "bootstrap reference data",
+               k = k,
+               bootstrap = b,
+               W.k = wk
+            )
+            break
          }
       }
+
       if (verbose)
-         cat(".",
-             if (b%%50 == 0) paste(b, "\n"))
+         cat(".", if (b %% 50 == 0) paste(b, "\n"))
    }
 
-   if (verbose && (B%%50 != 0))
+   if (verbose && (B %% 50 != 0))
       cat("", B, "\n")
+
+   ## Retain only the common finite prefix across the observed data and every
+   ## bootstrap reference sample.
+   keep.k <- seq_len(K.max.used)
+   logW <- logW[keep.k]
+   logWks <- logWks[, keep.k, drop = FALSE]
 
    E.logW <- colMeans(logWks)
    SE.sim <- sqrt((1 + 1/B) * apply(logWks, 2, stats::var))
 
-   return(structure(class = "clusGap",
-                     list(Tab = cbind(logW, E.logW,
-                                      gap = E.logW - logW,
-                                      SE.sim),
-                          call = cl.,
-                          n = n,
-                          B = B,
-                          FUNcluster = FUNcluster,
-                          useLog = useLog,
-                          distName = distName,
-                          value.range = value.range)) )
+   truncated <- K.max.used < K.max.requested
+
+   if (truncated) {
+      event.location <- if (is.na(limiting.event$bootstrap)) {
+         paste0("observed data at k = ", limiting.event$k)
+      } else {
+         paste0(
+            "bootstrap sample ", limiting.event$bootstrap,
+            " at k = ", limiting.event$k
+         )
+      }
+
+      warning(
+         "Non-finite ", if (useLog) "logW" else "W.k",
+         " encountered for ", event.location, ". Requested K.max = ",
+         K.max.requested, "; results were returned only through K.max = ",
+         K.max.used, ".",
+         call. = FALSE
+      )
+   }
+
+   return(structure(
+      class = "clusGap",
+      list(
+         Tab = cbind(
+            logW,
+            E.logW,
+            gap = E.logW - logW,
+            SE.sim
+         ),
+         call = cl.,
+         n = n,
+         B = B,
+         FUNcluster = FUNcluster,
+         useLog = useLog,
+         distName = distName,
+         value.range = value.range,
+         offset = offset,
+         K.max.requested = K.max.requested,
+         K.max.used = K.max.used,
+         truncated = truncated,
+         limiting.event = limiting.event
+      )
+   ))
 }
 
 #' Discrete application of clusGap
@@ -265,12 +365,14 @@ clusGapDiscr0 <- function (x,
 #' @param verbose Integer or logical. Determines whether progress output should printed while running. By DEFAULT one bit is printed per bootstrap sample.
 #' @param useLog Logical. Use log function after estimating `W.k`. Following the original formulation `useLog=TRUE` by default.
 #' @param dataClass character. Either 'nom' for nominal or 'ord' for ordinal.
-#' @param offset numerical. A small constant value added to W.k to avoid NAs when running `useLog=TRUE`
-#' for clusters with extremely low variability. `offset = 0` is set by default.
+#' @param offset Numeric. A nonnegative constant added to both observed and bootstrap W.k
+#' before taking logarithms when `useLog=TRUE`. `offset = 0` by default.
 #' @param ... optionally further arguments for `FUNcluster()`
 #'
-#' @return a matrix with K.max rows and 4 columns, named "logW", "E.logW", "gap", and "SE.sim",
-#' where gap = E.logW - logW, and SE.sim correspond to the standard error of `gap`.
+#' @return A `clusGap` object. Normally its `Tab` component has `K.max` rows. If a
+#' non-finite observed or bootstrap dispersion is encountered, the table is truncated to
+#' the largest contiguous finite value of k. The object records `K.max.requested`,
+#' `K.max.used`, and `truncated`.
 #' @export
 
 clusGapDiscr <- function(x,
@@ -371,7 +473,7 @@ clusGapDiscr <- function(x,
                     distName = distName,
                     useLog = useLog,
                     dataClass = dataClass,
-                    offset,
+                    offset = offset,
                     ...)
 
    }else if(grepl(pattern = '^kmodes.*', x = clusterFUN)){
@@ -420,7 +522,15 @@ findK <- function (cG_obj, meth = "Tibs2001SEmax", SE.fact = 1){
    colnames(outDF) <- c('logW', 'E.logW', 'gap', 'SE.sim', 'nClus')
 
    myTab <- outDF %>%
-      subset(is.finite(logW) & !is.na(gap) & !is.na(SE.sim))
+      subset(is.finite(logW) & is.finite(gap) & is.finite(SE.sim))
+
+   if (nrow(myTab) < 1L) {
+      stop(
+         "No finite logW, gap, and SE.sim values are available for cluster ",
+         "selection."
+      )
+   }
+
    selK <- with(myTab,
                 cluster::maxSE(f = gap,
                                SE.f = SE.sim,
