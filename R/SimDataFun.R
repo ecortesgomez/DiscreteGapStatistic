@@ -13,6 +13,8 @@
 #' If `dataClass = nominal` and pi vector names are numerical, these will remain characters.
 #' @param dataClass Character. Either 'nominal' or 'ordinal'.
 #' @param seed Integer. Numerical seed for the RNG.
+#' @param tol Numeric. Absolute tolerance used when checking that probability vectors sum to 1.
+#' Defaults to 1e-5. A vector is accepted when `abs(sum(pi) - 1) <= tol`.
 #'
 #' @returns N x nQ matrix with simulated categories distributed according to vector pi
 #' @export
@@ -35,16 +37,18 @@
 
 SimData <- function(N, nQ, pi,
                     dataClass = 'nominal',
-                    seed = NULL){
+                    seed = NULL,
+                    tol = 1e-3){
 
    if(!is.null(seed))
       set.seed(seed)
 
+   stopifnot(is.numeric(tol), length(tol) == 1, is.finite(tol), tol >= 0)
+
    if(dataClass == 'nominal' | grepl('^nom', dataClass, ignore.case=TRUE)){
 
       if(is.numeric(pi)){ ## Just a numerical vector
-         ## stopifnot(sum(pi) == 1 )
-         stopifnot( (sum(pi) %>% round(digits = 5)) == 1 )
+         stopifnot(abs(sum(pi) - 1) <= tol)
 
          out <- matrix(sample(names(pi), N*nQ, replace=TRUE, prob = pi),
                        nrow = N,
@@ -54,8 +58,9 @@ SimData <- function(N, nQ, pi,
 
       }else if(is.list(pi) & length(pi) == nQ){
 
-         ## stopifnot(all(lapply(pi, sum) == 1))
-         stopifnot(all(lapply(pi, function(x) sum(x) %>% round(digits = 5)) == 1 ))
+         stopifnot(all(vapply(pi,
+                              function(x) abs(sum(x) - 1) <= tol,
+                              logical(1))))
 
          out <-lapply(pi,
                       function(y) sample(x = names(y),
@@ -79,8 +84,7 @@ SimData <- function(N, nQ, pi,
    }else if(dataClass == 'ordinal' | grepl('^ord', dataClass, ignore.case=TRUE)){
 
       if(is.numeric(pi) ){ ## Just a vector
-         ## stopifnot(sum(pi) == 1)
-         stopifnot( (sum(pi) %>% round(digits = 5)) == 1 )
+         stopifnot(abs(sum(pi) - 1) <= tol)
 
          out <- matrix(sample(names(pi) %>% as.integer,
                               N*nQ,
@@ -92,7 +96,9 @@ SimData <- function(N, nQ, pi,
          return(out)
 
       }else if(is.list(pi) & length(pi) == nQ){
-         stopifnot(all(lapply(pi, sum) == 1))
+         stopifnot(all(vapply(pi,
+                              function(x) abs(sum(x) - 1) <= tol,
+                              logical(1))))
          out <-lapply(pi,
                       function(y) sample(x = names(y) %>% as.integer,
                                          size = N,
