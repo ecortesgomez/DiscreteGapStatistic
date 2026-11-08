@@ -11,8 +11,9 @@
 #' @useDynLib DiscreteGapStatistic, .registration = TRUE
 #'
 #' @examples
-#' X <- rbind(matrix(paste0("a", rpois(7*5, 1)), nrow=5),
-#'            matrix(paste0("a", rpois(7*5, 3)), nrow=5))
+#' X <- rbind(matrix(paste0("a", sample(1:5, 7*5, replace = TRUE), nrow=5),
+#'            matrix(paste0("a", sample(1:5, 7*5, replace = TRUE,
+#'            prob = c(0.1, 0.1, 0.3, 0.1, 0.4))), nrow=5))
 #' distancematrix(X = X, d = "hellinger")
 distancematrix <- function(X, d) {
    if (!is.matrix(X)) stop("'X' must be a matrix.", call. = FALSE)

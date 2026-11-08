@@ -14,7 +14,7 @@
 #' @param dataClass Character. Either 'nominal' or 'ordinal'.
 #' @param seed Integer. Numerical seed for the RNG.
 #' @param tol Numeric. Absolute tolerance used when checking that probability vectors sum to 1.
-#' Defaults to 1e-5. A vector is accepted when `abs(sum(pi) - 1) <= tol`.
+#' Defaults to 1e-3. A vector is accepted when `abs(sum(pi) - 1) <= tol`.
 #'
 #' @returns N x nQ matrix with simulated categories distributed according to vector pi
 #' @export

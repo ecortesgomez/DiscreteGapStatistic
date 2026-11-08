@@ -447,3 +447,153 @@ NumericMatrix WassersteinRank_rcpp(IntegerMatrix x, double power = 1.0) {
   }
   return D;
 }
+
+// Podani's (1999) ordinal dissimilarity for integer-coded categories.
+// Integer codes determine category order, not numerical spacing.
+//
+// For two different observed levels a < b within a column:
+//
+//   partial distance = (1 + count(a < X < b)) /
+//                      (n_observed - count(min) - count(max) + 1).
+//
+// This is Podani's midrank/tie-adjusted expression, simplified using
+// cumulative frequencies. Equal levels contribute zero. Constant columns
+// contribute zero and remain in the average. Missing values are omitted
+// pairwise; pairs with no shared observed columns receive NA.
+//
+// The returned R 'dist' vector uses lower-triangular, column-wise order.
+
+//' Ordinal Podani distance via Rcpp
+//'
+//' @name PodaniDist_rcpp
+//' @title Ordinal Podani distance via Rcpp
+//' @description Computes Podani's rank-and-tie-adjusted dissimilarity
+//'   for each pair of rows of an integer-coded ordinal matrix. Numeric
+//'   spacing between category codes is ignored; only ordering matters.
+//' @param x An n x p integer matrix, with rows as observations and
+//'   columns as ordinal variables. Missing values (NA) are permitted.
+//' @return A compact object of class \code{dist}, with equal weights over
+//'   available variables. All-missing pairs have distance NA.
+//' @export
+// [[Rcpp::export]]
+Rcpp::NumericVector PodaniDist_rcpp(Rcpp::IntegerMatrix x) {
+    const int n = x.nrow();
+    const int p = x.ncol();
+
+    if (n < 2 || p < 1) {
+        Rcpp::stop("x must have at least two rows and one column.");
+    }
+
+    // Column-major storage: category code for row i, column j at j*n + i.
+    // Code -1 designates a missing observation.
+    std::vector<int> codes(static_cast<size_t>(n) * p, -1);
+    std::vector<std::vector<int> > cumulative(p);
+    std::vector<double> denominators(p, 0.0);
+
+    for (int j = 0; j < p; ++j) {
+        std::vector<int> observed;
+        observed.reserve(n);
+
+        for (int i = 0; i < n; ++i) {
+            const int value = x(i, j);
+            if (value != NA_INTEGER) {
+                observed.push_back(value);
+            }
+        }
+
+        if (observed.empty()) {
+            continue;
+        }
+
+        std::sort(observed.begin(), observed.end());
+        std::vector<int> levels = observed;
+        levels.erase(std::unique(levels.begin(), levels.end()), levels.end());
+
+        const int n_levels = static_cast<int>(levels.size());
+        std::vector<int> counts(n_levels, 0);
+
+        for (size_t k = 0; k < observed.size(); ++k) {
+            const int level = static_cast<int>(
+                std::lower_bound(levels.begin(), levels.end(), observed[k]) -
+                levels.begin()
+            );
+            ++counts[level];
+        }
+
+        cumulative[j].assign(n_levels + 1, 0);
+        for (int k = 0; k < n_levels; ++k) {
+            cumulative[j][k + 1] = cumulative[j][k] + counts[k];
+        }
+
+        if (n_levels > 1) {
+            denominators[j] = static_cast<double>(
+                observed.size() - counts.front() - counts.back() + 1
+            );
+        }
+
+        for (int i = 0; i < n; ++i) {
+            const int value = x(i, j);
+            if (value == NA_INTEGER) {
+                continue;
+            }
+
+            codes[static_cast<size_t>(j) * n + i] = static_cast<int>(
+                std::lower_bound(levels.begin(), levels.end(), value) -
+                levels.begin()
+            );
+        }
+    }
+
+    // R 'dist' ordering: (2,1), (3,1), ..., (n,1), (3,2), ...
+    const R_xlen_t pairs = static_cast<R_xlen_t>(n) * (n - 1) / 2;
+    Rcpp::NumericVector result(pairs);
+    R_xlen_t position = 0;
+
+    for (int i = 0; i < n - 1; ++i) {
+        if (i % 256 == 0) {
+            Rcpp::checkUserInterrupt();
+        }
+
+        for (int k = i + 1; k < n; ++k) {
+            double sum = 0.0;
+            int available = 0;
+
+            for (int j = 0; j < p; ++j) {
+                const int code_i = codes[static_cast<size_t>(j) * n + i];
+                const int code_k = codes[static_cast<size_t>(j) * n + k];
+
+                if (code_i < 0 || code_k < 0) {
+                    continue;
+                }
+
+                ++available;
+                if (code_i == code_k) {
+                    continue;
+                }
+
+                const int lower = std::min(code_i, code_k);
+                const int upper = std::max(code_i, code_k);
+                const int between = cumulative[j][upper] - cumulative[j][lower + 1];
+
+                sum += (1.0 + static_cast<double>(between)) / denominators[j];
+            }
+
+            result[position++] = available > 0 ? sum / available : NA_REAL;
+        }
+    }
+
+    result.attr("Size") = n;
+    result.attr("Diag") = false;
+    result.attr("Upper") = false;
+    result.attr("method") = "podani";
+    result.attr("class") = "dist";
+
+    if (x.hasAttribute("dimnames")) {
+        Rcpp::List names = x.attr("dimnames");
+        if (!Rf_isNull(names[0])) {
+            result.attr("Labels") = names[0];
+        }
+    }
+
+    return result;
+}

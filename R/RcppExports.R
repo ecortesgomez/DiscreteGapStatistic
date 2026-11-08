@@ -114,3 +114,19 @@ WassersteinRank_rcpp <- function(x, power = 1.0) {
     .Call(`_DiscreteGapStatistic_WassersteinRank_rcpp`, x, power)
 }
 
+#' Ordinal Podani distance via Rcpp
+#'
+#' @name PodaniDist_rcpp
+#' @title Ordinal Podani distance via Rcpp
+#' @description Computes Podani's rank-and-tie-adjusted dissimilarity
+#'   for each pair of rows of an integer-coded ordinal matrix. Numeric
+#'   spacing between category codes is ignored; only ordering matters.
+#' @param x An n x p integer matrix, with rows as observations and
+#'   columns as ordinal variables. Missing values (NA) are permitted.
+#' @return A compact object of class \code{dist}, with equal weights over
+#'   available variables. All-missing pairs have distance NA.
+#' @export
+PodaniDist_rcpp <- function(x) {
+    .Call(`_DiscreteGapStatistic_PodaniDist_rcpp`, x)
+}
+

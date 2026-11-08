@@ -4,7 +4,7 @@
 \alias{SimData}
 \title{Simulate Data}
 \usage{
-SimData(N, nQ, pi, dataClass = "nominal", seed = NULL)
+SimData(N, nQ, pi, dataClass = "nominal", seed = NULL, tol = 0.001)
 }
 \arguments{
 \item{N}{Integer. Number of observations.}
@@ -21,6 +21,9 @@ If \code{dataClass = nominal} and pi vector names are numerical, these will rema
 \item{dataClass}{Character. Either 'nominal' or 'ordinal'.}
 
 \item{seed}{Integer. Numerical seed for the RNG.}
+
+\item{tol}{Numeric. Absolute tolerance used when checking that probability vectors sum to 1.
+Defaults to 1e-3. A vector is accepted when \code{abs(sum(pi) - 1) <= tol}.}
 }
 \value{
 N x nQ matrix with simulated categories distributed according to vector pi

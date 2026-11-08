@@ -36,7 +36,12 @@
 
 .podani_dist <- function(X) {
    .assert_integer_matrix(X)
-   FD::gowdis(X, ord = "podani")
+
+   .use_rcpp_or_fallback(
+      PodaniDist_rcpp(x = X),
+      function() .PodaniDist_R(X),
+      "podani"
+   )
 }
 
 .spearman_dist <- function(X) {

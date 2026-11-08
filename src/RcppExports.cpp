@@ -114,6 +114,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// PodaniDist_rcpp
+Rcpp::NumericVector PodaniDist_rcpp(Rcpp::IntegerMatrix x);
+RcppExport SEXP _DiscreteGapStatistic_PodaniDist_rcpp(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::IntegerMatrix >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(PodaniDist_rcpp(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_DiscreteGapStatistic_HammingDist_rcpp", (DL_FUNC) &_DiscreteGapStatistic_HammingDist_rcpp, 1},
@@ -125,6 +136,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_DiscreteGapStatistic_WassersteinDS_rcpp", (DL_FUNC) &_DiscreteGapStatistic_WassersteinDS_rcpp, 2},
     {"_DiscreteGapStatistic_WassersteinKS_rcpp", (DL_FUNC) &_DiscreteGapStatistic_WassersteinKS_rcpp, 3},
     {"_DiscreteGapStatistic_WassersteinRank_rcpp", (DL_FUNC) &_DiscreteGapStatistic_WassersteinRank_rcpp, 2},
+    {"_DiscreteGapStatistic_PodaniDist_rcpp", (DL_FUNC) &_DiscreteGapStatistic_PodaniDist_rcpp, 1},
     {NULL, NULL, 0}
 };
 
